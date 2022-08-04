@@ -3,7 +3,7 @@ from apps.abstract.models import NameSlug
 from apps.category.models import Category, Properties
 from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
-from apps.attribute.abstract.fields import ProductOptionGroupField
+from apps.attribute.abstract.fields import OptionGroupField
 from slugify import slugify
 
 
@@ -31,11 +31,11 @@ class ProductClassProperty(NameSlug):
 class ProductClassOptionGroup(AttributeGroupAbstract):
     product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, null=True, blank=True)
-    type = ProductOptionGroupField(max_length=24)
+    type = OptionGroupField(max_length=24)
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, null=True, blank=True,
                                         related_name='product_class_option_group')
     unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
-    save_all_options = models.BooleanField(default=True)
+    save_all_options = models.BooleanField(default=False)
 
     def __str__(self):
         name = self.get_name
@@ -55,13 +55,13 @@ class ProductClassOptionGroup(AttributeGroupAbstract):
     @property
     def actual_field_name(self):
         attr_fields = {
-            ProductOptionGroupField.ATTRIBUTE: 'value_attribute',
+            OptionGroupField.ATTRIBUTE: 'value_attribute',
             **self.attr_fields,
         }
         return attr_fields[self.type]
 
     def validate(self):
-        if self.type == ProductOptionGroupField.ATTRIBUTE:
+        if self.type == OptionGroupField.ATTRIBUTE:
             self.unit = None
             self.name = None
         else:
@@ -95,12 +95,7 @@ class ProductClassOption(AttributeAbstract):
         if self.group.type != 'attribute':
             self.value_attribute = None
 
-    def save(self, *args, **kwargs):
-        super(ProductClassOption, self).save(*args, **kwargs)
-
 
 class ProductAttributeOptionImage(models.Model):
     product_option = models.ForeignKey(ProductClassOption, on_delete=models.CASCADE)
     image = models.ImageField()
-
-

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.abstract.models import NameSlug
-from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute
+from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute, PredefinedAttributeGroups
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 
 from slugify import slugify
@@ -16,9 +16,7 @@ class Product(models.Model):
     @property
     def get_required_attributes(self):
         categories = self.product_class.category.get_ancestors(include_self=True)
-        attrs = AttributeGroup.objects.filter(category__in=categories).exclude(
-                required=AttributeGroup.OPTION)
-        print(attrs)
+        attrs = PredefinedAttributeGroups.objects.filter(category__in=categories)
         return attrs
 
     def __str__(self):
@@ -39,10 +37,36 @@ class ProductProperty(NameSlug):
         return self.name + ' - ' + self.value
 
 
-class ProductAttribute(models.Model):
+class ProductAttribute(AttributeAbstract):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
-    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.PROTECT)
-    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, null=True, blank=True)
+    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
+    value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True)
+
+    class Meta:
+        unique_together = [
+            ['group', 'value_attribute'],
+            *AttributeAbstract.Meta.unique_together
+        ]
+        ordering = (
+            'value_attribute',
+            *AttributeAbstract.Meta.ordering,
+        )
+
+    @property
+    def get_name(self):
+        if self.value_attribute:
+            return self.value_attribute.get_attribute_name
+        return self.get_attribute_name
+
+    def validator(self):
+        if self.group.type != 'attribute':
+            self.value_attribute = None
+
+
+# class ProductAttribute(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
+#     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.PROTECT)
+#     attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, null=True, blank=True)
 
     # def __str__(self):
     #     return str(self.attribute_group.get_name) + ' - ' + str(self.attribute.get_name)

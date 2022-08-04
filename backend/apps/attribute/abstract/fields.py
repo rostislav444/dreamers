@@ -54,7 +54,6 @@ class AttributeGroupTypeAbstractField(models.CharField):
     INTEGER = "integer"
     BOOLEAN = "boolean"
     FLOAT = "float"
-    ATTRIBUTE = "attribute"
     COLOR = "color"
     RANGE = "range"
     IMAGE = "image"
@@ -81,7 +80,7 @@ class AttributeGroupTypeField(AttributeGroupTypeAbstractField):
         super(AttributeGroupTypeField, self).__init__(*args, **kwargs)
 
 
-class ProductOptionGroupField(AttributeGroupTypeAbstractField):
+class OptionGroupField(AttributeGroupTypeAbstractField):
     ATTRIBUTE = 'attribute'
 
     TYPE_CHOICES = (
@@ -93,4 +92,5 @@ class ProductOptionGroupField(AttributeGroupTypeAbstractField):
         kwargs['choices'] = self.TYPE_CHOICES
         kwargs['default'] = self.ATTRIBUTE
         kwargs['verbose_name'] = _("Type")
-        super(ProductOptionGroupField, self).__init__(*args, **kwargs)
+        kwargs['max_length'] = 24
+        super(OptionGroupField, self).__init__(*args, **kwargs)

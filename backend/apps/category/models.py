@@ -20,6 +20,3 @@ class Category(MPTTModel, NameSlug):
 
 class Properties(NameSlug):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='properties', null=True, blank=True)
-
-
-

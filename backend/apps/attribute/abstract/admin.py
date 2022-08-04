@@ -1,5 +1,5 @@
 from django.contrib import admin
-import abc
+
 
 
 class AttributeFildSet(admin.TabularInline):

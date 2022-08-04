@@ -4,20 +4,27 @@ from apps.attribute.abstract.fields import AttributeGroupTypeAbstractField
 from apps.attribute.models import AttributeGroup
 from apps.product.models import ProductClass, ProductClassOptionGroup
 
+#
+# @receiver(signals.post_save, sender=ProductClass)
+# def add_required_options_to_product_class(sender, instance, **kwargs):
+#     for predefined_option_group in instance.category.predefined_option_groups.all():
+#         params = {
+#             'product_class': instance,
+#             'type': AttributeGroupTypeAbstractField.ATTRIBUTE,
+#             'attribute_group': predefined_option_group.group
+#         }
 
-@receiver(signals.post_save, sender=ProductClass)
-def add_required_options_to_product_class(sender, instance, **kwargs):
-    for attribute_group in instance.category.attribute_groups.filter(required=AttributeGroup.OPTION):
-        params = {
-            'product_class': instance,
-            'type': AttributeGroupTypeAbstractField.ATTRIBUTE,
-            'attribute_group': attribute_group
-        }
-        try:
-            ProductClassOptionGroup.objects.get(**params)
-        except ProductClassOptionGroup.DoesNotExist:
-            product_class = ProductClassOptionGroup(**params)
-            product_class.save()
+        #     .attribute_groups.filter(required=AttributeGroup.OPTION):
+        # params = {
+        #     'product_class': instance,
+        #     'type': AttributeGroupTypeAbstractField.ATTRIBUTE,
+        #     'attribute_group': attribute_group
+        # }
+        # try:
+        #     ProductClassOptionGroup.objects.get(**params)
+        # except ProductClassOptionGroup.DoesNotExist:
+        #     product_class = ProductClassOptionGroup(**params)
+        #     product_class.save()
 
 
 # @receiver(signals.post_save, sender=ProductClassOptionGroup)

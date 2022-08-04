@@ -26,6 +26,15 @@ class ProductAttributeInline(admin.StackedInline):
     form = ProductAttributeForm
     extra = 0
 
+    fieldsets = (
+        (None, {
+            'fields': (
+                'group', 'value_text', 'value_integer', 'value_boolean', 'value_float', 'value_color_name',
+                'value_color_hex', 'value_color_image', 'value_image_name', 'value_image_image',
+                ('value_min', 'value_max',), 'value_attribute')
+        },),
+    )
+
     def get_max_num(self, request, obj=None, **kwargs):
         if not obj:
             return 0
@@ -35,7 +44,6 @@ class ProductAttributeInline(admin.StackedInline):
         if not obj:
             return 0
         return obj.get_required_attributes.count()
-
 
 
 @admin.register(Product)

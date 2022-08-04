@@ -1,5 +1,8 @@
+import abc
+
 from django.db import models
 from apps.abstract.models import NameSlug
+from apps.attribute.abstract.fields import OptionGroupField
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.category.models import Category
 
@@ -14,17 +17,10 @@ class AttributeGroupUnit(NameSlug):
 
 # Ram, screen width...
 class AttributeGroup(AttributeGroupAbstract):
-    OPTION = 'option'
-    ATTRIBUTE = 'attribute'
-    REQUIRED = (
-        (OPTION, 'Option'),
-        (ATTRIBUTE, 'Attribute'),
-    )
-
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='attribute_groups', null=True,
                                  blank=True)
     unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
-    required = models.CharField(choices=REQUIRED, max_length=9, null=True, blank=True)
+    custom = models.BooleanField(default=False)
 
 
 # Sometimes needed subgroups of attributes, like textile quality class
@@ -93,6 +89,44 @@ class AttributeUnit(models.Model):
             return '-'
 
 
+class PredefinedAttributeGroupsAbstract(AttributeGroupAbstract):
+    type = OptionGroupField()
+    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
+    required = models.BooleanField(default=False)
+    unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    @abc.abstractmethod
+    def category(self):
+        pass
+
+    @property
+    def get_name(self):
+        if not self.name:
+            return self.group.name
+        return self.name
+
+    def validator(self):
+        if self.type != 'attribute':
+            self.group = None
+            if not self.name:
+                raise ValueError('Only Attribute type can be without name')
+        else:
+            self.unit = None
+
+    def save(self, *args, **kwargs):
+        self.validator()
+        super(PredefinedAttributeGroupsAbstract, self).save(*args, **kwargs)
 
 
+class PredefinedAttributeGroups(PredefinedAttributeGroupsAbstract):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='predefined_attribute_groups')
+
+
+class PredefinedOptionsGroups(PredefinedAttributeGroupsAbstract):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='predefined_option_groups')
 

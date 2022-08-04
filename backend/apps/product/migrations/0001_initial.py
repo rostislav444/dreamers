@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('slug', models.SlugField(blank=True, editable=False, max_length=1024, null=True)),
                 ('name', models.CharField(blank=True, max_length=255, null=True)),
-                ('type', apps.attribute.abstract.fields.ProductOptionGroupField(choices=[('attribute', 'Attribute'), ('text', 'Text'), ('integer', 'Integer'), ('boolean', 'Boolean'), ('float', 'Float'), ('color', 'Color'), ('range', 'Range'), ('image', 'Image')], default='attribute', max_length=24, verbose_name='Type')),
+                ('type', apps.attribute.abstract.fields.OptionGroupField(choices=[('attribute', 'Attribute'), ('text', 'Text'), ('integer', 'Integer'), ('boolean', 'Boolean'), ('float', 'Float'), ('color', 'Color'), ('range', 'Range'), ('image', 'Image')], default='attribute', max_length=24, verbose_name='Type')),
                 ('save_all_options', models.BooleanField(default=True)),
                 ('attribute_group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='product_class_option_group', to='attribute.attributegroup')),
                 ('product_class', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='product.productclass')),

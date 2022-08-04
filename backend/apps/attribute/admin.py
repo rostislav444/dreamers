@@ -22,7 +22,7 @@ class AttributeUnitInline(AttributeFildSet):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_max_num(self, request, obj=None, **kwargs):
-        if not obj:
+        if not obj or obj.custom:
             return 0
 
 
@@ -37,6 +37,10 @@ class AttributeUnitGroupInline(admin.StackedInline):
     model = AttributeUnitGroup
     extra = 0
 
+    def get_max_num(self, request, obj=None, **kwargs):
+        if not obj or obj.custom:
+            return 0
+
 
 # Attribute Sub Group
 class AttributeSubGroupInline(admin.StackedInline):
@@ -44,13 +48,17 @@ class AttributeSubGroupInline(admin.StackedInline):
     model = AttributeSubGroup
     extra = 0
 
+    def get_max_num(self, request, obj=None, **kwargs):
+        if not obj or obj.custom:
+            return 0
+
 
 class AttributeInline(AttributeFildSet):
     model = Attribute
     extra = 0
 
     def get_max_num(self, request, obj=None, **kwargs):
-        if not obj:
+        if not obj or obj.custom:
             return 0
 
 

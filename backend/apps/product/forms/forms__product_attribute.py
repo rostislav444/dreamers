@@ -1,5 +1,6 @@
 from django import forms
 from apps.attribute.models import AttributeGroup
+from apps.attribute.serializers import PredefinedAttributeGroupsSerializer
 from apps.product.models import ProductAttribute
 
 
@@ -11,39 +12,42 @@ class ProductAttributeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProductAttributeForm, self).__init__(*args, **kwargs)
 
-        if kwargs.get('initial', None):
-            initial = kwargs['initial']
-            self.fields['attribute_group'].queryset = self.fields['attribute_group'].queryset.filter(
-                id=initial['attribute_group'])
-            self.fields['attribute'].queryset = self.fields['attribute'].queryset.filter(
-                group=initial['attribute_group'])
-            self.fields['attribute'].required = initial['required']
-        elif kwargs.get('instance', None):
+        print(kwargs.get('initial', None))
+
+        fields = [field for field in self.fields]
+        non_hidden_fields = ['group', 'type']
+
+        data = kwargs.get('initial', None)
+        if kwargs.get('instance', None):
             instance = kwargs['instance']
-            self.fields['attribute_group'].queryset = self.fields['attribute_group'].queryset.filter(
-                id=instance.attribute_group_id)
-            self.fields['attribute'].queryset = self.fields['attribute'].queryset.filter(
-                group=instance.attribute_group_id)
-            self.fields['attribute'].required = instance.attribute_group.required == AttributeGroup.ATTRIBUTE
+            data = PredefinedAttributeGroupsSerializer(instance).data
+
+        if data:
+            print(data)
+        # if all(data.values()):
+        #     self.fields['group'].queryset = self.fields['group'].queryset.filter(id=data['pk'])
+        #     self.fields['group'].empty_label = None
+        #     if data['custom']:
+        #         actual_field_name = data['actual_field_name']
+        #         if type(actual_field_name) == list:
+        #             non_hidden_fields += actual_field_name
+        #         else:
+        #             non_hidden_fields.append(actual_field_name)
+        #
+        for field in list(set(fields) - set(non_hidden_fields)):
+            self.fields[field].widget = forms.HiddenInput()
 
 
 class ProductAttributeFormSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         if kwargs['instance'].pk:
             product = kwargs['instance']
-            attribute_groups = product.get_required_attributes.exclude(
-                pk__in=product.attributes.all().values_list('attribute_group', flat=True)
-            )
-
+            groups = product.get_required_attributes
             # .exclude(
-            # required=AttributeGroup.OPTION, pk__in=product.attributes.all().values_list('attribute_group', flat=True))
+            #     pk__in=product.attributes.all().values_list('group', flat=True)
+            # )
 
             kwargs.update({
-                'initial': [{
-                        'attribute_group': attribute_group.pk,
-                        'required': attribute_group.required,
-                        'name': attribute_group.name
-                    } for attribute_group in attribute_groups
-                ],
+                'initial': [PredefinedAttributeGroupsSerializer(group).data for group in groups],
             })
         super(ProductAttributeFormSet, self).__init__(*args, **kwargs)
