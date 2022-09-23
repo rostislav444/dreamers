@@ -1,41 +1,64 @@
 from django.db import models
 from apps.abstract.models import NameSlug
-from apps.category.models import Category, Properties
+from apps.category.models import Category
 from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.attribute.abstract.fields import OptionGroupField
-from slugify import slugify
 
 
 class ProductClass(NameSlug):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     description = models.TextField(default='', blank=True, null=True)
+    generate_sku_from_options = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
 
+    @property
+    def possible_option_groups(self):
+        categories = self.category.get_ancestors(include_self=True)
+        attributes__groups = self.product_set.all().values_list('attributes__group', flat=True)
+        return AttributeGroup.objects.filter(category__in=categories).exclude(id__in=attributes__groups)
 
-# Create your models here.
-class ProductClassProperty(NameSlug):
-    product = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='properties')
-    property = models.ForeignKey(Properties, on_delete=models.PROTECT)
+    @property
+    def possible_attribute_groups(self):
+        categories = self.category.get_ancestors(include_self=True)
+        options_groups = self.option_groups.all().values_list('attribute_group', flat=True)
+        return AttributeGroup.objects.filter(category__in=categories).exclude(id__in=options_groups)
 
-    def get_slug(self):
-        return slugify(self.property.name + '-' + self.name)
+    def save(self, *args, **kwargs):
+        super(ProductClass, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return self.property.name + ' - ' + self.name
+
+# TODO Add functionality to choose range width... ot static for product
+# TODO Add functionality to have ability not duplicate data everytime in product
+class ProductClassAttributes(models.Model):
+    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='product_class_attributes')
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE,
+                                        related_name='product_class_attributes')
+
+
+class ProductClassProductAttributes(models.Model):
+    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='product_attributes')
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE,
+                                        related_name='product_class_product_attributes')
 
 
 # Attribute option
 class ProductClassOptionGroup(AttributeGroupAbstract):
-    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, null=True, blank=True)
+    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='option_groups')
+    name = models.CharField(max_length=255, default='', blank=True)
     type = OptionGroupField(max_length=24)
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, null=True, blank=True,
                                         related_name='product_class_option_group')
     unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
     save_all_options = models.BooleanField(default=False)
+    image_dependency = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = [
+            ['name', 'attribute_group']
+        ]
 
     def __str__(self):
         name = self.get_name
@@ -67,12 +90,20 @@ class ProductClassOptionGroup(AttributeGroupAbstract):
         else:
             self.attribute_group = None
 
+    def make_save_all_options(self):
+        if self.save_all_options and self.attribute_group:
+            for attribute in self.attribute_group.attributes.all():
+                ProductClassOption.objects.get_or_create(group=self, value_attribute=attribute)
+        self.save_all_options = False
+
     def save(self, *args, **kwargs):
+        if self.save_all_options:
+            self.make_save_all_options()
         super(ProductClassOptionGroup, self).save(*args, **kwargs)
 
 
 class ProductClassOption(AttributeAbstract):
-    group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE, related_name="options")
     value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
@@ -94,8 +125,3 @@ class ProductClassOption(AttributeAbstract):
     def validator(self):
         if self.group.type != 'attribute':
             self.value_attribute = None
-
-
-class ProductAttributeOptionImage(models.Model):
-    product_option = models.ForeignKey(ProductClassOption, on_delete=models.CASCADE)
-    image = models.ImageField()

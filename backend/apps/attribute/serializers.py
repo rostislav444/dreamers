@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from apps.attribute.models import PredefinedAttributeGroups
+from apps.attribute.models import AttributeGroup
 
 
-class PredefinedAttributeGroupsSerializer(serializers.ModelSerializer):
+class AttributeGroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PredefinedAttributeGroups
-        fields = ['id', 'name', 'type', 'group']
+        model = AttributeGroup
+        fields = ['pk', 'custom', 'actual_field_name']

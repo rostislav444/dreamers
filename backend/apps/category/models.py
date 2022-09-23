@@ -8,7 +8,9 @@ class Category(MPTTModel, NameSlug):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     def __str__(self):
-        return self.name
+        names = [c.name for c in self.get_ancestors(include_self=True)]
+
+        return ' > '.join(names)
 
     class Meta:
         verbose_name = 'Category'

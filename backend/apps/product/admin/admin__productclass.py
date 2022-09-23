@@ -1,10 +1,14 @@
 from django.contrib import admin
 from apps.attribute.abstract.admin import AttributeFildSet
 from apps.attribute.models import AttributeGroup, Attribute
-from apps.product.models import ProductClass, Product, ProductClassProperty, ProductClassOptionGroup, \
-    ProductClassOption
-from apps.product.forms import ProductClassPropertyAdminFormSet, ProductClassPropertyInlineAdminFrom, \
-    ProductClassOptionGroupForm
+from apps.product.models import ProductClass, Product, ProductClassOptionGroup, ProductClassOption, \
+    ProductClassProductAttributes
+from apps.product.forms import ProductClassOptionGroupForm
+
+
+class ProductClassProductAttributesInline(admin.TabularInline):
+    model = ProductClassProductAttributes
+    extra = 0
 
 
 # Product Class Option
@@ -13,10 +17,7 @@ class ProductClassOptionInline(AttributeFildSet):
     extra = 0
 
     def get_max_num(self, request, obj=None, **kwargs):
-        if obj:
-            if obj.type == 'attribute' and not obj.attribute_group:
-                return 0
-        else:
+        if not obj:
             return 0
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -26,57 +27,69 @@ class ProductClassOptionInline(AttributeFildSet):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-# ProductClassOptionGroup
-class ProductClassOptionGroupAdminAbstract:
+# Product Class Option Group
+class ProductClassOptionGroupAbstract:
     form = ProductClassOptionGroupForm
     fieldsets = (
         (None, {
-            'fields': ('name', ('type', 'attribute_group', 'unit'),'save_all_options',)
+            'fields': ('name', ('type', 'attribute_group', 'unit', 'image_dependency'), 'save_all_options')
         },),
     )
 
+    class Meta:
+        abstract = True
+
 
 @admin.register(ProductClassOptionGroup)
-class ProductClassOptionGroupAdmin(ProductClassOptionGroupAdminAbstract, admin.ModelAdmin):
+class ProductClassOptionGroupAdmin(ProductClassOptionGroupAbstract, admin.ModelAdmin):
     inlines = [ProductClassOptionInline]
 
+    def get_inline_instances(self, request, obj=None):
+        inline_instances = []
+        for inline in super(ProductClassOptionGroupAdmin, self).get_inline_instances(request, obj):
+            if inline.model.__name__ == ProductClassOption.__name__:
+                if not obj.attribute_group or obj.attribute_group and not obj.attribute_group.custom:
+                    inline_instances.append(inline)
+        return obj and inline_instances or []
 
-class ProductClassOptionGroupInline(ProductClassOptionGroupAdminAbstract, admin.StackedInline):
+
+class ProductClassOptionGroupInline(ProductClassOptionGroupAbstract, admin.StackedInline):
     model = ProductClassOptionGroup
-    extra = 0
     show_change_link = True
-
-    def get_max_num(self, request, obj=None, **kwargs):
-        if not obj:
-            return 0
-
-
-# Property
-class ProductClassPropertyInline(admin.StackedInline):
-    model = ProductClassProperty
-    fields = (('property', 'name'),)
-    formset = ProductClassPropertyAdminFormSet
-    form = ProductClassPropertyInlineAdminFrom
     extra = 0
 
     def get_max_num(self, request, obj=None, **kwargs):
         if not obj:
             return 0
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'attribute_group':
+            parent_id = request.resolver_match.kwargs.get('object_id')
+            try:
+                product_class = self.parent_model.objects.get(id=parent_id)
+                kwargs['queryset'] = product_class.possible_option_groups
+            except self.parent_model.DoesNotExist:
+                pass
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 # Product
-class ProductInline(admin.StackedInline):
+class ProductInline(admin.TabularInline):
     show_change_link = True
     model = Product
     extra = 0
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        if not obj:
+            return 0
 
 
 # Product class
 @admin.register(ProductClass)
 class ProductClassAdmin(admin.ModelAdmin):
     inlines = [
-        ProductClassPropertyInline,
         ProductClassOptionGroupInline,
+        ProductClassProductAttributesInline,
         ProductInline
     ]
 

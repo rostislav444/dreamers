@@ -42,7 +42,7 @@ class AttributeImageField(ImageField):
         filename = posixpath.join(dirname, filename)
 
         ext = filename.split('.')[-1]
-        name = 'attributes/' + instance.slug
+        name = 'attributes/' + instance.get_slug
         filename = '.'.join([name, ext])
 
         filename = validate_file_name(filename, allow_relative_path=True)

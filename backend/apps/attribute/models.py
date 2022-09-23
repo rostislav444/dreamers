@@ -1,8 +1,8 @@
 import abc
 
 from django.db import models
+from django.utils.html import mark_safe
 from apps.abstract.models import NameSlug
-from apps.attribute.abstract.fields import OptionGroupField
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.category.models import Category
 
@@ -17,10 +17,23 @@ class AttributeGroupUnit(NameSlug):
 
 # Ram, screen width...
 class AttributeGroup(AttributeGroupAbstract):
+    PRICE_RQ_SUB_GROUP = 'sub_group'
+    PRICE_RQ_ATTRIBUTE = 'attribute'
+
+    PRICE_REQUIRED_CHOICES = (
+        (PRICE_RQ_SUB_GROUP, 'sub_group'),
+        (PRICE_RQ_ATTRIBUTE, 'attribute')
+    )
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='attribute_groups', null=True,
                                  blank=True)
     unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
     custom = models.BooleanField(default=False)
+    price_required = models.CharField(default=None, max_length=9, null=True, blank=True, choices=PRICE_REQUIRED_CHOICES)
+
+    def __str__(self):
+        if self.custom:
+            return f'{self.get_name} (custom)'
+        return self.get_name
 
 
 # Sometimes needed subgroups of attributes, like textile quality class
@@ -31,6 +44,23 @@ class AttributeSubGroup(NameSlug):
 class Attribute(AttributeAbstract):
     group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='attributes')
     sub_group = models.ForeignKey(AttributeSubGroup, on_delete=models.PROTECT, blank=True, null=True)
+    price = models.PositiveIntegerField(default=None, null=True, blank=True)
+
+    def image_tag(self):
+        path = None
+        if self.value_image_image.path:
+            path = self.value_image_image.name
+        elif self.value_image_image.path:
+            path = self.value_image_image.name
+        if path:
+            return mark_safe(f'''
+                <img src="/media/{path}" width="80" height="80" style="
+                    border: 1px solid #ccc; border-radius: 6px; margin-top: -4px; object-fit: cover
+                " />
+            ''')
+        return None
+
+    image_tag.short_description = 'Image'
 
 
 # Like clothes sizes values in different countries
@@ -87,46 +117,4 @@ class AttributeUnit(models.Model):
             return self.value_float
         else:
             return '-'
-
-
-class PredefinedAttributeGroupsAbstract(AttributeGroupAbstract):
-    type = OptionGroupField()
-    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    required = models.BooleanField(default=False)
-    unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
-
-    class Meta:
-        abstract = True
-
-    @property
-    @abc.abstractmethod
-    def category(self):
-        pass
-
-    @property
-    def get_name(self):
-        if not self.name:
-            return self.group.name
-        return self.name
-
-    def validator(self):
-        if self.type != 'attribute':
-            self.group = None
-            if not self.name:
-                raise ValueError('Only Attribute type can be without name')
-        else:
-            self.unit = None
-
-    def save(self, *args, **kwargs):
-        self.validator()
-        super(PredefinedAttributeGroupsAbstract, self).save(*args, **kwargs)
-
-
-class PredefinedAttributeGroups(PredefinedAttributeGroupsAbstract):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='predefined_attribute_groups')
-
-
-class PredefinedOptionsGroups(PredefinedAttributeGroupsAbstract):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='predefined_option_groups')
 

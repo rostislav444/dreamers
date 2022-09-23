@@ -14,7 +14,24 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=ecommerce_db
     ports:
-      - 5432:5432
+      - 5433:5432
+
+  backend:
+    image: portal_backend
+    user: root
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/ecommerce/backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - default
 
 
 volumes:

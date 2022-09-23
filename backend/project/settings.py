@@ -31,9 +31,11 @@ INSTALLED_APPS = [
     'apps.product.apps.ProductConfig',
     'apps.category.apps.CategoryConfig',
     'apps.attribute.apps.AttributeConfig',
+    'apps.core.apps.CoreConfig',
     'rest_framework',
     'mptt',
     'corsheaders',
+    'colorfield'
 ]
 
 MIDDLEWARE = [
@@ -77,7 +79,7 @@ DATABASES = {
         'NAME': 'ecommerce_db',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': '0.0.0.0',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

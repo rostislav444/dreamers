@@ -1,8 +1,9 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+from colorfield.fields import ColorField
 from apps.abstract.models import NameSlug
 from apps.attribute.abstract import AttributeImageField
 from apps.attribute.abstract.fields import AttributeGroupTypeField
-from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 import abc
 
@@ -50,7 +51,7 @@ class AttributeAbstract(models.Model):
     value_boolean = models.BooleanField(_('Boolean'), blank=True, null=True, db_index=True)
     value_float = models.FloatField(_('Float'), blank=True, null=True, db_index=True)
     value_color_name = models.CharField(_('Color'), max_length=500, blank=True, null=True)
-    value_color_hex = models.CharField(_('Color HEX'), max_length=7, blank=True, null=True)
+    value_color_hex = ColorField(_('Color HEX'), max_length=7, blank=True, null=True)
     value_color_image = AttributeImageField(_('Color IMAGE'), blank=True, null=True)
     value_image_name = models.CharField(_('Name'), max_length=500, blank=True, null=True)
     value_image_image = AttributeImageField(_('Image'), max_length=500, blank=True, null=True)
@@ -144,5 +145,5 @@ class AttributeAbstract(models.Model):
 
     def save(self, *args, **kwargs):
         self.validator()
-        # self.slug = self.get_slug
+        self.slug = self.get_slug
         super(AttributeAbstract, self).save(*args, **kwargs)
