@@ -83,8 +83,12 @@ class AttributeGroupTypeField(AttributeGroupTypeAbstractField):
 class OptionGroupField(AttributeGroupTypeAbstractField):
     ATTRIBUTE = 'attribute'
 
-    TYPE_CHOICES = (
+    ATTRIBUTE_CHOICES = (
         (ATTRIBUTE, _("Attribute")),
+    )
+
+    TYPE_CHOICES = (
+        *ATTRIBUTE_CHOICES,
         *AttributeGroupTypeAbstractField.TYPE_CHOICES,
     )
 

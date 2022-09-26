@@ -62,12 +62,12 @@ class AttributeAbstract(models.Model):
     class Meta:
         abstract = True
         unique_together = [
-            ['group', 'value_text'],
-            ['group', 'value_integer'],
-            ['group', 'value_boolean'],
-            ['group', 'value_float'],
-            ['group', 'value_color_name', 'value_color_hex', 'value_color_image'],
-            ['group', 'value_min', 'value_max'],
+            ['attribute_group', 'value_text'],
+            ['attribute_group', 'value_integer'],
+            ['attribute_group', 'value_boolean'],
+            ['attribute_group', 'value_float'],
+            ['attribute_group', 'value_color_name', 'value_color_hex', 'value_color_image'],
+            ['attribute_group', 'value_min', 'value_max'],
         ]
         ordering = (
             'value_text',
@@ -82,19 +82,19 @@ class AttributeAbstract(models.Model):
 
     @property
     @abc.abstractmethod
-    def group(self):
+    def attribute_group(self):
         pass
 
     @property
     def get_attribute_name(self):
-        group = self.group
-        if group.type == AttributeGroupTypeField.RANGE:
+        attribute_group = self.attribute_group
+        if attribute_group.type == AttributeGroupTypeField.RANGE:
             return str(self.value_min) + ' - ' + str(self.value_max)
-        elif group.type == AttributeGroupTypeField.COLOR:
+        elif attribute_group.type == AttributeGroupTypeField.COLOR:
             return self.value_color_name
-        elif group.type == AttributeGroupTypeField.IMAGE:
+        elif attribute_group.type == AttributeGroupTypeField.IMAGE:
             return self.value_image_name
-        return getattr(self, self.group.actual_field_name)
+        return getattr(self, self.attribute_group.actual_field_name)
 
     @property
     def get_name(self):
@@ -104,46 +104,47 @@ class AttributeAbstract(models.Model):
         return str(self.get_name)
 
     def value(self):
-        group = self.group
-        if group.type == AttributeGroupTypeField.RANGE:
+        attribute_group = self.attribute_group
+        if attribute_group.type == AttributeGroupTypeField.RANGE:
             return {
                 'min': self.value_min,
                 'max': self.value_max
             }
-        if group.type == AttributeGroupTypeField.COLOR:
+        if attribute_group.type == AttributeGroupTypeField.COLOR:
             return {
                 'name': self.value_color_name,
                 'hex': self.value_color_hex,
-                'image': self.value_color_image.path,
+                'image': self.value_color_image.name if self.value_color_image else None
             }
-        if group.type == AttributeGroupTypeField.IMAGE:
+        if attribute_group.type == AttributeGroupTypeField.IMAGE:
             return {
                 'name': self.value_image_name,
-                'image': self.value_image_image.path
+                'image': self.value_image_image.name if self.value_image_image else None
             }
-        return getattr(self, self.group.actual_field_name)
+        return getattr(self, self.attribute_group.actual_field_name)
 
     @property
     def get_slug(self):
-        group = self.group
-        values = [self.group.slug]
-        if group.type == AttributeGroupTypeField.RANGE:
+        attribute_group = self.attribute_group
+        values = [self.attribute_group.slug]
+        if attribute_group.type == AttributeGroupTypeField.RANGE:
             values.append('min-' + str(self.value_min))
             values.append('max-' + str(self.value_max))
-        elif group.type == AttributeGroupTypeField.COLOR:
+        elif attribute_group.type == AttributeGroupTypeField.COLOR:
             values.append(self.value_color_name)
-        elif group.type == AttributeGroupTypeField.IMAGE:
+        elif attribute_group.type == AttributeGroupTypeField.IMAGE:
             values.append(self.value_image_name)
         else:
-            values.append(getattr(self, group.actual_field_name))
+            values.append(getattr(self, attribute_group.actual_field_name))
         values = [str(value) for value in values]
         return slugify('-'.join(values))
 
     def validator(self):
-        if self.group.type == AttributeGroupTypeField.RANGE and self.value_min >= self.value_max:
+        if self.attribute_group.type == AttributeGroupTypeField.RANGE and self.value_min >= self.value_max:
             raise ValueError('MIN value cant be bigger or equal MAX')
 
+    # TODO Make able to first save attribute group and only then validate
     def save(self, *args, **kwargs):
-        self.validator()
+        # self.validator()
         self.slug = self.get_slug
         super(AttributeAbstract, self).save(*args, **kwargs)

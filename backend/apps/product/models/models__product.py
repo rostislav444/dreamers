@@ -19,7 +19,8 @@ class Product(models.Model):
     generate_sku = models.BooleanField(default=False)
 
     def generate_sku_from_options(self):
-        options_groups = [list(group.options.all()) for group in self.product_class.option_groups.filter(image_dependency=True)]
+        options_groups = [list(group.options.all()) for group in
+                          self.product_class.option_groups.filter(image_dependency=True)]
         options_groups = itertools.product(*options_groups)
 
         for num, options_group in enumerate(options_groups):
@@ -36,6 +37,7 @@ class Product(models.Model):
         return self.product_class.name
 
     def save(self, *args, **kwargs):
+        self.generate_sku = True
         if self.generate_sku:
             self.generate_sku_from_options()
             self.generate_sku = False
@@ -58,12 +60,12 @@ class ProductProperty(NameSlug):
 
 class ProductAttribute(AttributeAbstract):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
-    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
     value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         unique_together = [
-            ['group', 'value_attribute'],
+            ['attribute_group', 'value_attribute'],
             *AttributeAbstract.Meta.unique_together
         ]
         ordering = (
@@ -78,7 +80,7 @@ class ProductAttribute(AttributeAbstract):
         return self.get_attribute_name
 
     def validator(self):
-        if self.group.type != 'attribute':
+        if self.attribute_group.type != 'attribute':
             self.value_attribute = None
 
 
@@ -88,8 +90,8 @@ class Sku(models.Model):
     quantity = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return ', '.join([f'{sku_option.option.group.get_name}: {sku_option.option.get_name}' for sku_option in
-                          self.options.all()])
+        return ', '.join([f'{sku_option.option.attribute_group.get_name}: {sku_option.option.get_name}' for sku_option
+                          in self.options.all()])
 
 
 class SkuOptions(models.Model):
@@ -101,7 +103,7 @@ class SkuOptions(models.Model):
         unique_together = (
             ('sku', 'option'),
         )
-        ordering = ('sku', 'option__group')
+        ordering = ('sku', 'option')
 
     def __str__(self):
         return str(self.option.get_name)

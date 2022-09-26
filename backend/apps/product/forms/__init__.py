@@ -1,2 +1,3 @@
-from .forms__product_attribute import *
-from .forms__product_class_option import *
+from .forms__abstract import *
+from .forms__product import *
+from .froms__productclass import *

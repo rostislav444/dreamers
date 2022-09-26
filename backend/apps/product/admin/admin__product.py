@@ -1,10 +1,11 @@
 from django.contrib import admin
-from apps.attribute.models import AttributeGroup
-from apps.product.models import Product, Sku, SkuOptions, ProductAttribute
-from apps.product.forms import ProductAttributeFormSet, ProductAttributeForm
-
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+
+from apps.attribute.models import AttributeGroup
+from apps.product.forms import ProductAttributeFormSet, ProductAttributeForm
+from apps.product.models import Product, Sku, SkuOptions, ProductAttribute
+
 
 class SkuOptionsInline(admin.TabularInline):
     model = SkuOptions
@@ -36,7 +37,7 @@ class ProductAttributeInline(admin.StackedInline):
     fieldsets = (
         (None, {
             'fields': (
-                'group', 'value_text', 'value_integer', 'value_boolean', 'value_float', 'value_color_name',
+                'attribute_group', 'value_text', 'value_integer', 'value_boolean', 'value_float', 'value_color_name',
                 'value_color_hex', 'value_color_image', 'value_image_name', 'value_image_image',
                 ('value_min', 'value_max',), 'value_attribute')
         },),
@@ -53,15 +54,12 @@ class ProductAttributeInline(admin.StackedInline):
     def get_extra(self, request, obj=None, **kwargs):
         return self.get_max_num_count(obj)
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        return super(ProductAttributeInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
-
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [
         ProductAttributeInline,
-        # SkuInline
+        SkuInline
     ]
 
     @staticmethod

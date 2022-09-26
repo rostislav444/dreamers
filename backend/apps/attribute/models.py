@@ -1,7 +1,6 @@
 import abc
 
 from django.db import models
-from django.utils.html import mark_safe
 from apps.abstract.models import NameSlug
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.category.models import Category
@@ -42,32 +41,16 @@ class AttributeSubGroup(NameSlug):
 
 
 class Attribute(AttributeAbstract):
-    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='attributes')
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='attributes')
     sub_group = models.ForeignKey(AttributeSubGroup, on_delete=models.PROTECT, blank=True, null=True)
     price = models.PositiveIntegerField(default=None, null=True, blank=True)
-
-    def image_tag(self):
-        path = None
-        if self.value_image_image.path:
-            path = self.value_image_image.name
-        elif self.value_image_image.path:
-            path = self.value_image_image.name
-        if path:
-            return mark_safe(f'''
-                <img src="/media/{path}" width="80" height="80" style="
-                    border: 1px solid #ccc; border-radius: 6px; margin-top: -4px; object-fit: cover
-                " />
-            ''')
-        return None
-
-    image_tag.short_description = 'Image'
 
 
 # Like clothes sizes values in different countries
 class AttributeUnitGroup(NameSlug):
     STRING = 'string'
     INTEGER = 'integer'
-    FLOAT = 'FLOAT'
+    FLOAT = 'float'
 
     CHOICES = (
         (STRING, 'String'),

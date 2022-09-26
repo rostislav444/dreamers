@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('product/', include('apps.product.urls', namespace='product')),
     path('category/', include('apps.category.urls', namespace='category')),
+    path('attribute/', include('apps.attribute.urls', namespace='attribute')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

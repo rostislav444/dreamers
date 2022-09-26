@@ -1,9 +1,10 @@
 from django.db import models
+
 from apps.abstract.models import NameSlug
-from apps.category.models import Category
-from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute
-from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.attribute.abstract.fields import OptionGroupField
+from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
+from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute
+from apps.category.models import Category
 
 
 class ProductClass(NameSlug):
@@ -17,8 +18,8 @@ class ProductClass(NameSlug):
     @property
     def possible_option_groups(self):
         categories = self.category.get_ancestors(include_self=True)
-        attributes__groups = self.product_set.all().values_list('attributes__group', flat=True)
-        return AttributeGroup.objects.filter(category__in=categories).exclude(id__in=attributes__groups)
+        attributes_groups = self.product_set.all().values_list('attributes__group', flat=True)
+        return AttributeGroup.objects.filter(category__in=categories).exclude(id__in=attributes_groups)
 
     @property
     def possible_attribute_groups(self):
@@ -30,12 +31,10 @@ class ProductClass(NameSlug):
         super(ProductClass, self).save(*args, **kwargs)
 
 
-# TODO Add functionality to choose range width... ot static for product
-# TODO Add functionality to have ability not duplicate data everytime in product
-class ProductClassAttributes(models.Model):
-    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='product_class_attributes')
+class ProductClassAttributes(AttributeAbstract):
+    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='attributes')
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE,
-                                        related_name='product_class_attributes')
+                                        related_name='product_class')
 
 
 class ProductClassProductAttributes(models.Model):
@@ -57,7 +56,7 @@ class ProductClassOptionGroup(AttributeGroupAbstract):
 
     class Meta:
         unique_together = [
-            ['name', 'attribute_group']
+            ['product_class', 'name', 'attribute_group']
         ]
 
     def __str__(self):
@@ -103,12 +102,12 @@ class ProductClassOptionGroup(AttributeGroupAbstract):
 
 
 class ProductClassOption(AttributeAbstract):
-    group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE, related_name="options")
+    attribute_group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE, related_name="options")
     value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         unique_together = [
-            ['group', 'value_attribute'],
+            ['attribute_group', 'value_attribute'],
             *AttributeAbstract.Meta.unique_together
         ]
         ordering = (
@@ -123,5 +122,5 @@ class ProductClassOption(AttributeAbstract):
         return self.get_attribute_name
 
     def validator(self):
-        if self.group.type != 'attribute':
+        if self.attribute_group.type != 'attribute':
             self.value_attribute = None

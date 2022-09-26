@@ -2,12 +2,60 @@ from django.contrib import admin
 from apps.attribute.abstract.admin import AttributeFildSet
 from apps.attribute.models import AttributeGroup, Attribute
 from apps.product.models import ProductClass, Product, ProductClassOptionGroup, ProductClassOption, \
-    ProductClassProductAttributes
-from apps.product.forms import ProductClassOptionGroupForm
+    ProductClassProductAttributes, ProductClassAttributes
+from apps.product.forms import ProductClassOptionGroupForm, ProductClassOptionCustomGroupForm, \
+    ProductClassAttributesForm, ProductClassProductAttributesForm, ProductClassOptionCustomGroupFormSet, \
+    ProductClassOptionGroupFormSet
 
 
-class ProductClassProductAttributesInline(admin.TabularInline):
+def filter_attribute_groups(request):
+    print('filter_attribute_groups')
+    # Product class id from django-admin url
+    product_class = ProductClass.objects.get(id=request.resolver_match.kwargs.get('object_id'))
+
+    # Attribute groups that assigned to product class category and category ancestors
+    attribute_groups = product_class.possible_attribute_groups
+
+    # Get ids of already assign attributes to products class
+    product_class_attributes_groups_ids = product_class.attributes.all().values_list('attribute_group', flat=True)
+    product_attribute_groups_ids = product_class.product_attributes.all().values_list('attribute_group', flat=True)
+
+    # Return queryset
+    return attribute_groups.exclude(id__in=[*product_class_attributes_groups_ids, *product_attribute_groups_ids])
+
+
+class FilterAttributeGroupsFK(admin.StackedInline):
+    class Meta:
+        abstract = True
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        if not obj:
+            return 0
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "attribute_group":
+            kwargs["queryset"] = filter_attribute_groups(request)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+class ProductClassAttributesInline(FilterAttributeGroupsFK):
+    model = ProductClassAttributes
+    form = ProductClassAttributesForm
+    extra = 0
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'attribute_group', 'value_text', 'value_integer', 'value_boolean', 'value_float', 'value_color_name',
+                'value_color_hex', 'value_color_image', 'value_image_name', 'value_image_image',
+                ('value_min', 'value_max',))
+        },),
+    )
+
+
+class ProductClassProductAttributesInline(admin.TabularInline, FilterAttributeGroupsFK):
     model = ProductClassProductAttributes
+    form = ProductClassProductAttributesForm
     extra = 0
 
 
@@ -27,22 +75,15 @@ class ProductClassOptionInline(AttributeFildSet):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-# Product Class Option Group
-class ProductClassOptionGroupAbstract:
-    form = ProductClassOptionGroupForm
+@admin.register(ProductClassOptionGroup)
+class ProductClassOptionGroupAdmin(admin.ModelAdmin):
+    inlines = [ProductClassOptionInline]
+
     fieldsets = (
         (None, {
-            'fields': ('name', ('type', 'attribute_group', 'unit', 'image_dependency'), 'save_all_options')
+            'fields': ('type', 'name', ('attribute_group', 'unit'), 'save_all_options', 'image_dependency')
         },),
     )
-
-    class Meta:
-        abstract = True
-
-
-@admin.register(ProductClassOptionGroup)
-class ProductClassOptionGroupAdmin(ProductClassOptionGroupAbstract, admin.ModelAdmin):
-    inlines = [ProductClassOptionInline]
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
@@ -53,24 +94,22 @@ class ProductClassOptionGroupAdmin(ProductClassOptionGroupAbstract, admin.ModelA
         return obj and inline_instances or []
 
 
-class ProductClassOptionGroupInline(ProductClassOptionGroupAbstract, admin.StackedInline):
+class ProductClassOptionGroupInline(admin.TabularInline, FilterAttributeGroupsFK):
     model = ProductClassOptionGroup
+    form = ProductClassOptionGroupForm
+    formset = ProductClassOptionGroupFormSet
     show_change_link = True
     extra = 0
+    fields = ('type', 'attribute_group', 'image_dependency', 'save_all_options')
 
-    def get_max_num(self, request, obj=None, **kwargs):
-        if not obj:
-            return 0
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'attribute_group':
-            parent_id = request.resolver_match.kwargs.get('object_id')
-            try:
-                product_class = self.parent_model.objects.get(id=parent_id)
-                kwargs['queryset'] = product_class.possible_option_groups
-            except self.parent_model.DoesNotExist:
-                pass
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+class ProductClassOptionGroupCustomInline(admin.TabularInline):
+    model = ProductClassOptionGroup
+    form = ProductClassOptionCustomGroupForm
+    formset = ProductClassOptionCustomGroupFormSet
+    show_change_link = True
+    extra = 0
+    fields = ('type', 'name', 'unit', 'image_dependency')
 
 
 # Product
@@ -88,10 +127,9 @@ class ProductInline(admin.TabularInline):
 @admin.register(ProductClass)
 class ProductClassAdmin(admin.ModelAdmin):
     inlines = [
+        ProductClassAttributesInline,
         ProductClassOptionGroupInline,
+        ProductClassOptionGroupCustomInline,
         ProductClassProductAttributesInline,
         ProductInline
     ]
-
-
-
