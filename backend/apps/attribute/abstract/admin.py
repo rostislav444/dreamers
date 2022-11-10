@@ -24,7 +24,6 @@ class AttributeFildSet(admin.TabularInline):
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = list(super(AttributeFildSet, self).get_readonly_fields(request, obj))
-        print('get_readonly_fields', obj)
         if obj.type in ['color', 'image']:
             if 'image_tag' not in readonly_fields:
                 readonly_fields.append('image_tag')

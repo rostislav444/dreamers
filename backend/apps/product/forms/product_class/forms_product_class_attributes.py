@@ -1,27 +1,21 @@
 from django import forms
 
 from apps.attribute.serializers import AttributeGroupSerializer
-from apps.product.forms import ProductAttributeFormAbstract
-from apps.product.models import ProductAttribute
+from apps.product.forms import ProductAttributeFormAbstract, FilterAttributeGroupAbstract
+from apps.product.models import ProductClassAttributes, \
+    ProductClassProductAttributeGroups
 
 
-# Product attribute
-class ProductAttributeForm(ProductAttributeFormAbstract):
+class ProductClassAttributesForm(ProductAttributeFormAbstract, FilterAttributeGroupAbstract):
     class Meta:
-        model = ProductAttribute
+        model = ProductClassAttributes
         fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
-        super(ProductAttributeForm, self).__init__(*args, **kwargs)
 
-        data = self.get_data(kwargs)
-        if data:
-            self.fields['attribute_group'].queryset = self.fields['attribute_group'].queryset.filter(id=data['pk'])
-            self.fields['attribute_group'].empty_label = None
-        print(data)
+class ProductClassAttributeFormSet(forms.BaseInlineFormSet):
+    class Meta:
+        abstract = True
 
-
-class ProductAttributeFormSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         if kwargs['instance'].pk:
             product = kwargs['instance']
@@ -33,5 +27,10 @@ class ProductAttributeFormSet(forms.BaseInlineFormSet):
                 'initial': [AttributeGroupSerializer(attribute_group).data for attribute_group in
                             possible_attribute_groups],
             })
-        super(ProductAttributeFormSet, self).__init__(*args, **kwargs)
+        super(ProductClassAttributeFormSet, self).__init__(*args, **kwargs)
 
+
+class ProductClassProductAttributeGroupsForm(FilterAttributeGroupAbstract):
+    class Meta:
+        model = ProductClassProductAttributeGroups
+        fields = '__all__'

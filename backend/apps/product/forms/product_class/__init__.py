@@ -1,0 +1,6 @@
+from .forms_product_class_attributes import ProductClassAttributesForm, ProductClassAttributeFormSet, \
+    ProductClassProductAttributeGroupsForm
+from .forms_product_class_options import ProductClassOptionGroupForm, ProductClassOptionGroupFormSet, \
+    ProductClassOptionCustomGroupForm, ProductClassOptionCustomGroupFormSet
+from .forms_product_class_product_attributes import ProductClassProductAttributesForm, \
+    ProductClassProductAttributesFormSet

@@ -22,6 +22,23 @@ def get_file(path):
     return image
 
 
+models_data = {
+    'Attribute': {
+        'model': Attribute,
+        'fk_name': 'attribute_group'
+    },
+    'Category': {
+        'model': Category,
+        'fk_name': 'parent',
+    },
+    'AttributeGroup': {
+        'model': AttributeGroup,
+        'fk_name': 'category',
+    }
+
+}
+
+
 class Command(BaseCommand):
     # def add_arguments(self, parser):
     #     parser.add_argument('poll_ids', nargs='+', type=int)
@@ -29,44 +46,59 @@ class Command(BaseCommand):
     @property
     def data(self):
         return [{
-            'model': Category,
-            'fk_name': 'parent',
+            **models_data['Category'],
             'data': [{
                 'name': 'Мебель',
                 'parent': None,
                 'children': [{
-                    'model': Category,
-                    'fk_name': 'parent',
+                    **models_data['Category'],
                     'data': [
                         {'name': 'Тумбы под медиа'},
                         {'name': 'Шкафы', 'children': [{
-                            'model': AttributeGroup,
-                            'fk_name': 'category',
+                            **models_data['AttributeGroup'],
                             'data': [{
                                 'name': 'Цвет фасадов',
                                 'type': AttributeGroupTypeField.COLOR,
                                 'price_required': AttributeGroup.PRICE_RQ_ATTRIBUTE,
                                 'children': [{
-                                    'model': Attribute,
-                                    'fk_name': 'group',
+                                    **models_data['Attribute'],
                                     'data': [{'value_color_name': name, 'value_color_hex': color_hex} for
                                              name, color_hex in colors.items()]
                                 }]}
-                            ]}
+                            ]}, {
+                            **models_data['AttributeGroup'],
+                            'data': [{
+                                'name': 'Ширина',
+                                'type': AttributeGroupTypeField.INTEGER,
+                                'price_required': None,
+                                'children': [{
+                                    **models_data['Attribute'],
+                                    'data': [{'value_integer': num} for num in [120, 140, 160, 180, 200, 220, 240]]
+                                }]}
+                            ]}, {
+                            **models_data['AttributeGroup'],
+                            'data': [{
+                                'name': 'Высота',
+                                'type': AttributeGroupTypeField.INTEGER,
+                                'price_required': None,
+                                'children': [{
+                                    **models_data['Attribute'],
+                                    'data': [{'value_integer': num} for num in [40, 60, 80, 100, 120]]
+                                }]}
+                            ]},
                         ]},
                         {'name': 'Диваны'},
                         {'name': 'Кровати'},
                         {'name': 'Стулья'},
                     ]
                 }, {
-                    'model': AttributeGroup,
+                    **models_data['AttributeGroup'],
                     'fk_name': 'category',
                     'data': [{
                         'name': 'Цвет корпуса',
                         'type': AttributeGroupTypeField.COLOR,
                         'children': [{
-                            'model': Attribute,
-                            'fk_name': 'group',
+                            **models_data['Attribute'],
                             'data': [{'value_color_name': key, 'value_color_hex': value} for key, value in
                                      colors.items()]
                         }]
@@ -74,8 +106,7 @@ class Command(BaseCommand):
                         'name': 'Ручки',
                         'type': AttributeGroupTypeField.IMAGE,
                         'children': [{
-                            'model': Attribute,
-                            'fk_name': 'group',
+                            **models_data['Attribute'],
                             'data': [{'value_image_image': get_file(item['image']), 'value_image_name': item['name'],
                                       'price': item.get('price')} for item in handles]
                         }]
@@ -96,6 +127,7 @@ class Command(BaseCommand):
         def get_or_save_item(model, data, exclude_fields_from_search):
             try:
                 _data = {k: v for k, v in data.items() if k not in exclude_fields_from_search}
+                print(model, _data)
                 item = model.objects.get(**_data)
             except ObjectDoesNotExist:
                 item = model(**data)

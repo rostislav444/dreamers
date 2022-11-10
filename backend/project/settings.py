@@ -138,4 +138,5 @@ STATICFILES_FINDERS = (
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://ecommerce-backend:8000"
 ]

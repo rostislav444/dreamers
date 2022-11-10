@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.7'
 
 services:
   db:
@@ -15,24 +15,31 @@ services:
       - POSTGRES_DB=ecommerce_db
     ports:
       - 5433:5432
+    networks:
+      - proxynet
 
   backend:
-    image: portal_backend
+    image: ecommerce-backend-image
+    container_name: ecommerce-backend
     user: root
     restart: always
     build:
       context: .
       dockerfile: docker/Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/ecommerce/backend
     ports:
       - "8000:8000"
+    volumes:
+      - .:/ecommerce/backend
     depends_on:
       - db
     networks:
-      - default
+      - proxynet
 
 
 volumes:
   postgres_data:
+
+networks:
+  proxynet:
+    name: custom_network

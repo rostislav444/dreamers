@@ -1,11 +1,13 @@
+import abc
+
+from colorfield.fields import ColorField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from colorfield.fields import ColorField
+from slugify import slugify
+
 from apps.abstract.models import NameSlug
 from apps.attribute.abstract import AttributeImageField
 from apps.attribute.abstract.fields import AttributeGroupTypeField
-from slugify import slugify
-import abc
 
 
 class AttributeGroupAbstract(NameSlug):
@@ -14,6 +16,7 @@ class AttributeGroupAbstract(NameSlug):
 
     class Meta:
         abstract = True
+        ordering = ['type', 'name']
 
     def __init__(self, *args, **kwargs):
         super(AttributeGroupAbstract, self).__init__( *args, **kwargs)
@@ -31,10 +34,10 @@ class AttributeGroupAbstract(NameSlug):
     @property
     def attr_fields(self):
         return {
-            AttributeGroupTypeField.TEXT: 'value_text',
-            AttributeGroupTypeField.INTEGER: 'value_integer',
-            AttributeGroupTypeField.BOOLEAN: 'value_boolean',
-            AttributeGroupTypeField.FLOAT: 'value_float',
+            AttributeGroupTypeField.TEXT: ['value_text'],
+            AttributeGroupTypeField.INTEGER: ['value_integer'],
+            AttributeGroupTypeField.BOOLEAN: ['value_boolean'],
+            AttributeGroupTypeField.FLOAT: ['value_float'],
             AttributeGroupTypeField.COLOR: ['value_color_name', 'value_color_hex', 'value_color_image'],
             AttributeGroupTypeField.RANGE: ['value_min', 'value_max'],
             AttributeGroupTypeField.IMAGE: ['value_image_name', 'value_image_image']
@@ -94,16 +97,17 @@ class AttributeAbstract(models.Model):
             return self.value_color_name
         elif attribute_group.type == AttributeGroupTypeField.IMAGE:
             return self.value_image_name
-        return getattr(self, self.attribute_group.actual_field_name)
+        return getattr(self, self.attribute_group.actual_field_name[0])
+
+    def __str__(self):
+        return str(self.get_name)
 
     @property
     def get_name(self):
         return self.get_attribute_name
 
-    def __str__(self):
-        return str(self.get_name)
-
-    def value(self):
+    @property
+    def get_value(self):
         attribute_group = self.attribute_group
         if attribute_group.type == AttributeGroupTypeField.RANGE:
             return {
@@ -121,7 +125,11 @@ class AttributeAbstract(models.Model):
                 'name': self.value_image_name,
                 'image': self.value_image_image.name if self.value_image_image else None
             }
-        return getattr(self, self.attribute_group.actual_field_name)
+        return getattr(self, self.attribute_group.actual_field_name[0])
+
+    @property
+    def value(self):
+        return self.get_value
 
     @property
     def get_slug(self):
@@ -135,16 +143,63 @@ class AttributeAbstract(models.Model):
         elif attribute_group.type == AttributeGroupTypeField.IMAGE:
             values.append(self.value_image_name)
         else:
-            values.append(getattr(self, attribute_group.actual_field_name))
+            values += attribute_group.actual_field_name
         values = [str(value) for value in values]
         return slugify('-'.join(values))
 
     def validator(self):
-        if self.attribute_group.type == AttributeGroupTypeField.RANGE and self.value_min >= self.value_max:
-            raise ValueError('MIN value cant be bigger or equal MAX')
+        empty = True
+        for field in self.attribute_group.actual_field_name:
+            if getattr(self, field):
+                empty = False
+                break
+        if empty:
+            raise ValueError('Form is empty')
+
+        if self.attribute_group.type == AttributeGroupTypeField.RANGE:
+            if not self.value_min:
+                raise ValueError('MIN value cant be null')
+            if self.value_min >= self.value_max:
+                raise ValueError('MIN value cant be bigger or equal MAX')
 
     # TODO Make able to first save attribute group and only then validate
     def save(self, *args, **kwargs):
-        # self.validator()
+        self.validator()
         self.slug = self.get_slug
         super(AttributeAbstract, self).save(*args, **kwargs)
+
+
+class AttributeAbstractWithValueAttribute(AttributeAbstract):
+    value_attribute = models.ForeignKey('attribute.Attribute', on_delete=models.PROTECT, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+        unique_together = [
+            ['attribute_group', 'value_attribute'],
+            *AttributeAbstract.Meta.unique_together
+        ]
+        ordering = (
+            'value_attribute',
+            *AttributeAbstract.Meta.ordering,
+        )
+
+    @property
+    @abc.abstractmethod
+    def attribute_group(self):
+        pass
+
+    @property
+    def get_name(self):
+        if self.value_attribute:
+            return self.value_attribute.get_attribute_name
+        return self.get_attribute_name
+
+    @property
+    def value(self):
+        if self.attribute_group.type == 'attribute':
+            return self.value_attribute.value
+        return self.get_value
+
+    def validator(self):
+        if self.attribute_group.type != 'attribute':
+            self.value_attribute = None

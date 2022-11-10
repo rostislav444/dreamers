@@ -1,42 +1,8 @@
 from django import forms
-from django.core.exceptions import ValidationError
 
 from apps.attribute.abstract.fields import AttributeGroupTypeAbstractField, OptionGroupField
-from apps.attribute.serializers import AttributeGroupSerializer
-from apps.product.forms import ProductAttributeFormAbstract, FilterAttributeGroupAbstract
-from apps.product.models import ProductAttribute, ProductClassOptionGroup, ProductClassAttributes, \
-    ProductClassProductAttributes
-
-
-# TODO Add "value_attribute" field
-class ProductClassAttributesForm(ProductAttributeFormAbstract, FilterAttributeGroupAbstract):
-    class Meta:
-        model = ProductClassAttributes
-        fields = '__all__'
-
-
-class ProductClassAttributeFormSet(forms.BaseInlineFormSet):
-    class Meta:
-        abstract = True
-
-    def __init__(self, *args, **kwargs):
-        if kwargs['instance'].pk:
-            product = kwargs['instance']
-            product_class = product.product_class
-            attribute_groups_id = product.product_class.product_attributes.all().values_list('attribute_group',
-                                                                                             flat=True)
-            possible_attribute_groups = product_class.possible_attribute_groups.filter(id__in=attribute_groups_id)
-            kwargs.update({
-                'initial': [AttributeGroupSerializer(attribute_group).data for attribute_group in
-                            possible_attribute_groups],
-            })
-        super(ProductClassAttributeFormSet, self).__init__(*args, **kwargs)
-
-
-class ProductClassProductAttributesForm(FilterAttributeGroupAbstract):
-    class Meta:
-        model = ProductClassProductAttributes
-        fields = '__all__'
+from apps.product.forms import FilterAttributeGroupAbstract
+from apps.product.models import ProductClassOptionGroup
 
 
 class ProductClassOptionGroupForm(FilterAttributeGroupAbstract):

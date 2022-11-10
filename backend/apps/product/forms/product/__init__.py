@@ -1,0 +1,1 @@
+from .forms_product_attributes import ProductAttributeFormSet, ProductAttributeForm

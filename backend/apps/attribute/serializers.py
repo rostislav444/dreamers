@@ -18,4 +18,35 @@ class AttributeGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AttributeGroup
-        fields = ('pk', 'name', 'slug', 'type', 'custom', 'actual_field_name','attributes')
+        fields = ('pk', 'name', 'slug', 'type', 'custom', 'actual_field_name', 'attributes')
+
+
+class AttributeGroupLiteSerializer(serializers.ModelSerializer):
+    attributes = AttributeSerializer(read_only=True, many=True)
+    name = serializers.CharField(source='get_name')
+
+    class Meta:
+        model = AttributeGroup
+        fields = ('pk', 'name', 'slug', 'attributes')
+
+
+class AttributeGroupOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeGroup
+        fields = ('pk', 'name', 'slug', 'type', 'custom', 'actual_field_name')
+
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    value = serializers.JSONField()
+
+    class Meta:
+        model = Attribute
+        fields = ('id', 'value')
+
+
+class ProductAttributeGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeGroup
+        fields = ('pk', 'name', 'slug', 'type')
+
+

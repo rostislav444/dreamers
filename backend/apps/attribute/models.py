@@ -1,6 +1,5 @@
-import abc
-
 from django.db import models
+
 from apps.abstract.models import NameSlug
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.category.models import Category
@@ -30,9 +29,8 @@ class AttributeGroup(AttributeGroupAbstract):
     price_required = models.CharField(default=None, max_length=9, null=True, blank=True, choices=PRICE_REQUIRED_CHOICES)
 
     def __str__(self):
-        if self.custom:
-            return f'{self.get_name} (custom)'
-        return self.get_name
+        name_parts = [self.get_name, self.type, 'custom' if self.custom else '']
+        return ', '.join(name_parts)
 
 
 # Sometimes needed subgroups of attributes, like textile quality class
@@ -43,6 +41,7 @@ class AttributeSubGroup(NameSlug):
 class Attribute(AttributeAbstract):
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='attributes')
     sub_group = models.ForeignKey(AttributeSubGroup, on_delete=models.PROTECT, blank=True, null=True)
+    manual = models.BooleanField(default=False, editable=True)
     price = models.PositiveIntegerField(default=None, null=True, blank=True)
 
 

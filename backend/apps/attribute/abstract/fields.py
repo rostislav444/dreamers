@@ -9,7 +9,8 @@ from django.db.models import ImageField
 from django.utils.translation import gettext_lazy as _
 
 from project import settings
-
+from slugify import slugify
+import socket
 
 class OverwriteStorage(FileSystemStorage):
     def check_file(self, name):
@@ -47,6 +48,11 @@ class AttributeImageField(ImageField):
 
         filename = validate_file_name(filename, allow_relative_path=True)
         return self.storage.generate_filename(filename)
+
+    @property
+    def get_path(self):
+        print(self.name)
+        return socket.gethostname()
 
 
 class AttributeGroupTypeAbstractField(models.CharField):

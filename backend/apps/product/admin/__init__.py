@@ -1,2 +1,2 @@
-from .admin__product import *
-from .admin__productclass import *
+from .product import *
+from .product_class import *
