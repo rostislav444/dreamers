@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.attribute.models import AttributeGroup, Attribute
+from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class AttributeSerializer(serializers.ModelSerializer):
         fields = ('pk', 'value')
 
     def get_value(self, obj):
-        return obj.value()
+        return obj.value
 
 
 class AttributeGroupSerializer(serializers.ModelSerializer):
@@ -49,4 +49,9 @@ class ProductAttributeGroupSerializer(serializers.ModelSerializer):
         model = AttributeGroup
         fields = ('pk', 'name', 'slug', 'type')
 
+
+class AttributeSubGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeSubGroup
+        fields = ['id', 'name', 'slug', 'price']
 

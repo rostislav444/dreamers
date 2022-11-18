@@ -44,7 +44,7 @@ class ProductClassAttributes(models.Model):
 
 
 class ProductClassProductAttributeGroups(models.Model):
-    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='product_attributes')
+    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='product_attributes_groups')
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE,
                                         related_name='product_class_product_attributes')
 
@@ -60,6 +60,12 @@ class ProductClassProductAttributes(models.Model):
     attribute_group = models.ForeignKey(ProductClassProductAttributeGroups, on_delete=models.CASCADE,
                                         related_name='attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name='product_class_attributes')
+
+    def __str__(self):
+        unit = self.attribute_group.attribute_group.unit
+        if unit:
+            return str(self.attribute) + ' ' + unit.name
+        return str(self.attribute)
 
 
 # Attribute option

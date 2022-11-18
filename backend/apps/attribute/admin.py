@@ -53,6 +53,11 @@ class AttributeSubGroupInline(admin.StackedInline):
             return 0
 
 
+@admin.register(Attribute)
+class AttributeAdmin(admin.ModelAdmin):
+    list_display = ['get_name', 'attribute_group']
+
+
 class AttributeInline(AttributeFildSet):
     model = Attribute
     extra = 0

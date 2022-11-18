@@ -5,10 +5,10 @@ import itertools
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from apps.attribute.models import AttributeGroup
 from apps.abstract.fields import CustomFileField, CustomImageField
 from apps.abstract.models import NameSlug
-from .models__productclass import ProductClass, ProductClassProductAttributes
+from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
 
 
 class Product(NameSlug):
@@ -40,6 +40,16 @@ class Product(NameSlug):
     @property
     def get_name(self):
         return '-'.join([self.product_class.name, self.code])
+
+    @property
+    def get_price_multiplier_attribute_groups(self):
+        return self.product_class.option_groups.filter(
+            attribute_group__price_required=AttributeGroup.PRICE_RQ_MULTIPLIER)
+
+    @property
+    def get_price_sub_group_multiplier_attribute_groups(self):
+        return self.product_class.option_groups.filter(
+            attribute_group__price_required=AttributeGroup.PRICE_RQ_SUB_GROUP_MULTIPLIER)
 
     def save(self, *args, **kwargs):
         if self.generate_sku:
@@ -74,22 +84,25 @@ class ProductProperty(NameSlug):
         return self.name + ' - ' + self.value
 
 
+class ProductOptionPriceMultiplier(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='multipliers')
+    option_group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE, related_name='multiplier')
+    value = models.PositiveIntegerField(default=0)
+
+
 class ProductAttribute(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
     attribute = models.ForeignKey(ProductClassProductAttributes, on_delete=models.CASCADE,
                                   related_name='product_attributes', null=True, blank=True)
-    # attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='product_attributes')
-    # value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True,
-    #                                     related_name='product_attributes')
 
     class Meta:
         unique_together = (('product', 'attribute'),)
-        ordering = ('attribute',)
+        ordering = ('attribute__attribute_group',)
 
     @property
     def get_name(self):
         if self.attribute:
-            return self.attribute
+            return str(self.attribute)
         return None
 
 
@@ -105,7 +118,9 @@ class Sku(models.Model):
     @property
     def get_name(self):
         product = self.product.get_name
-        options = '_'.join([f'{sku_option.option.attribute_group.get_name}-{sku_option.option.get_name}' for sku_option in self.options.all()])
+        options = '_'.join(
+            [f'{sku_option.option.attribute_group.get_name}-{sku_option.option.get_name}' for sku_option in
+             self.options.all()])
         return '__'.join([product, options])
 
 
@@ -141,4 +156,3 @@ class SkuImages(models.Model):
         sku = self.sku.get_name
         sha = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         return '-'.join([sku, sha])
-

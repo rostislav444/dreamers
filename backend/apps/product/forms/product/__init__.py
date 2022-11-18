@@ -1,1 +1,2 @@
 from .forms_product_attributes import ProductAttributeFormSet, ProductAttributeForm
+from .froms_product import ProductOptionPriceMultiplierFromSet, ProductOptionPriceMultiplierFrom

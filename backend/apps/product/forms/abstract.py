@@ -7,7 +7,7 @@ from apps.product.models import ProductClassAttributes
 
 
 # Abstract
-class ProductAttributeFormAbstract(forms.ModelForm):
+class AttributeFieldsForm(forms.ModelForm):
     value_text = forms.CharField(label=_('Text'), required=False)
     value_integer = forms.IntegerField(label=_('Integer'), required=False)
     value_boolean = forms.BooleanField(label=_('Boolean'), required=False)
@@ -23,39 +23,51 @@ class ProductAttributeFormAbstract(forms.ModelForm):
     class Meta:
         abstract = True
 
-    def hide_fields(self, non_hidden_fields):
-        for field in list(set(self.fields) - set(non_hidden_fields)):
+    def set_required_fields(self, fields):
+        for field in fields:
+            self.fields[field].required = True
+
+    def set_non_required_fields(self, fields):
+        for field in fields:
+            self.fields[field].required = False
+
+    def hide_fields(self, fields):
+        for field in list(set(self.fields) - set(fields)):
             self.fields[field].widget = forms.HiddenInput()
 
+
+class ProductAttributeFormAbstract(AttributeFieldsForm):
     def __init__(self, *args, **kwargs):
         super(ProductAttributeFormAbstract, self).__init__(*args, **kwargs)
-        non_hidden_fields = ['attribute_group']
 
-        initial_data = kwargs.get('initial', None)
-        instance = kwargs.get('instance', None)
 
-        if initial_data:
-            self.fields['attribute_group'].empty_label = None
-            self.fields['attribute_group'].queryset = self.fields['attribute_group'].queryset.filter(id=initial_data['pk'])
-            if initial_data['custom']:
-                non_hidden_fields = [*non_hidden_fields, *initial_data['actual_field_name']]
-                self.fields['attribute_group'].empty_label = None
-            else:
-                non_hidden_fields.append('value_attribute')
-                self.fields['value_attribute'].queryset = self.fields['value_attribute'].queryset \
-                    .filter(attribute_group__pk=initial_data['pk'])
-        elif instance:
-            if instance.attribute_group.custom:
-                for field in instance.attribute_group.actual_field_name:
-                    non_hidden_fields.append(field)
-                    if instance.value_attribute:
-                        self.fields[field].initial = getattr(instance.value_attribute, field)
-            else:
-                non_hidden_fields.append('value_attribute')
-                self.fields['value_attribute'].queryset = self.fields['value_attribute'].queryset \
-                    .filter(attribute_group=instance.attribute_group)
+        # non_hidden_fields = ['attribute_group']
+        #
+        # initial_data = kwargs.get('initial', None)
+        # instance = kwargs.get('instance', None)
+        #
+        # if initial_data:
+        #     self.fields['attribute_group'].empty_label = None
+        #     self.fields['attribute_group'].queryset = self.fields['attribute_group'].queryset.filter(id=initial_data['pk'])
+        #     if initial_data['custom']:
+        #         non_hidden_fields = [*non_hidden_fields, *initial_data['actual_field_name']]
+        #         self.fields['attribute_group'].empty_label = None
+        #     else:
+        #         non_hidden_fields.append('value_attribute')
+        #         self.fields['value_attribute'].queryset = self.fields['value_attribute'].queryset \
+        #             .filter(attribute_group__pk=initial_data['pk'])
+        # elif instance:
+        #     if instance.attribute_group.custom:
+        #         for field in instance.attribute_group.actual_field_name:
+        #             non_hidden_fields.append(field)
+        #             if instance.value_attribute:
+        #                 self.fields[field].initial = getattr(instance.value_attribute, field)
+        #     else:
+        #         non_hidden_fields.append('value_attribute')
+        #         self.fields['value_attribute'].queryset = self.fields['value_attribute'].queryset \
+        #             .filter(attribute_group=instance.attribute_group)
 
-        self.hide_fields(non_hidden_fields)
+        # self.hide_fields(non_hidden_fields)
 
     def clean(self):
         if self.cleaned_data['DELETE']:

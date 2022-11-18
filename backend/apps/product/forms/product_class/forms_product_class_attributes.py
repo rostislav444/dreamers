@@ -1,12 +1,12 @@
 from django import forms
 
 from apps.attribute.serializers import AttributeGroupSerializer
-from apps.product.forms import ProductAttributeFormAbstract, FilterAttributeGroupAbstract
+from apps.product.forms import ProductAttributeForm, FilterAttributeGroupAbstract
 from apps.product.models import ProductClassAttributes, \
     ProductClassProductAttributeGroups
 
 
-class ProductClassAttributesForm(ProductAttributeFormAbstract, FilterAttributeGroupAbstract):
+class ProductClassAttributesForm(forms.ModelForm):
     class Meta:
         model = ProductClassAttributes
         fields = '__all__'

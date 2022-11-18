@@ -17,16 +17,21 @@ class AttributeGroupUnit(NameSlug):
 class AttributeGroup(AttributeGroupAbstract):
     PRICE_RQ_SUB_GROUP = 'sub_group'
     PRICE_RQ_ATTRIBUTE = 'attribute'
+    PRICE_RQ_MULTIPLIER = 'multiplier'
+    PRICE_RQ_SUB_GROUP_MULTIPLIER = 'sub_group_multiplier'
 
     PRICE_REQUIRED_CHOICES = (
         (PRICE_RQ_SUB_GROUP, 'sub_group'),
-        (PRICE_RQ_ATTRIBUTE, 'attribute')
+        (PRICE_RQ_ATTRIBUTE, 'attribute'),
+        (PRICE_RQ_MULTIPLIER, 'multiplier'),
+        (PRICE_RQ_SUB_GROUP_MULTIPLIER, 'sub_group_multiplier'),
     )
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='attribute_groups', null=True,
                                  blank=True)
     unit = models.ForeignKey(AttributeGroupUnit, on_delete=models.PROTECT, blank=True, null=True)
     custom = models.BooleanField(default=False)
-    price_required = models.CharField(default=None, max_length=9, null=True, blank=True, choices=PRICE_REQUIRED_CHOICES)
+    price_required = models.CharField(default=None, max_length=20, null=True, blank=True,
+                                      choices=PRICE_REQUIRED_CHOICES)
 
     def __str__(self):
         name_parts = [self.get_name, self.type, 'custom' if self.custom else '']
@@ -35,7 +40,11 @@ class AttributeGroup(AttributeGroupAbstract):
 
 # Sometimes needed subgroups of attributes, like textile quality class
 class AttributeSubGroup(NameSlug):
-    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='sub_groups')
+    price = models.PositiveIntegerField(default=None, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Attribute(AttributeAbstract):
@@ -99,4 +108,3 @@ class AttributeUnit(models.Model):
             return self.value_float
         else:
             return '-'
-
