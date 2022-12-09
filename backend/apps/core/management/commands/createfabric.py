@@ -10,7 +10,7 @@ from django.db import models
 from apps.attribute.abstract.fields import AttributeGroupTypeField
 from apps.attribute.data.colors import colors
 from apps.attribute.data.handles import handles
-from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup
+from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup, AttributeColor
 from apps.category.models import Category
 import os
 
@@ -43,6 +43,8 @@ class Command(BaseCommand):
             type=AttributeGroupTypeField.IMAGE,
             category=Category.objects.get(name='Диваны')
         )
+
+        AttributeColor.objects.all().delete()
         attribute_group.attributes.all().delete()
 
         for root, dirs, files in os.walk(os.path.join(MEDIA_ROOT, 'fabric'), topdown=False):
@@ -56,7 +58,9 @@ class Command(BaseCommand):
 
                 fabric_dir = os.path.join(MEDIA_ROOT, 'fabric/' + name)
                 for d_root, d_dirs, d_files in os.walk(fabric_dir):
+
                     for f in d_files:
+                        print('file:', f)
                         attribute, _ = Attribute.objects.get_or_create(value_image_image='/'.join(['fabric', name, f]),
                                                                        value_image_name=f.split('.')[0],
                                                                        attribute_group=attribute_group,

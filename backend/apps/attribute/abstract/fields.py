@@ -51,8 +51,7 @@ class AttributeImageField(ImageField):
 
     @property
     def get_path(self):
-        print(self.name)
-        return socket.gethostname()
+        return '/media/attributes/' + self.name
 
 
 class AttributeGroupTypeAbstractField(models.CharField):

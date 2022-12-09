@@ -20,3 +20,6 @@ django-colorfield==0.7.2
 Faker
 requests
 django-jet
+singlemodeladmin==0.9
+colorthief==0.2.1
+numpy==1.23.5

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup
+from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup, AttributeColor, Colors
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -7,10 +7,24 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute
-        fields = ('pk', 'value')
+        fields = ('id', 'value')
 
     def get_value(self, obj):
         return obj.value
+
+
+class ColorsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Colors
+        fields = ('id', 'name', 'slug', 'hex', 'rgb')
+
+
+class AttributeColorsSerializer(serializers.ModelSerializer):
+    color = ColorsSerializer(read_only=True)
+
+    class Meta:
+        model = AttributeColor
+        fields = ('id', 'color')
 
 
 class AttributeGroupSerializer(serializers.ModelSerializer):
@@ -18,22 +32,23 @@ class AttributeGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AttributeGroup
-        fields = ('pk', 'name', 'slug', 'type', 'custom', 'actual_field_name', 'attributes')
+        fields = ('id', 'name', 'slug', 'type', 'custom', 'actual_field_name', 'attributes')
 
 
 class AttributeGroupLiteSerializer(serializers.ModelSerializer):
     attributes = AttributeSerializer(read_only=True, many=True)
+    colors = AttributeColorsSerializer(read_only=True, many=True)
     name = serializers.CharField(source='get_name')
 
     class Meta:
         model = AttributeGroup
-        fields = ('pk', 'name', 'slug', 'attributes')
+        fields = ('id', 'name', 'slug', 'type', 'attributes', 'colors')
 
 
 class AttributeGroupOnlySerializer(serializers.ModelSerializer):
     class Meta:
         model = AttributeGroup
-        fields = ('pk', 'name', 'slug', 'type', 'custom', 'actual_field_name')
+        fields = ('id', 'name', 'slug', 'type', 'custom', 'actual_field_name')
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
@@ -47,7 +62,7 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
 class ProductAttributeGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = AttributeGroup
-        fields = ('pk', 'name', 'slug', 'type')
+        fields = ('id', 'name', 'slug', 'type')
 
 
 class AttributeSubGroupSerializer(serializers.ModelSerializer):

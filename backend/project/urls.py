@@ -8,7 +8,8 @@ urlpatterns = [
     path('product/', include('apps.product.urls', namespace='product')),
     path('category/', include('apps.category.urls', namespace='category')),
     path('catalogue/', include('apps.catalogue.urls', namespace='catalogue')),
-    path('attribute/', include('apps.attribute.urls', namespace='attribute')),
+    path('attributes/', include('apps.attribute.urls', namespace='attributes')),
+    path('newpost/', include('apps.newpost.urls', namespace='newpost')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

@@ -1,7 +1,12 @@
 from django.contrib import admin
 from apps.attribute.abstract.admin import AttributeFildSet
 from apps.attribute.models import AttributeGroupUnit, AttributeGroup, AttributeSubGroup, AttributeUnitGroup, \
-    AttributeUnit, Attribute
+    AttributeUnit, Attribute, Colors
+
+
+@admin.register(Colors)
+class ColorsAdmin(admin.ModelAdmin):
+    pass
 
 
 # Attribute Group Unit

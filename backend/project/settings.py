@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'apps.category.apps.CategoryConfig',
     'apps.catalogue.apps.CatalogueConfig',
     'apps.attribute.apps.AttributeConfig',
+    'apps.newpost.apps.NewpostConfig',
     'apps.core.apps.CoreConfig',
     'rest_framework',
     'mptt',

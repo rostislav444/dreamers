@@ -33,10 +33,12 @@ class AttributeFildSet(admin.TabularInline):
         fieldsets = super(AttributeFildSet, self).get_fieldsets(request, obj)
         fields = []
         for field in fieldsets[0][1]['fields']:
-            if not field.startswith('value_'):
+            if not field.startswith('value_') and field not in ['color']:
                 fields.append(field)
         if obj:
             fields.append(obj.actual_field_name)
+            if hasattr(obj, 'has_color') and obj.has_color:
+                fields.append('color')
 
         fieldsets[0][1]['fields'] = fields
         return fieldsets

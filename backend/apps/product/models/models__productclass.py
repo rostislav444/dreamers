@@ -130,4 +130,5 @@ class ProductClassOptionGroup(AttributeGroupAbstract):
 
 class ProductClassOption(AttributeAbstractWithValueAttribute):
     attribute_group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE, related_name="options")
-    value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True)
+    value_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, blank=True, null=True,
+                                        related_name='product_class_options')

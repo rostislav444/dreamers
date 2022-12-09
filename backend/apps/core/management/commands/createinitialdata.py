@@ -10,12 +10,12 @@ from django.db import models
 from apps.attribute.abstract.fields import AttributeGroupTypeField
 from apps.attribute.data.colors import colors
 from apps.attribute.data.handles import handles
-from apps.attribute.models import AttributeGroup, Attribute
+from apps.attribute.models import Colors, AttributeGroup, Attribute, AttributeColor
 from apps.category.models import Category
 import os
 
 from project.settings import MEDIA_ROOT
-
+from apps.core.colors import colors as web_colors
 
 def get_file(path):
     url = 'http://localhost:8000/static/' + path
@@ -26,10 +26,19 @@ def get_file(path):
 
 
 def get_fabric_data():
-    for root, dirs, files in os.walk(os.path.join(MEDIA_ROOT,'fabric'), topdown=False):
+    for root, dirs, files in os.walk(os.path.join(MEDIA_ROOT, 'fabric'), topdown=False):
         for name in dirs:
             print(os.path.join(root, name))
     pass
+
+
+def add_base_colors():
+    AttributeColor.objects.all().delete()
+    Colors.objects.all().delete()
+
+    for base_color in web_colors:
+        color, _ = Colors.objects.get_or_create(name=base_color['name'], hex=base_color['hex'])
+        print(color)
 
 
 models_data = {
@@ -109,7 +118,7 @@ class Command(BaseCommand):
                                         **models_data['Attribute'],
                                         'data': get_fabric_data(),
                                     }]}
-                            ]},
+                                ]},
 
                         },
                         {'name': 'Кровати'},
@@ -139,41 +148,43 @@ class Command(BaseCommand):
             }]
         }]
 
+
     def handle(self, *args, **options):
+        add_base_colors()
         get_fabric_data()
 
-        # def get_model_image_fields(model):
-        #     fields = []
-        #     # Exclude image fields from search
-        #     for field in model._meta.get_fields():
-        #         if models.ImageField in field.__class__.__bases__:
-        #             fields.append(field.name)
-        #     return fields
-        #
-        # def get_or_save_item(model, data, exclude_fields_from_search):
-        #     try:
-        #         _data = {k: v for k, v in data.items() if k not in exclude_fields_from_search}
-        #         print(model, _data)
-        #         item = model.objects.get(**_data)
-        #     except ObjectDoesNotExist:
-        #         item = model(**data)
-        #         item.save()
-        #     return item
-        #
-        # def recursive_loop(main_data, parent=None):
-        #     if type(main_data) == list:
-        #         for obj in main_data:
-        #             model = obj['model']
-        #             exclude_fields_from_search = get_model_image_fields(model)
-        #             if type(obj['data']) != list:
-        #                 raise ValidationError('Object data should be list')
-        #             for data in obj['data']:
-        #                 children = data.pop('children', None)
-        #                 if parent:
-        #                     data[obj['fk_name']] = parent
-        #                 item = get_or_save_item(model, data, exclude_fields_from_search)
-        #                 if children:
-        #                     recursive_loop(children, item)
-        #     return None
-        #
-        # recursive_loop(self.data)
+        def get_model_image_fields(model):
+            fields = []
+            # Exclude image fields from search
+            for field in model._meta.get_fields():
+                if models.ImageField in field.__class__.__bases__:
+                    fields.append(field.name)
+            return fields
+
+        def get_or_save_item(model, data, exclude_fields_from_search):
+            try:
+                _data = {k: v for k, v in data.items() if k not in exclude_fields_from_search}
+                print(model, _data)
+                item = model.objects.get(**_data)
+            except ObjectDoesNotExist:
+                item = model(**data)
+                item.save()
+            return item
+
+        def recursive_loop(main_data, parent=None):
+            if type(main_data) == list:
+                for obj in main_data:
+                    model = obj['model']
+                    exclude_fields_from_search = get_model_image_fields(model)
+                    if type(obj['data']) != list:
+                        raise ValidationError('Object data should be list')
+                    for data in obj['data']:
+                        children = data.pop('children', None)
+                        if parent:
+                            data[obj['fk_name']] = parent
+                        item = get_or_save_item(model, data, exclude_fields_from_search)
+                        if children:
+                            recursive_loop(children, item)
+            return None
+
+        recursive_loop(self.data)

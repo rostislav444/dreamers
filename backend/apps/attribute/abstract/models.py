@@ -77,7 +77,7 @@ class AttributeAbstract(models.Model):
             'value_integer',
             'value_boolean',
             'value_float',
-            'value_color_name',
+            'value_color_hex',
             'value_min',
             'value_max',
             'value_image_name'

@@ -1,23 +1,54 @@
 from rest_framework import serializers
-from apps.product.models import Product
-from apps.product.serializers import SkuSerializer, ProductClassOptionGroupSerializer
 from collections import OrderedDict
+from apps.product.models import ProductClass, Product, Sku, SkuImages, SkuOptions
+from apps.product.serializers import SkuSerializer, ProductClassOptionGroupSerializer
+
+
+class CatalogueSkuOptionsSerializer(serializers.ModelSerializer):
+    value = serializers.SerializerMethodField()
+    option_id = serializers.IntegerField(source='option.id')
+
+    class Meta:
+        model = SkuOptions
+        fields = ['id', 'option_id', 'value']
+
+    def get_value(self, obj):
+        return obj.option.value
+
+
+class CatalogueSkuImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SkuImages
+        fields = ['image']
+
+
+class CatalogueSkuSerializer(serializers.ModelSerializer):
+    options = serializers.SerializerMethodField()
+    images = CatalogueSkuImagesSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Sku
+        fields = ['id', 'options', 'images']
+
+    def get_options(self, obj):
+        data = []
+        for option in obj.options.all():
+            data.append([option.option.attribute_group.slug, option.option.id])
+        return OrderedDict(data)
 
 
 class CatalogueProductSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='product_class.name', max_length=255)
-    slug = serializers.CharField(source='product_class.slug', max_length=255)
-    description = serializers.CharField(source='product_class.description')
-    sku = SkuSerializer(read_only=True, many=True)
-    options_groups = serializers.SerializerMethodField()
+    sku = CatalogueSkuSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug', 'description', 'price', 'slug', 'images', 'sku', 'options_groups']
+        fields = ['id', 'price', 'slug', 'images', 'sku']
 
-    @staticmethod
-    def get_options_groups(obj):
-        data = OrderedDict()
-        for group in obj.product_class.option_groups.filter(image_dependency=True):
-            data[group.slug] = ProductClassOptionGroupSerializer(group).data
-        return data
+
+class CatalogueProductClassSerializer(serializers.ModelSerializer):
+    products = CatalogueProductSerializer(read_only=True, many=True)
+    option_groups = ProductClassOptionGroupSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = ProductClass
+        fields = ['id', 'name', 'slug', 'description', 'products', 'option_groups']

@@ -1,8 +1,26 @@
+import PIL
+from PIL import ImageColor
+from colorfield.fields import ColorField
+from colorthief import ColorThief
 from django.db import models
 
 from apps.abstract.models import NameSlug
+from apps.attribute.abstract.fields import AttributeGroupTypeField
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
+from apps.attribute.untils import get_closet_color
 from apps.category.models import Category
+
+
+class Colors(NameSlug):
+    hex = ColorField(max_length=7)
+    rgb = models.JSONField(default=list)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.rgb = PIL.ImageColor.getrgb(self.hex)
+        super(Colors, self).save(*args, **kwargs)
 
 
 # Units like: cm, kg.
@@ -37,6 +55,10 @@ class AttributeGroup(AttributeGroupAbstract):
         name_parts = [self.get_name, self.type, 'custom' if self.custom else '']
         return ', '.join(name_parts)
 
+    @property
+    def has_color(self):
+        return self.type in [AttributeGroupTypeField.COLOR, AttributeGroupTypeField.IMAGE]
+
 
 # Sometimes needed subgroups of attributes, like textile quality class
 class AttributeSubGroup(NameSlug):
@@ -47,11 +69,43 @@ class AttributeSubGroup(NameSlug):
         return self.name
 
 
+class AttributeColor(models.Model):
+    color = models.ForeignKey(Colors, on_delete=models.CASCADE, related_name='attribute_colors')
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='colors')
+
+    def __str__(self):
+        return self.color.name
+
+
 class Attribute(AttributeAbstract):
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, related_name='attributes')
     sub_group = models.ForeignKey(AttributeSubGroup, on_delete=models.PROTECT, blank=True, null=True)
+    color = models.ForeignKey(AttributeColor, on_delete=models.SET_NULL, blank=True, null=True,
+                              related_name='attributes')
     manual = models.BooleanField(default=False, editable=True)
     price = models.PositiveIntegerField(default=None, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        super(AttributeAbstract, self).save(*args, **kwargs)
+        if self.attribute_group.has_color:
+            color_hex, color_rgb = None, None
+            colors = Colors.objects.all()
+            if self.attribute_group.type == AttributeGroupTypeField.COLOR:
+                color_hex = self.value_color_hex
+            elif self.attribute_group.type == AttributeGroupTypeField.IMAGE:
+                try:
+                    color_thief = ColorThief(self.value_image_image.path)
+                    color_rgb = color_thief.get_color(quality=10)
+
+                except PIL.UnidentifiedImageError:
+                    return
+
+            color = get_closet_color(color_hex, color_rgb, colors)
+            if color:
+                attribute_color, _ = AttributeColor.objects.get_or_create(color=color,
+                                                                          attribute_group=self.attribute_group)
+                self.color = attribute_color
+            super(AttributeAbstract, self).save()
 
 
 # Like clothes sizes values in different countries

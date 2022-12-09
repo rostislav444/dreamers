@@ -31,6 +31,14 @@ class ProductClassOptionSerializer(serializers.ModelSerializer):
         return value
 
 
+class ProductClassOptionGroupLiteSerializer(serializers.ModelSerializer):
+    options = ProductClassOptionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProductClassOptionGroup
+        fields = ['id', 'name', 'slug', 'options']
+
+
 class ProductClassOptionGroupSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='get_name')
     options = serializers.SerializerMethodField()
