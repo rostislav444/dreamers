@@ -28,15 +28,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.abstract.apps.AbstractConfig',
     'apps.product.apps.ProductConfig',
+    'apps.order.apps.OrderConfig',
     'apps.category.apps.CategoryConfig',
     'apps.catalogue.apps.CatalogueConfig',
     'apps.attribute.apps.AttributeConfig',
     'apps.newpost.apps.NewpostConfig',
     'apps.core.apps.CoreConfig',
+    'apps.material.apps.MaterialConfig',
     'rest_framework',
     'mptt',
     'corsheaders',
-    'colorfield'
+    'colorfield',
+    'django_admin_inline_paginator',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +58,7 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,8 +82,8 @@ DATABASES = {
         'NAME': 'ecommerce_db',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
+        'HOST': '0.0.0.0',
+        'PORT': '5434',
     }
 }
 

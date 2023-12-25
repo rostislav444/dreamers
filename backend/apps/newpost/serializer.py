@@ -17,5 +17,6 @@ class NewPostCitiesSerializer(serializers.ModelSerializer):
 class NewPostDepartmentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewPostDepartments
-        fields = ['number', 'description', 'description_ru', 'short_address', 'short_address_ru', 'latitude', 'longitude',
-                  'schedule']
+        fields = ['id', 'ref', 'number', 'description', 'description_ru', 'short_address', 'short_address_ru', 'latitude',
+                  'longitude', 'schedule']
+

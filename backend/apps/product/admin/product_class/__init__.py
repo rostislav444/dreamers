@@ -1,6 +1,4 @@
-from .admin_product_class import ProductClassAdmin
-from .admin_product_class_attribues import ProductClassAttributesInline
-from .admin_product_class_options import ProductClassOptionInline, ProductClassOptionGroupAdmin, \
-    ProductClassOptionGroupInline, ProductClassOptionGroupCustomInline
-from .admin_product_class_product_attributes import ProductClassProductAttributeGroupsInline, \
-    ProductClassProductAttributesInline, ProductClassProductAttributeGroupsAdmin
+from .admin_product_class import *
+from .admin_product_class_attribues import *
+from .admin_product_class_options import *
+from .admin_product_class_product_attributes import *

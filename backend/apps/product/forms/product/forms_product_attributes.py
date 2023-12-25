@@ -10,6 +10,7 @@ class ProductAttributeForm(forms.ModelForm):
 
     def __init__(self, *args, group=None, **kwargs):
         super(ProductAttributeForm, self).__init__(*args, **kwargs)
+
         if group:
             self.fields['attribute'].queryset = self.fields['attribute'].queryset.filter(attribute_group=group)
             self.fields['attribute'].label = group.attribute_group.name

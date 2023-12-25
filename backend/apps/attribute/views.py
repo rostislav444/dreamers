@@ -13,17 +13,7 @@ class AttributesViewSet(generics.GenericAPIView, mixins.ListModelMixin, viewsets
 
     @staticmethod
     def filter_attributes_byt_category(categories):
-        return Attribute.objects.prefetch_related(
-            'product_class_options',
-            'product_class_options__attribute_group',
-            'product_class_options__attribute_group__product_class',
-            'product_class_options__attribute_group__product_class__category',
-            'product_class_attributes',
-            'product_class_attributes__product_attributes',
-            'product_class_attributes__product_attributes__product',
-            'product_class_attributes__product_attributes__product__product_class',
-            'product_class_attributes__product_attributes__product__product_class__category'
-        ).filter(
+        return Attribute.objects.filter(
             Q(productclassattributes__product_class__category__in=categories) |
             Q(product_class_options__attribute_group__product_class__category__in=categories) |
             Q(product_class_attributes__product_attributes__product__product_class__category__in=categories)
@@ -32,7 +22,7 @@ class AttributesViewSet(generics.GenericAPIView, mixins.ListModelMixin, viewsets
         ).distinct()
 
     @staticmethod
-    def filter_colors_byt_category(categories):
+    def filter_colors_buy_category(categories):
         return AttributeColor.objects.filter(
             attributes__product_class_options__attribute_group__product_class__category__in=categories
         ).distinct()
@@ -40,14 +30,9 @@ class AttributesViewSet(generics.GenericAPIView, mixins.ListModelMixin, viewsets
     def get_queryset(self):
         self.categories = Category.objects.get(name="Мебель").get_family()
         attributes = self.filter_attributes_byt_category(self.categories)
-        colors = self.filter_colors_byt_category(self.categories)
+        colors = self.filter_colors_buy_category(self.categories)
 
-        return AttributeGroup.objects.filter(
-            category__in=self.categories,
-            attributes__isnull=False
-        ).exclude(
-            product_class_option_group__image_dependency=False
-        ).prefetch_related(
-            Prefetch('attributes', queryset=attributes),
-            Prefetch('colors', queryset=colors)
-        ).distinct()
+        return AttributeGroup.objects.filter(category__in=self.categories, attributes__isnull=False) \
+            .exclude(product_class_option_group__image_dependency=False) \
+            .prefetch_related(Prefetch('attributes', queryset=attributes), Prefetch('colors', queryset=colors)) \
+            .distinct()

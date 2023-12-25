@@ -1,8 +1,13 @@
 from django import forms
 
 from apps.attribute.abstract.fields import AttributeGroupTypeAbstractField, OptionGroupField
+from apps.attribute.forms import AttributeFormAbstract
 from apps.product.forms import FilterAttributeGroupAbstract
 from apps.product.models import ProductClassOptionGroup
+
+
+class ProductClassOptionForm(AttributeFormAbstract):
+    pass
 
 
 class ProductClassOptionGroupForm(FilterAttributeGroupAbstract):

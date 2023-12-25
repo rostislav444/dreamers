@@ -7,12 +7,19 @@ class ProductClassAttributesInline(FilterAttributeGroupsFK):
     model = ProductClassAttributes
     form = ProductClassAttributesForm
     extra = 0
-    # fieldsets = (
-    #     (None, {
-    #         'fields': (
-    #             'attribute_group', 'value_attribute', 'value_text', 'value_integer', 'value_boolean', 'value_float',
-    #             'value_color_name',
-    #             'value_color_hex', 'value_color_image', 'value_image_name', 'value_image_image',
-    #             ('value_min', 'value_max',),)
-    #     },),
-    # )
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super(ProductClassAttributesInline, self).get_fieldsets(request, obj)
+        # Set default field, that should be selected, until other appears
+        fieldsets[0][1]['fields'] = ('attribute_group',)
+        if obj:
+            # Search for inline object
+            item = self.model.objects.filter(product_class=obj).first()
+            if item and item.attribute_group:
+                if item.attribute_group.custom:
+                    fieldsets[0][1]['fields'] = ('attribute_group', *item.attribute_group.actual_field_name)
+                else:
+                    fieldsets[0][1]['fields'] = ('attribute_group', 'value_attribute')
+
+        return fieldsets
+

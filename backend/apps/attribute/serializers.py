@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup, AttributeColor, Colors
+from apps.attribute.models import AttributeGroup, Attribute, AttributeSubGroup, AttributeColor
+from apps.material.models import Color
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -15,7 +16,7 @@ class AttributeSerializer(serializers.ModelSerializer):
 
 class ColorsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Colors
+        model = Color
         fields = ('id', 'name', 'slug', 'hex', 'rgb')
 
 

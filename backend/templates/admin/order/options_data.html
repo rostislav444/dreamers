@@ -1,0 +1,36 @@
+<ul style="margin: 0; padding: 0">
+    {% for option in options %}
+        <li style="display: grid; grid-template-columns: 160px 80px; grid-gap: 12px; margin-bottom: 12px;">
+            <p>
+                <span style="font-weight: bold; display: block">{{ option.group }}: </span>
+                <span>{{ option.attribute.value.name }}</span>
+            </p>
+
+            {% if option.attribute.value.image %}
+                <div style="
+                    position: relative;
+                    display: block;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 4px;
+
+                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+                ">
+                    <img alt="option_img" style="position: absolute; width: 100%; height: 100%; border: 1px solid #cccccc; border-radius: 4px;" src="/media/{{ option.attribute.value.image }}" />
+                </div>
+            {% elif option.attribute.value.hex %}
+                <div style="
+                    position: relative;
+                    display: block;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 4px;
+                    border: 1px solid #cccccc;
+                    background-color: {{ option.attribute.value.hex }};
+                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+                "></div>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+

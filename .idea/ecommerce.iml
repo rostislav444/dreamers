@@ -18,8 +18,9 @@
       <sourceFolder url="file://$MODULE_DIR$/backend" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/backend/static" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/frontend" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/render_server" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 3.9.2 Docker Compose (backend at [/Users/rostislavnikolaev/Desktop/Sites/ecommerce/backend/docker-compose.yml])" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (ecommerce)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

@@ -1,23 +1,31 @@
+import itertools
 import random
 import string
-import itertools
 
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from apps.attribute.models import AttributeGroup
+
 from apps.abstract.fields import CustomFileField, CustomImageField
 from apps.abstract.models import NameSlug
+from apps.attribute.models import AttributeGroup
 from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
 
 
-class Product(NameSlug):
+class Product(models.Model):
     product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='products')
     code = models.CharField(_('Code'), blank=True, null=True, max_length=255)
     price = models.PositiveIntegerField(_('Price'), blank=True, null=True)
     stock = models.PositiveIntegerField(_('Stock'), blank=True, null=True)
     render_variants = models.BooleanField(default=False)
     generate_sku = models.BooleanField(default=False)
+
+    width = models.PositiveIntegerField(_('Width'), default=0, blank=True)
+    height = models.PositiveIntegerField(_('Height'), default=0, blank=True)
+    depth = models.PositiveIntegerField(_('Depth'), default=0, blank=True)
+
+    class Meta:
+        ordering = ['width', 'height', 'depth']
 
     def generate_sku_from_options(self):
         options_groups = [list(group.options.all()) for group in
@@ -60,10 +68,8 @@ class Product(NameSlug):
 
 class Product3DBlenderModel(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='model_3d')
-    blend = CustomFileField(validators=[FileExtensionValidator(allowed_extensions=["blend"])])
-    blend1 = CustomFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["blend1"])])
-    mtl = CustomFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["mtl"])])
     obj = CustomFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["obj"])])
+    mtl = CustomFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["mtl"])])
 
     @property
     def get_name(self):
@@ -105,15 +111,15 @@ class ProductAttribute(models.Model):
             return str(self.attribute)
         return None
 
-
+# TODO Add correct __str__ method value
 class Sku(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sku')
     code = models.CharField(max_length=255, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
-        return ', '.join([f'{sku_option.option.attribute_group.get_name}: {sku_option.option.get_name}' for sku_option
-                          in self.options.all()])
+    # def __str__(self):
+    #     return ', '.join([f'{sku_option.option.attribute_group.get_name}: {sku_option.option.get_name}' for sku_option
+    #                       in self.options.all()])
 
     @property
     def get_name(self):
@@ -124,9 +130,13 @@ class Sku(models.Model):
         return '__'.join([product, options])
 
 
-class SkuOptions(models.Model):
+class SkuMaterials(models.Model):
     sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='options')
-    # option_group = models.ForeignKey('product.ProductClassOptionGroup', on_delete=models.PROTECT)
+    material = models.ForeignKey('product.ProductPartMaterials', on_delete=models.CASCADE)
+
+
+class SkuOptions(models.Model):
+    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='materials')
     option = models.ForeignKey('product.ProductClassOption', on_delete=models.PROTECT)
 
     class Meta:

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
 
-from apps.product.models import Sku, SkuOptions, SkuImages
+from apps.abstract.admin import ParentLinkMixin
+from apps.product.models import Product, Sku, SkuOptions, SkuImages, SkuMaterials
 
 
 class SkuImagesInline(admin.TabularInline):
@@ -23,14 +24,21 @@ class SkuImagesInline(admin.TabularInline):
     image_tag.short_description = 'Image preview'
 
 
+class SkuMaterialsInline(admin.TabularInline):
+    model = SkuMaterials
+    extra = 0
+
+
 class SkuOptionsInline(admin.TabularInline):
     model = SkuOptions
     extra = 0
 
 
 @admin.register(Sku)
-class SkuAdmin(admin.ModelAdmin):
+class SkuAdmin(ParentLinkMixin, admin.ModelAdmin):
+    parent_model = Product
     inlines = [
+        SkuMaterialsInline,
         SkuOptionsInline,
         SkuImagesInline
     ]

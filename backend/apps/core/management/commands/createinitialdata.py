@@ -1,8 +1,8 @@
 import io
+import os
 
 import requests
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.images import ImageFile
 from django.core.management.base import BaseCommand
 from django.db import models
@@ -10,12 +10,12 @@ from django.db import models
 from apps.attribute.abstract.fields import AttributeGroupTypeField
 from apps.attribute.data.colors import colors
 from apps.attribute.data.handles import handles
-from apps.attribute.models import Colors, AttributeGroup, Attribute, AttributeColor
+from apps.attribute.models import AttributeGroup, Attribute, AttributeColor
 from apps.category.models import Category
-import os
-
-from project.settings import MEDIA_ROOT
 from apps.core.colors import colors as web_colors
+from project.settings import MEDIA_ROOT
+from apps.material.models import Color
+
 
 def get_file(path):
     url = 'http://localhost:8000/static/' + path
@@ -34,10 +34,10 @@ def get_fabric_data():
 
 def add_base_colors():
     AttributeColor.objects.all().delete()
-    Colors.objects.all().delete()
+    Color.objects.all().delete()
 
     for base_color in web_colors:
-        color, _ = Colors.objects.get_or_create(name=base_color['name'], hex=base_color['hex'])
+        color, _ = Color.objects.get_or_create(name=base_color['name'], hex=base_color['hex'])
         print(color)
 
 
@@ -59,8 +59,6 @@ models_data = {
 
 
 class Command(BaseCommand):
-    # def add_arguments(self, parser):
-    #     parser.add_argument('poll_ids', nargs='+', type=int)
 
     @property
     def data(self):

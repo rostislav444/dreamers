@@ -24,7 +24,8 @@ class Command(BaseCommand):
             "calledMethod": "getAreas",
             "methodProperties": {}
         })
-        for state in data:
+
+        for state in data['data']:
             print(state)
             state_item, _ = NewPostAreas.objects.get_or_create(
                 ref=state['Ref'],
@@ -118,6 +119,7 @@ class Command(BaseCommand):
                 city = NewPostCities.objects.get(ref=item['SettlementRef'])
                 department, _ = NewPostDepartments.objects.get_or_create(
                     city=city,
+                    ref=item['Ref'],
                     number=item['Number'],
                     site_key=item['SiteKey'],
                     description=item['Description'],
@@ -147,6 +149,6 @@ class Command(BaseCommand):
             iter_data(response['data'])
 
     def handle(self, *args, **options):
-        # self.load_areas()
-        # self.load_cities()
+        self.load_areas()
+        self.load_cities()
         self.load_departments()

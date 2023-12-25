@@ -9,7 +9,7 @@ class NewPostApiKey(models.Model):
 
 
 class NewPostAreas(models.Model):
-    ref = models.CharField(max_length=255)
+    ref = models.UUIDField(max_length=255, primary_key=True)
     areas_center = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     description_ru = models.CharField(max_length=255)
@@ -33,8 +33,8 @@ class NewPostRegion(models.Model):
 
 
 class NewPostCities(models.Model):
+    ref = models.UUIDField(max_length=255, primary_key=True)
     region = models.ForeignKey(NewPostRegion, on_delete=models.CASCADE)
-    ref = models.CharField(max_length=255)
     settlement_type = models.CharField(max_length=255)
     latitude = models.DecimalField(max_digits=18, decimal_places=16)
     longitude = models.DecimalField(max_digits=18, decimal_places=16)
@@ -51,6 +51,7 @@ class NewPostCities(models.Model):
 
 
 class NewPostDepartments(models.Model):
+    ref = models.UUIDField(max_length=255, primary_key=True)
     city = models.ForeignKey(NewPostCities, on_delete=models.CASCADE, related_name='departments')
     number = models.PositiveIntegerField(default=0)
     site_key = models.PositiveIntegerField()

@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from apps.product.models import ProductClass, Product
 from .admin_product_class_attribues import ProductClassAttributesInline
+from .admin_product_class_materials import ProductPartInline
 from .admin_product_class_options import ProductClassOptionGroupInline, ProductClassOptionGroupCustomInline
 from .admin_product_class_product_attributes import ProductClassProductAttributeGroupsInline
 
@@ -20,7 +21,32 @@ class ProductInline(admin.TabularInline):
 # Product class
 @admin.register(ProductClass)
 class ProductClassAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('category', 'name', 'description', )
+        }),
+        ('Price', {
+            'fields': (('initial_price', 'square_decimeter_price'),)
+        }),
+        ('Width', {
+            'fields': (('min_width', 'max_width', 'width_step',),)
+        }),
+        ('Height', {
+            'fields': (('min_height', 'max_height', 'height_step',),)
+        }),
+        ('Depth', {
+            'fields': (('min_depth', 'max_depth', 'depth_step',),)
+        }),
+        ('Options', {
+            'fields': (
+                ('generate_sku_from_options', 'generate_variants_from_sizes'),
+                ('generate_products_from_dimensions',),
+            )
+        }),
+    )
+
     inlines = [
+        ProductPartInline,
         ProductClassAttributesInline,
         ProductClassOptionGroupInline,
         ProductClassOptionGroupCustomInline,

@@ -1,8 +1,8 @@
 from django.contrib import admin
-from apps.attribute.models import AttributeGroup
+
+from apps.abstract.admin import ParentLinkMixin
 from apps.product.forms import ProductOptionPriceMultiplierFromSet, ProductOptionPriceMultiplierFrom
-from apps.product.abstract.admin import ReturnToProductClassAdmin
-from apps.product.models import Product, Product3DBlenderModel, ProductOptionPriceMultiplier
+from apps.product.models import Product, Product3DBlenderModel, ProductOptionPriceMultiplier, ProductClass
 from .admin_product_attribute import ProductAttributeInline
 from .admin_sku import SkuInline
 
@@ -29,22 +29,18 @@ class Product3DBlenderModelInline(admin.StackedInline):
 
 
 @admin.register(Product)
-class ProductAdmin(ReturnToProductClassAdmin, admin.ModelAdmin):
+class ProductAdmin(ParentLinkMixin, admin.ModelAdmin):
+    parent_model = ProductClass
     inlines = [
         Product3DBlenderModelInline,
         ProductOptionPriceMultiplierInline,
         ProductAttributeInline,
         SkuInline
     ]
-
-    def get_fieldsets(self, request, obj=None):
-        return (
-            (None, {
-                'fields': (
-                    'product_class_link',
-                    'code', ('price', 'stock'), ('render_variants', 'generate_sku'),
-                )
-            },),
-        )
-
-
+    fieldsets = [
+        [None, {
+            'fields': (
+                'code', ('price', 'stock'), ('render_variants', 'generate_sku'),
+            )
+        }, ],
+    ]

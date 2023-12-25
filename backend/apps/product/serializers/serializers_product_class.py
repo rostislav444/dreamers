@@ -43,7 +43,7 @@ class ProductClassOptionGroupSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='get_name')
     options = serializers.SerializerMethodField()
     sub_groups = serializers.SerializerMethodField()
-    price_required = serializers.CharField(source='attribute_group.price_required'  , read_only=True)
+    price_required = serializers.CharField(source='attribute_group.price_required', read_only=True)
 
     class Meta:
         model = ProductClassOptionGroup

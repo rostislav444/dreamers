@@ -6,6 +6,7 @@ from project import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('product/', include('apps.product.urls', namespace='product')),
+    path('order/', include('apps.order.urls', namespace='order')),
     path('category/', include('apps.category.urls', namespace='category')),
     path('catalogue/', include('apps.catalogue.urls', namespace='catalogue')),
     path('attributes/', include('apps.attribute.urls', namespace='attributes')),

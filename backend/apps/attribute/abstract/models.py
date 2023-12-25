@@ -5,9 +5,20 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
+from apps.abstract.fields import DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.attribute.abstract import AttributeImageField
 from apps.attribute.abstract.fields import AttributeGroupTypeField
+
+attr_fields = {
+    AttributeGroupTypeField.TEXT: ['value_text'],
+    AttributeGroupTypeField.INTEGER: ['value_integer'],
+    AttributeGroupTypeField.BOOLEAN: ['value_boolean'],
+    AttributeGroupTypeField.FLOAT: ['value_float'],
+    AttributeGroupTypeField.COLOR: ['value_color_name', 'value_color_hex', 'value_color_image'],
+    AttributeGroupTypeField.RANGE: ['value_min', 'value_max'],
+    AttributeGroupTypeField.IMAGE: ['value_image_name', 'value_image_image']
+}
 
 
 class AttributeGroupAbstract(NameSlug):
@@ -19,7 +30,7 @@ class AttributeGroupAbstract(NameSlug):
         ordering = ['type', 'name']
 
     def __init__(self, *args, **kwargs):
-        super(AttributeGroupAbstract, self).__init__( *args, **kwargs)
+        super(AttributeGroupAbstract, self).__init__(*args, **kwargs)
         self.__type = self.type
 
     def save(self, *args, **kwargs):
@@ -33,15 +44,7 @@ class AttributeGroupAbstract(NameSlug):
 
     @property
     def attr_fields(self):
-        return {
-            AttributeGroupTypeField.TEXT: ['value_text'],
-            AttributeGroupTypeField.INTEGER: ['value_integer'],
-            AttributeGroupTypeField.BOOLEAN: ['value_boolean'],
-            AttributeGroupTypeField.FLOAT: ['value_float'],
-            AttributeGroupTypeField.COLOR: ['value_color_name', 'value_color_hex', 'value_color_image'],
-            AttributeGroupTypeField.RANGE: ['value_min', 'value_max'],
-            AttributeGroupTypeField.IMAGE: ['value_image_name', 'value_image_image']
-        }
+        return attr_fields
 
     @property
     def actual_field_name(self):
@@ -55,9 +58,10 @@ class AttributeAbstract(models.Model):
     value_float = models.FloatField(_('Float'), blank=True, null=True, db_index=True)
     value_color_name = models.CharField(_('Color'), max_length=500, blank=True, null=True)
     value_color_hex = ColorField(_('Color HEX'), max_length=7, blank=True, null=True)
-    value_color_image = AttributeImageField(_('Color IMAGE'), blank=True, null=True)
+    value_color_image = DeletableImageField(_('Color IMAGE'), blank=True, null=True)
+    # value_color_base_hex = ColorField(_('Base Color HEX'), max_length=7, blank=True, null=True)
     value_image_name = models.CharField(_('Name'), max_length=500, blank=True, null=True)
-    value_image_image = AttributeImageField(_('Image'), max_length=500, blank=True, null=True)
+    value_image_image = DeletableImageField(_('Image'), max_length=500, blank=True, null=True)
     value_min = models.IntegerField(_('Min'), blank=True, null=True, db_index=True)
     value_max = models.IntegerField(_('Max'), blank=True, null=True, db_index=True)
     slug = models.SlugField(max_length=1024, blank=True, null=True, editable=False)
