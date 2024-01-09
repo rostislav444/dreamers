@@ -95,10 +95,7 @@ DATABASES = {
         'USER': env['DB_USER'],
         'PASSWORD': env['DB_PASSWORD'],
         'HOST': '0.0.0.0',
-        'PORT': env.get('DB_PORT', 5432),
-        'OPTIONS': {
-            'charset': 'utf8',
-        },
+        'PORT': env.get('DB_PORT', 5432)
     }
 }
 
