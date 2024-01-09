@@ -59,7 +59,9 @@ def generate_variants_from_dimensions(obj):
     Product.objects.bulk_update(update, ['code', 'price'])
     updated_ids = [p.id for p in update]
 
-    products.exclude(id__in=created_ids+updated_ids).delete()
+    products.exclude(id__in=created_ids + updated_ids).delete()
 
 
-
+__all__ = [
+    'generate_variants_from_dimensions'
+]

@@ -11,7 +11,8 @@ class SkuImageLoadView(generics.GenericAPIView, mixins.CreateModelMixin, viewset
         return SkuImages.objects.all()
 
 
-class ProductClassRenderViewSet(generics.GenericAPIView, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.ViewSet):
+
+class ProductClassRenderViewSet(generics.GenericAPIView, mixins.RetrieveModelMixin, viewsets.ViewSet):
     serializer_class = ProductRenderWithSkuSerializer
 
     def get_queryset(self):

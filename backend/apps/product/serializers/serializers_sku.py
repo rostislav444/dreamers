@@ -1,44 +1,57 @@
 from rest_framework import serializers
 
-from apps.product.models import Sku, SkuOptions, SkuImages
-from collections import OrderedDict
+from apps.product.models import Sku, SkuMaterials, SkuImages
+from apps.product.serializers.serializers_materials import ProductPartMaterialSerializer
 
 
-class SkuOptionsSerializer(serializers.ModelSerializer):
-    value = serializers.SerializerMethodField()
-    group = serializers.SerializerMethodField()
-    option_id = serializers.IntegerField(source='option.id')
-    model_3d_name = serializers.CharField(source='option.attribute_group.model_3d_name')
+class SkuMaterialsSerializer(serializers.ModelSerializer):
+    material = ProductPartMaterialSerializer()
+    part_name = serializers.CharField(source='get_material_part_name')
 
     class Meta:
-        model = SkuOptions
-        fields = ['id', 'option_id', 'value', 'group', 'model_3d_name']
-
-    def get_value(self, obj):
-        return obj.option.value
-
-    def get_group(self, obj):
-        return obj.option.attribute_group.slug
+        model = SkuMaterials
+        fields = ['id', 'material', 'part_name']
 
 
 class SkuImagesSerializer(serializers.ModelSerializer):
-    sku = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Sku.objects.all())
-
     class Meta:
         model = SkuImages
-        fields = ['sku', 'image']
+        fields = ['image']
 
 
 class SkuSerializer(serializers.ModelSerializer):
-    options = serializers.SerializerMethodField()
-    images = SkuImagesSerializer(read_only=True, many=True)
+    images = SkuImagesSerializer(many=True, read_only=True)
+    materials = serializers.SerializerMethodField()
 
     class Meta:
         model = Sku
-        fields = ['id', 'options', 'images']
+        fields = ['id', 'code', 'images', 'materials']
 
-    def get_options(self, obj):
-        data = OrderedDict()
-        for option in obj.options.all():
-            data[option.option.attribute_group.slug] = SkuOptionsSerializer(option).data
-        return data
+    @staticmethod
+    def get_images(obj):
+        return [image.image_thumbnails['s'] for image in obj.images.all()]
+
+    @staticmethod
+    def get_materials(obj):
+        return {material.material.group.product_part.id: material.material.id for material in obj.materials.all()}
+
+
+class CatalogueSkuSerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField()
+    materials = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Sku
+        fields = ['id', 'code', 'images', 'materials']
+
+    @staticmethod
+    def get_images(obj):
+        return [
+            image.image_thumbnails.get('m', image.image.name)
+            for image in obj.images.all()
+        ]
+
+    @staticmethod
+    def get_materials(obj):
+        return {material.material.group.product_part.id: material.material.id for material in obj.materials.all()}
+

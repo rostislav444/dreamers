@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
+from django_admin_inline_paginator.admin import TabularInlinePaginated
 
 from apps.abstract.admin import ParentLinkMixin
 from apps.product.models import Product, Sku, SkuOptions, SkuImages, SkuMaterials
+from project.settings import AWS_BUCKET_URL
 
 
 class SkuImagesInline(admin.TabularInline):
@@ -13,14 +15,14 @@ class SkuImagesInline(admin.TabularInline):
         path = instance.image.name
         if path:
             return mark_safe(f'''
-                    <img src="/media/{path}" width="80" height="80" style="
+                    <img src="{AWS_BUCKET_URL}{path}" width="120" height="80" style="
                         border: 1px solid #ccc; border-radius: 6px; margin-top: -4px; object-fit: cover
                     " />
                ''')
         return None
 
     fields = ('index', 'image_tag', 'image',)
-    readonly_fields = ('image_tag',)
+    readonly_fields = ('image_tag', )
     image_tag.short_description = 'Image preview'
 
 
@@ -44,13 +46,24 @@ class SkuAdmin(ParentLinkMixin, admin.ModelAdmin):
     ]
 
 
-class SkuInline(admin.TabularInline):
+class SkuInline(TabularInlinePaginated):
     show_change_link = True
     model = Sku
     extra = 0
 
+    can_delete = True
+
     def name(self, object):
-        return object.__str__()
+        data = []
+
+        for material in object.materials.all():
+            part = material.get_material_part_name
+            material_name = material.material.get_value
+            material_type = material.material.group_type
+            li_str = f'<li><b>{part}</b> - <span>{material_name} {material_type[0]}</span></li>'
+            data.append(li_str)
+
+        return mark_safe(f'<ul>{"".join(data)}</ul>')
 
     fields = ('name', 'code', 'quantity',)
     readonly_fields = ('name',)

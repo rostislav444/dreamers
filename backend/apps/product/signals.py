@@ -1,42 +1,21 @@
 from django.db.models import signals
 from django.dispatch import receiver
-from apps.attribute.abstract.fields import AttributeGroupTypeAbstractField
-from apps.attribute.models import AttributeGroup
-from apps.product.models import ProductClass, ProductClassOptionGroup
 
-#
-# @receiver(signals.post_save, sender=ProductClass)
-# def add_required_options_to_product_class(sender, instance, **kwargs):
-#     for predefined_option_group in instance.category.predefined_option_groups.all():
-#         params = {
-#             'product_class': instance,
-#             'type': AttributeGroupTypeAbstractField.ATTRIBUTE,
-#             'attribute_group': predefined_option_group.group
-#         }
-
-        #     .attribute_groups.filter(required=AttributeGroup.OPTION):
-        # params = {
-        #     'product_class': instance,
-        #     'type': AttributeGroupTypeAbstractField.ATTRIBUTE,
-        #     'attribute_group': attribute_group
-        # }
-        # try:
-        #     ProductClassOptionGroup.objects.get(**params)
-        # except ProductClassOptionGroup.DoesNotExist:
-        #     product_class = ProductClassOptionGroup(**params)
-        #     product_class.save()
+from apps.product.models import ProductClass, ProductPartMaterialsGroups, ProductPartMaterials
+from apps.product.utils import generate_sku
 
 
-# @receiver(signals.post_save, sender=ProductClassOptionGroup)
-# def run_save_all_options(sender, instance, **kwargs):
-#     if instance.save_all_options and instance.attribute_group:
-#         for attr in instance.attribute_group.attributes.all():
-#             params = {
-#                 'group': instance,
-#                 'value_attribute': attr
-#             }
-#             try:
-#                 ProductClassOption.objects.get(**params)
-#             except ProductClassOption.DoesNotExist:
-#                 option = ProductClassOption(**params)
-#                 option.save()
+@receiver(signals.post_save, sender=ProductClass)
+def generate_sku_from_options(sender, instance, **kwargs):
+    if instance.pk and instance.generate_sku_from_options:
+        generate_sku(instance)
+        ProductClass.objects.filter(pk=instance.pk).update(generate_sku_from_options=False)
+
+
+@receiver(signals.post_save, sender=ProductPartMaterialsGroups)
+def add_plette_to_material_group_colors(sender, instance, **kwargs):
+    if instance.pk and instance.add_palette:
+        for palette_color in instance.add_palette.colors.all():
+            material, _ = ProductPartMaterials.objects.get_or_create(group=instance, color=palette_color.color)
+
+        ProductPartMaterialsGroups.objects.filter(pk=instance.pk).update(add_palette=None)

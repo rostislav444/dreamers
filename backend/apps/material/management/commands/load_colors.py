@@ -10,10 +10,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         csv_file_path = 'data/ral_classic.csv'
 
+        Color.objects.all().delete()
+
         with open(csv_file_path, 'r') as csv_file:
             reader = csv.reader(csv_file)
 
             for row in reader:
+                if row[2].lower() == 'hex':
+                    continue
                 try:
                     Color.objects.get(ral=row[0])
                 except ObjectDoesNotExist:

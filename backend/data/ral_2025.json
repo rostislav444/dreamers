@@ -1,0 +1,167 @@
+[
+    {
+        "id": 498,
+        "name": "Crimson red",
+        "hex": "#8B4B47",
+        "ral": "RAL 030 30 40",
+        "rgb": [
+            139,
+            75,
+            71
+        ]
+    },
+    {
+        "id": 499,
+        "name": "Fox red",
+        "hex": "#CA4E33",
+        "ral": "RAL 040 50 60",
+        "rgb": [
+            202,
+            78,
+            51
+        ]
+    },
+    {
+        "id": 500,
+        "name": "Apricot brown",
+        "hex": "#CC7E5B",
+        "ral": "RAL 050 60 40",
+        "rgb": [
+            204,
+            126,
+            91
+        ]
+    },
+    {
+        "id": 501,
+        "name": "Peanut butter",
+        "hex": "#C8A38A",
+        "ral": "RAL 060 70 20",
+        "rgb": [
+            200,
+            163,
+            138
+        ]
+    },
+    {
+        "id": 502,
+        "name": "Mineral brown",
+        "hex": "#4D3F33",
+        "ral": "RAL 070 30 10",
+        "rgb": [
+            77,
+            63,
+            51
+        ]
+    },
+    {
+        "id": 503,
+        "name": "Brick yellow",
+        "hex": "#CAAC65",
+        "ral": "RAL 075 70 40",
+        "rgb": [
+            202,
+            172,
+            101
+        ]
+    },
+    {
+        "id": 504,
+        "name": "Garlic beige",
+        "hex": "#B0AAA1",
+        "ral": "RAL 080 70 05",
+        "rgb": [
+            176,
+            170,
+            161
+        ]
+    },
+    {
+        "id": 505,
+        "name": "Pepper white",
+        "hex": "#dbd6cb",
+        "ral": "RAL 090 85 05",
+        "rgb": [
+            219,
+            214,
+            203
+        ]
+    },
+    {
+        "id": 506,
+        "name": "Natural yellow",
+        "hex": "#edd88a",
+        "ral": "RAL 095 85 40",
+        "rgb": [
+            237,
+            216,
+            138
+        ]
+    },
+    {
+        "id": 507,
+        "name": "Sand brown",
+        "hex": "#afac87",
+        "ral": "RAL 100 70 20",
+        "rgb": [
+            175,
+            172,
+            135
+        ]
+    },
+    {
+        "id": 508,
+        "name": "Sea green",
+        "hex": "#34675e",
+        "ral": "RAL 180 40 20",
+        "rgb": [
+            52,
+            103,
+            94
+        ]
+    },
+    {
+        "id": 509,
+        "name": "Summer soft blue",
+        "hex": "#98d1d2",
+        "ral": "RAL 200 80 20",
+        "rgb": [
+            152,
+            209,
+            210
+        ]
+    },
+    {
+        "id": 510,
+        "name": "Opal violet",
+        "hex": "#868fbc",
+        "ral": "RAL 280 60 25",
+        "rgb": [
+            134,
+            143,
+            188
+        ]
+    },
+    {
+        "id": 511,
+        "name": "Light violet",
+        "hex": "#868fbc",
+        "ral": "RAL 320 80 05",
+        "rgb": [
+            134,
+            143,
+            188
+        ]
+    },
+    {
+        "id": 512,
+        "name": "Opaline pink",
+        "hex": "#c6a2ac",
+        "ral": "RAL 360 70 15",
+        "rgb": [
+            198,
+            162,
+            172
+        ]
+    }
+]

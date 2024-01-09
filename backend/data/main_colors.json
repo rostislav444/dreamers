@@ -1,0 +1,52 @@
+{
+  "colors": [
+    {
+      "name": "Yellow",
+      "hex": "#FEF200"
+    },
+    {
+      "name": "Yellow-Orange",
+      "hex": "#FABD02"
+    },
+    {
+      "name": "Orange",
+      "hex": "#F2A205"
+    },
+    {
+      "name": "Red-Orange",
+      "hex": "#E2410B"
+    },
+    {
+      "name": "Red",
+      "hex": "#CC080C"
+    },
+    {
+      "name": "Red-Purple",
+      "hex": "#B3102D"
+    },
+    {
+      "name": "Purple",
+      "hex": "#89114E"
+    },
+    {
+      "name": "Blue-Purple",
+      "hex": "#54166C"
+    },
+    {
+      "name": "Blue",
+      "hex": "#013372"
+    },
+    {
+      "name": "Blue-Green",
+      "hex": "#358A69"
+    },
+    {
+      "name": "Green",
+      "hex": "#66B132"
+    },
+    {
+      "name": "Yellow-Green",
+      "hex": "#CDDF17"
+    }
+  ]
+}

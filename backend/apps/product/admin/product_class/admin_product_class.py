@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from apps.product.models import ProductClass, Product
 from .admin_product_class_attribues import ProductClassAttributesInline
-from .admin_product_class_materials import ProductPartInline
+from .admin_product_class_materials import ProductPartInline, ProductStaticPartInline
 from .admin_product_class_options import ProductClassOptionGroupInline, ProductClassOptionGroupCustomInline
 from .admin_product_class_product_attributes import ProductClassProductAttributeGroupsInline
 
@@ -46,6 +46,7 @@ class ProductClassAdmin(admin.ModelAdmin):
     )
 
     inlines = [
+        ProductStaticPartInline,
         ProductPartInline,
         ProductClassAttributesInline,
         ProductClassOptionGroupInline,

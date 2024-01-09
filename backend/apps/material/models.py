@@ -2,7 +2,8 @@ import PIL
 from PIL import ImageColor
 from django.db import models
 
-from apps.abstract.fields import DeletableFileField
+
+from apps.abstract.fields import DeletableFileField, DeletableImageField
 from apps.abstract.models import NameSlug
 
 
@@ -10,22 +11,34 @@ class MidColor(NameSlug):
     hex = models.CharField(max_length=7)
 
 
+class Palette(NameSlug):
+    pass
+
+
 class Color(NameSlug):
     mid_color = models.ForeignKey(MidColor, on_delete=models.CASCADE, null=True, blank=True)
-    ral = models.CharField(max_length=9, null=True, blank=True)
+    ral = models.CharField(max_length=24, null=True, blank=True)
     hex = models.CharField(max_length=7)
-    rgb = models.JSONField(default=list)
+    rgb = models.JSONField(default=list, blank=True)
+    lvl = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['mid_color', 'ral', 'hex']
+        ordering = ['lvl']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        print('self.hex', self.hex)
         self.rgb = PIL.ImageColor.getrgb(self.hex)
         super(Color, self).save(*args, **kwargs)
+
+
+class PaletteColor(models.Model):
+    palette = models.ForeignKey(Palette, on_delete=models.CASCADE, related_name='colors')
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='palettes')
+
+    class Meta:
+        unique_together = (('palette', 'color'),)
 
 
 class MaterialGroups(models.Model):
@@ -33,8 +46,16 @@ class MaterialGroups(models.Model):
         ('material', 'material',),
         ('color', 'color',),
     )
+    PRICE_LEVEL_CHOICES = (
+        ('group', 'Цена на группу'),
+        ('sub_group', 'Цена на суб группу'),
+        ('material', 'Цена на материал'),
+    )
+
     type = models.CharField(max_length=25, choices=TYPES, default=TYPES[0][0])
     name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='Цена, м2', blank=True)
+    price_level = models.CharField(choices=PRICE_LEVEL_CHOICES, max_length=9, null=True, blank=True)
 
     class Meta:
         ordering = ('name',)
@@ -46,6 +67,7 @@ class MaterialGroups(models.Model):
 class MaterialSubGroup(models.Model):
     group = models.ForeignKey(MaterialGroups, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='Цена, м2', blank=True)
 
     def __str__(self):
         return self.name
@@ -76,17 +98,18 @@ class BlenderMaterial(NameSlug):
         return data
 
 
-
 class Material(NameSlug):
     group = models.ForeignKey(MaterialGroups, on_delete=models.CASCADE, related_name='materials')
     sub_group = models.ForeignKey(MaterialSubGroup, on_delete=models.CASCADE, null=True, blank=True,
                                   related_name='materials')
 
-    image = DeletableFileField(null=True, blank=True)
-    blender_material = models.OneToOneField(BlenderMaterial, null=True, blank=True, on_delete=models.PROTECT)
+    image = DeletableImageField(null=True, blank=True)
+    blender_material = models.OneToOneField(BlenderMaterial, null=True, blank=True, on_delete=models.PROTECT,
+                                            related_name='material')
+    price = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='Цена, м2', blank=True)
 
     def __str__(self):
-        names = [self.group.name, self.name]
-        if self.sub_group:
-            names.insert(1, self.sub_group.name)
-        return ' / '.join(names)
+        return ' / '.join([self.group.name, self.name])
+
+
+

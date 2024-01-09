@@ -6,7 +6,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.abstract.fields import CustomFileField, CustomImageField
+from apps.abstract.fields import CustomFileField, CustomImageField, DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
 from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
@@ -27,6 +27,19 @@ class Product(models.Model):
     class Meta:
         ordering = ['width', 'height', 'depth']
 
+    def __str__(self):
+        return self.product_class.name
+
+    @property
+    def get_image(self):
+        sku = self.sku.filter(images__isnull=False).first()
+        return sku.images.filter(index=0).first().image.url if sku else None
+
+    @property
+    def get_images(self):
+        sku = self.sku.filter(images__isnull=False).first()
+        return [obj.image.url for obj in sku.images.all()] if sku else None
+
     def generate_sku_from_options(self):
         options_groups = [list(group.options.all()) for group in
                           self.product_class.option_groups.filter(image_dependency=True)]
@@ -41,9 +54,6 @@ class Product(models.Model):
                 for option in options_group:
                     SkuOptions.objects.create(sku=sku, option=option)
             print(num, sku)
-
-    def __str__(self):
-        return self.product_class.name
 
     @property
     def get_name(self):
@@ -111,15 +121,25 @@ class ProductAttribute(models.Model):
             return str(self.attribute)
         return None
 
-# TODO Add correct __str__ method value
+
+class SkuManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('materials', 'options', 'images')
+
+
 class Sku(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sku')
-    code = models.CharField(max_length=255, null=True, blank=True)
+    code = models.CharField(max_length=1024, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
 
-    # def __str__(self):
-    #     return ', '.join([f'{sku_option.option.attribute_group.get_name}: {sku_option.option.get_name}' for sku_option
-    #                       in self.options.all()])
+    objects = SkuManager()
+
+    class Meta:
+        ordering = ['-materials__material__show_in_catalogue', 'images']
+
+    def __str__(self):
+        img_count = str(self.images.count())
+        return self.code + f' - imgs: {img_count}'
 
     @property
     def get_name(self):
@@ -129,14 +149,40 @@ class Sku(models.Model):
              self.options.all()])
         return '__'.join([product, options])
 
+    @property
+    def get_code(self):
+        materials = self.materials.all()
+        return '__'.join([self.product.code, *[material.material.code for material in materials]])
+
+
+class SkuMaterialsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('material__group__product_part')
+
+
+class SkuMaterialsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'material__group__product_part'
+        )
+
 
 class SkuMaterials(models.Model):
-    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='options')
-    material = models.ForeignKey('product.ProductPartMaterials', on_delete=models.CASCADE)
+    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='materials')
+    material = models.ForeignKey('product.ProductPartMaterials', on_delete=models.CASCADE, related_name='sku_materials')
+
+    objects = SkuMaterialsManager()
+
+    class Meta:
+        ordering = ['-material__show_in_catalogue']
+
+    @property
+    def get_material_part_name(self):
+        return self.material.group.product_part.name
 
 
 class SkuOptions(models.Model):
-    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='materials')
+    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='options')
     option = models.ForeignKey('product.ProductClassOption', on_delete=models.PROTECT)
 
     class Meta:
@@ -154,10 +200,11 @@ class SkuOptions(models.Model):
 
 
 class SkuImages(models.Model):
-    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='images')
-    image = CustomImageField()
-    image_thumb = CustomImageField(null=True, blank=True)
+    sku = models.ForeignKey(Sku, max_length=1024, on_delete=models.CASCADE, related_name='images')
+    image = DeletableImageField()
+    image_thumbnails = models.JSONField(default=dict, blank=True)
     index = models.PositiveIntegerField(default=0)
+    local = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('index',)

@@ -1,35 +1,26 @@
 from rest_framework import serializers
 
-from apps.product.models import Product, ProductAttribute, Product3DBlenderModel, ProductOptionPriceMultiplier
+from apps.product.models import Product
+from .serializers_materials import ProductPartSerializer
 from .serializers_sku import SkuSerializer
-
-
-class ProductOptionPriceMultiplierSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductOptionPriceMultiplier
-        fields = ['value', 'option_group']
-
-
-class Product3DBlenderModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product3DBlenderModel
-        fields = ['blend', 'blend1', 'mtl', 'obj']
-
-
-class ProductAttributesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductAttribute
-        fields = ['id', 'attribute']
+from ...category.serializers import CategorySerializer
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    model_3d = Product3DBlenderModelSerializer(read_only=True)
+    name = serializers.CharField(source='product_class.name')
     sku = SkuSerializer(read_only=True, many=True)
-    attributes = ProductAttributesSerializer(read_only=True, many=True)
-    multipliers = ProductOptionPriceMultiplierSerializer(many=True, read_only=True)
+    parts = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'price', 'model_3d', 'sku', 'attributes', 'multipliers']
+        fields = ['id', 'name', 'price', 'code', 'sku', 'parts', 'categories']
+
+    @staticmethod
+    def get_parts(obj):
+        return ProductPartSerializer(obj.product_class.parts.all(), many=True).data
 
 
+    @staticmethod
+    def get_categories(obj):
+        return [CategorySerializer(category).data for category in obj.product_class.category.get_ancestors(include_self=True)]
