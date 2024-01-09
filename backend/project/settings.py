@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv, dotenv_values
 from django.core.files.storage import default_storage
+from dotenv import load_dotenv, dotenv_values
 
 from .storage import S3Storage
 
@@ -18,7 +18,6 @@ load_dotenv()
 env = dotenv_values(".env")
 
 # print(os.path.join(BASE_DIR, '.env'))
-
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -96,7 +95,10 @@ DATABASES = {
         'USER': env['DB_USER'],
         'PASSWORD': env['DB_PASSWORD'],
         'HOST': '0.0.0.0',
-        'PORT': env.get('DB_PORT', 5432)
+        'PORT': env.get('DB_PORT', 5432),
+        'OPTIONS': {
+            'charset': 'utf8',
+        },
     }
 }
 
