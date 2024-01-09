@@ -5,16 +5,15 @@ from io import BytesIO
 
 from PIL import Image
 from django import forms
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.core.files.storage import default_storage
+from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.forms.widgets import FileInput
-from django.core.files import File
-from project.settings import MEDIA_ROOT
-from project.storage import S3Storage
+
+from project.settings import MEDIA_ROOT, FILE_STORAGE
 
 
 class DeleteMethods:
@@ -114,7 +113,7 @@ class FileNaming:
 
 class DeletableMediaField(FileNaming, DeleteMethods, models.FileField):
     valid_extensions = []
-    storage = S3Storage
+    storage = FILE_STORAGE
 
     class Meta:
         abstract = True
