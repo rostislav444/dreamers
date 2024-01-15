@@ -25,6 +25,7 @@ SECRET_KEY = 'django-insecure-zg@1y0y6nkmrhmeigva!jl@sxe)1=vsu96dt5h4(@6)ffel^60
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env['DEBUG']
+PRODUCTION = env['PRODUCTION']
 print('DEBUG', DEBUG)
 
 ALLOWED_HOSTS = ['*']
@@ -164,5 +165,5 @@ FILE_STORAGE = CustomFileSystemStorage if DEBUG else S3Storage
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
-MEDIA_URL = '/media/' if DEBUG else AWS_BUCKET_URL
+MEDIA_URL = '/media/' if PRODUCTION else AWS_BUCKET_URL
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
