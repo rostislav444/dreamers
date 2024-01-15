@@ -1,35 +1,96 @@
 import PIL
 from PIL import ImageColor
+from colormath.color_conversions import convert_color
+from colormath.color_diff import delta_e_cie1976
+from colormath.color_objects import sRGBColor, LabColor
 from django.db import models
-
 
 from apps.abstract.fields import DeletableFileField, DeletableImageField
 from apps.abstract.models import NameSlug
 
+import numpy
 
-class MidColor(NameSlug):
+def patch_asscalar(a):
+    return a.item()
+
+setattr(numpy, "asscalar", patch_asscalar)
+
+
+class BaseColor(NameSlug):
     hex = models.CharField(max_length=7)
+    rgb = models.JSONField(default=list, blank=True)
+    lvl = models.PositiveIntegerField(default=0)
+    index = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return '%s - %d' % (self.name, self.lvl)
+
+    class Meta:
+        ordering = ['index', 'lvl']
+
+    def save(self, *args, **kwargs):
+        self.rgb = PIL.ImageColor.getrgb(self.hex)
+        super(BaseColor, self).save(*args, **kwargs)
 
 
 class Palette(NameSlug):
     pass
 
 
+def calculate_cie76_distance(color1, color2):
+    """
+    Вычисляет расстояние между двумя цветами в модели CIELAB (CIE76).
+    """
+    color1_lab = convert_color(sRGBColor(*color1, is_upscaled=True), LabColor)
+    color2_lab = convert_color(sRGBColor(*color2, is_upscaled=True), LabColor)
+
+    # Use item() to convert the result to a Python scalar
+    distance = delta_e_cie1976(color1_lab, color2_lab)
+    return distance
+
+
+def find_closest_color_cie76(target_color, color_list):
+    """
+    Находит ближайший цвет из списка цветов к заданному целевому цвету в модели CIELAB (CIE76).
+    """
+    closest_color = min(color_list, key=lambda color: calculate_cie76_distance(target_color, color))
+    return closest_color
+
+
 class Color(NameSlug):
-    mid_color = models.ForeignKey(MidColor, on_delete=models.CASCADE, null=True, blank=True)
+    mid_color = models.ForeignKey(BaseColor, on_delete=models.CASCADE, null=True, blank=True)
     ral = models.CharField(max_length=24, null=True, blank=True)
     hex = models.CharField(max_length=7)
     rgb = models.JSONField(default=list, blank=True)
     lvl = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['lvl']
+        ordering = ['ral']
 
     def __str__(self):
+        if self.ral:
+            return ' '.join([self.name, self.ral])
         return self.name
+
+    def closest_color(self, rgb):
+        colors = BaseColor.objects.all()
+        rgb_colors = colors.values_list('rgb', flat=True)
+
+        # r, g, b = rgb
+        # color_diffs = []
+        # for color in rgb_colors:
+        #     cr, cg, cb = color
+        #     color_diff = sqrt((r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2)
+        #     color_diffs.append((color_diff, color))
+        # closest = min(color_diffs)[1]
+
+        closest = find_closest_color_cie76(rgb, rgb_colors)
+
+        return colors.filter(rgb=closest).first()
 
     def save(self, *args, **kwargs):
         self.rgb = PIL.ImageColor.getrgb(self.hex)
+        self.mid_color = self.closest_color(self.rgb)
         super(Color, self).save(*args, **kwargs)
 
 
@@ -110,6 +171,3 @@ class Material(NameSlug):
 
     def __str__(self):
         return ' / '.join([self.group.name, self.name])
-
-
-

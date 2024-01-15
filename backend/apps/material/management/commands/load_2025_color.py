@@ -26,5 +26,6 @@ class Command(BaseCommand):
                     hex=clr['hex'],
                     ral=clr['ral'],
                 )
+                color.save()
 
                 PaletteColor.objects.get_or_create(color=color, palette=palette)

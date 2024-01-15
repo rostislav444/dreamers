@@ -4,7 +4,7 @@ from pathlib import Path
 from django.core.files.storage import default_storage
 from dotenv import load_dotenv, dotenv_values
 
-from .storage import S3Storage
+from .storage import S3Storage, CustomFileSystemStorage
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,9 +141,7 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 STATICFILES_DIRS = [
     STATICFILE_DIR,
 ]
@@ -161,4 +159,9 @@ AWS_BUCKET_URL = env['AWS_BUCKET_URL']
 AWS_ACCESS_KEY_ID = env['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = env['AWS_SECRET_ACCESS_KEY']
 
-FILE_STORAGE = default_storage if DEBUG else S3Storage
+FILE_STORAGE = CustomFileSystemStorage if DEBUG else S3Storage
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
+MEDIA_URL = '/media/' if DEBUG else AWS_BUCKET_URL
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

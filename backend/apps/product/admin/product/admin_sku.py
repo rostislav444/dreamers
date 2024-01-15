@@ -4,7 +4,7 @@ from django_admin_inline_paginator.admin import TabularInlinePaginated
 
 from apps.abstract.admin import ParentLinkMixin
 from apps.product.models import Product, Sku, SkuOptions, SkuImages, SkuMaterials
-from project.settings import AWS_BUCKET_URL
+from project.settings import MEDIA_URL
 
 
 class SkuImagesInline(admin.TabularInline):
@@ -13,9 +13,10 @@ class SkuImagesInline(admin.TabularInline):
 
     def image_tag(self, instance):
         path = instance.image.name
+
         if path:
             return mark_safe(f'''
-                    <img src="{AWS_BUCKET_URL}{path}" width="120" height="80" style="
+                    <img src="{MEDIA_URL}{path}" width="120" height="80" style="
                         border: 1px solid #ccc; border-radius: 6px; margin-top: -4px; object-fit: cover
                     " />
                ''')

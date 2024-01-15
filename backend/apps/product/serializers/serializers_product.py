@@ -8,13 +8,14 @@ from ...category.serializers import CategorySerializer
 
 class ProductSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='product_class.name')
+    description = serializers.CharField(source='product_class.description')
     sku = SkuSerializer(read_only=True, many=True)
     parts = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price', 'code', 'sku', 'parts', 'categories']
+        fields = ['id', 'name', 'description', 'price', 'code', 'sku', 'parts', 'categories', 'width', 'height', 'depth']
 
     @staticmethod
     def get_parts(obj):

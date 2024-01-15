@@ -16,7 +16,7 @@ class SkuMaterialsSerializer(serializers.ModelSerializer):
 class SkuImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SkuImages
-        fields = ['image']
+        fields = ['sku', 'image', 'index']
 
 
 class SkuSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class CatalogueSkuSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_images(obj):
         return [
-            image.image_thumbnails.get('m', image.image.name)
+            image.image.name
             for image in obj.images.all()
         ]
 

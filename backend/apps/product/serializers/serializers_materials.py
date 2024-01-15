@@ -31,12 +31,19 @@ class ProductPartMaterialsSubGroupsSerializer(serializers.ModelSerializer):
 
 class ProductPartMaterialsGroupsSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='group.type')
-    materials = ProductPartMaterialSerializer(many=True, read_only=True)
+    materials = serializers.SerializerMethodField()
     sub_groups = ProductPartMaterialsSubGroupsSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductPartMaterialsGroups
         fields = ('id', 'type', 'sub_groups', 'materials',)
+
+    @staticmethod
+    def get_materials(obj):
+        materials_qs = obj.materials.filter(
+            sku_materials__sku__product__product_class=obj.product_part.product_class
+        ).distinct()
+        return ProductPartMaterialSerializer(materials_qs, many=True, read_only=True).data
 
 
 class ProductPartSerializer(serializers.ModelSerializer):
@@ -80,7 +87,8 @@ class CatalogueProductPartSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_materials(obj):
-        materials = []
-        for group in obj.material_groups.all():
-            materials += CatalogueProductPartMaterialSerializer(group.materials.all(), many=True).data
-        return materials
+        materials = ProductPartMaterials.objects.filter(
+            group__product_part=obj,
+            sku_materials__sku__product__product_class=obj.product_class
+        ).distinct()[:8]
+        return CatalogueProductPartMaterialSerializer(materials, many=True).data
