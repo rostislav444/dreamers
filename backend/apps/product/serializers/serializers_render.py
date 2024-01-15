@@ -33,6 +33,8 @@ class ProductRenderSerializer(serializers.ModelSerializer):
         fields = ['id', 'code', 'model_3d', 'sku', ]
 
 
+
+
 class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
     color = ColorSerializer(read_only=True)
     material = serializers.SerializerMethodField()

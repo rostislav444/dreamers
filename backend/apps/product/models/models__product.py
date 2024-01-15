@@ -6,7 +6,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.abstract.fields import CustomFileField, CustomImageField, DeletableImageField, DeletableFileField
+from apps.abstract.fields import CustomFileField, DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
 from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
@@ -124,9 +124,14 @@ class ProductAttribute(models.Model):
         return None
 
 
-class SkuManager(models.Manager):
+class SkuPrefetchedManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().prefetch_related('materials', 'options', 'images').distinct()
+
+
+class SkuManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
 
 
 class Sku(models.Model):
@@ -134,10 +139,11 @@ class Sku(models.Model):
     code = models.CharField(max_length=1024, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
 
-    # objects = SkuManager()
-    #
-    # class Meta:
-    #     ordering = ['-materials__material__show_in_catalogue', 'images']
+    objects_no_distinct = SkuManager()
+    objects = SkuPrefetchedManager()
+
+    class Meta:
+        ordering = ['-materials__material__show_in_catalogue', 'images']
 
     def __str__(self):
         img_count = str(self.images.count())
@@ -160,13 +166,6 @@ class Sku(models.Model):
 class SkuMaterialsManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related('material__group__product_part')
-
-
-class SkuMaterialsManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related(
-            'material__group__product_part'
-        )
 
 
 class SkuMaterials(models.Model):

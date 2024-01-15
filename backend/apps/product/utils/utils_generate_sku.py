@@ -14,7 +14,7 @@ def generate_sku(instance):
     combinations = [tuple(zip(keys, values)) for values in product(*data.values())]
 
     for variant in instance.products.all():
-        variant.sku.all().delete()
+        Sku.objects.filter(product=variant).delete()
         for combination in combinations:
             code = '__'.join([variant.code, *[material[1].code for material in combination]])
 
