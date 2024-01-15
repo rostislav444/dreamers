@@ -161,7 +161,7 @@ AWS_BUCKET_URL = env['AWS_BUCKET_URL']
 AWS_ACCESS_KEY_ID = env['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = env['AWS_SECRET_ACCESS_KEY']
 
-FILE_STORAGE = CustomFileSystemStorage if DEBUG else S3Storage
+FILE_STORAGE = CustomFileSystemStorage if PRODUCTION else S3Storage
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
