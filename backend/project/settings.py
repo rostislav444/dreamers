@@ -164,5 +164,5 @@ AWS_SECRET_ACCESS_KEY = env['AWS_SECRET_ACCESS_KEY']
 FILE_STORAGE = S3Storage if PRODUCTION else CustomFileSystemStorage
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
-MEDIA_URL = '/media/' if PRODUCTION else AWS_BUCKET_URL
+MEDIA_URL = AWS_BUCKET_URL if PRODUCTION else '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

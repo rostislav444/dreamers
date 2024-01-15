@@ -12,9 +12,26 @@ from django.core.files.storage import FileSystemStorage
 @deconstructible
 class S3Storage(Storage):
     def __init__(self):
-        self.bucket_name = 'dreamers'  # ваш бакет
-        self.client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                                   aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+        self.bucket_name = 'dreamersnew'  # ваш бакет
+        self.client = boto3.client('s3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name='eu-north-1',
+        )
+
+    def check_signature(self):
+        try:
+            # Выполните тестовый запрос, например, получите список объектов в бакете
+            response = self.client.list_objects(Bucket=self.bucket_name)
+
+            # Если запрос успешен, выведите информацию (или проверьте логи)
+            print("Подпись запроса успешна.")
+            print("Ответ сервера:", response)
+        except NoCredentialsError:
+            print("Ошибка: Ключи доступа не действительны.")
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
 
     def _normalize_name(self, name):
         return name
@@ -79,9 +96,7 @@ class S3Storage(Storage):
             print('Credentials not available')
 
     def url(self, name):
-        return f'https://{self.bucket_name}.s3.amazonaws.com/{name}'
-
-
+        return f'https://{self.bucket_name}.s3.eu-north-1.amazonaws.com/{name}'
 
 
 class CustomFileSystemStorage(FileSystemStorage):
