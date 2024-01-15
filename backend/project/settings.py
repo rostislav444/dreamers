@@ -24,7 +24,8 @@ env = dotenv_values(".env")
 SECRET_KEY = 'django-insecure-zg@1y0y6nkmrhmeigva!jl@sxe)1=vsu96dt5h4(@6)ffel^60'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env['DEBUG']
+print('DEBUG', DEBUG)
 
 ALLOWED_HOSTS = ['*']
 

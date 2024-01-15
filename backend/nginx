@@ -1,0 +1,52 @@
+server {
+    server_name 212.8.246.22 dreamers.com.ua;
+    access_log /var/log/nginx/dreamers/access.log;
+   
+    client_max_body_size 100M;
+    proxy_read_timeout 120s;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location /static/ {
+        alias /var/www/dreamers/backend/static_root/;
+    }
+
+    location /media/ {
+        alias /var/www/dreamers/backend/media/;
+        expires 30d;  # Cache media files for 30 days
+        add_header Cache-Control "public";
+    }
+
+    location /ru/rozetka/ {
+        include proxy_params;
+        proxy_pass http://unix:/run/dreamers.sock;
+    }
+
+    # Handle /api/ and /admin/ with Gunicorn
+    location ~ ^/(admin|api) {
+        # Exclude /api/auth/
+        location ~ ^/api/auth/ {
+            break;
+        }
+        include proxy_params;
+        proxy_pass http://unix:/run/dreamers.sock;
+    }
+
+    # Handle /api/auth/ with frontend
+    location ^~ /api/auth/ {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Handle everything else with frontend
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
