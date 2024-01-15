@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from apps.material.models import MaterialGroups, MaterialSubGroup, Material, Color, MidColor, BlenderMaterial, Palette, \
+from apps.material.models import MaterialGroups, MaterialSubGroup, Material, Color, BaseColor, BlenderMaterial, Palette, \
     PaletteColor
 
 
@@ -10,9 +10,22 @@ class BlenderMaterialAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(MidColor)
-class MidColorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'hex',)
+@admin.register(BaseColor)
+class BaseColorAdmin(admin.ModelAdmin):
+    @staticmethod
+    def color_preview(obj):
+        if obj.hex:
+            return format_html('''<div style="
+                width: 48px; 
+                height: 48px; 
+                background-color: {}; 
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            "></div>''', obj.hex)
+        return '-'
+
+    list_display = ('color_preview', 'name', 'lvl', 'index', 'hex',)
+    readonly_fields = ('color_preview',)
+
 
 
 class PaletteColorInline(admin.TabularInline):
@@ -48,9 +61,10 @@ class ColorAdmin(admin.ModelAdmin):
             "></div>''', obj.hex)
         return '-'
 
-    list_display = ('color_preview', 'name', 'lvl', 'ral', 'hex',)
+    list_display = ('color_preview', 'name', 'lvl', 'ral', 'mid_color', 'hex',)
     readonly_fields = ('color_preview',)
     inlines = [PaletteColorInline]
+    search_fields=['name', 'ral']
 
 
 class MaterialInline(admin.TabularInline):

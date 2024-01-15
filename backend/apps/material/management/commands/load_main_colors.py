@@ -2,7 +2,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from apps.material.models import Palette, Color
+from apps.material.models import Palette, BaseColor
 
 
 def generate_shades(base_color):
@@ -44,26 +44,33 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         file_path = 'data/main_colors.json'
 
-        Color.objects.all().delete()
+        BaseColor.objects.all().delete()
 
-        palette, _ = Palette.objects.get_or_create(name='Main colors')
+        white, _ = BaseColor.objects.get_or_create(name='White', hex='#ffffff', lvl=0, index=0)
+        black, _ = BaseColor.objects.get_or_create(name='Black', hex='#000000', lvl=8, index=13)
+
+        base_num = 4
 
         with open(file_path, 'r') as json_file:
             reader = json.load(json_file)
 
-            for color in reader['colors']:
-                main_color, _ = Color.objects.get_or_create(name=color['name'], hex=color['hex'], lvl=5)
+            for index, color in enumerate(reader['colors'], 1):
+                main_color, _ = BaseColor.objects.get_or_create(name=color['name'], hex=color['hex'], index=index, lvl=base_num)
 
                 for n, shade in enumerate(generate_shades(main_color.rgb)):
-                    _color, _ = Color.objects.get_or_create(
+                    _color, _ = BaseColor.objects.get_or_create(
                         name=color['name'],
                         hex=rgb_to_hex(shade),
-                        lvl=5 + n + 1
+                        index=index,
+                        lvl=base_num + n + 1
                     )
 
                 for n, shade in enumerate(lighten_color(main_color.rgb)):
-                    _color, _ = Color.objects.get_or_create(
+                    _color, _ = BaseColor.objects.get_or_create(
                         name=color['name'],
                         hex=rgb_to_hex(shade),
-                        lvl=5 - n - 1
+                        index=index,
+                        lvl=base_num - n - 1
                     )
+
+

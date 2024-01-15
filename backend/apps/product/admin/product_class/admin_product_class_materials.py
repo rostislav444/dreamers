@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-
+from admin_auto_filters.filters import AutocompleteFilter
 from apps.material.models import Material
 from apps.product.forms.product_class.forms_product_class_parts import ProductStaticPartForm
 from apps.product.models import ProductStaticPart, ProductPartMaterialsGroups, ProductPart, ProductPartMaterials
@@ -14,11 +14,19 @@ class ProductStaticPartInline(admin.StackedInline):
     fields = (('name', 'blender_name', 'group'), 'material', 'color')
 
 
+class ProductPartMaterialsFilter(AutocompleteFilter):
+    title = 'Color'
+    field_name = 'color'
+
+
 class ProductPartMaterialsInline(admin.TabularInline):
     _obj = None
 
     model = ProductPartMaterials
     readonly_fields = ('code', 'preview')
+    list_filter = [ProductPartMaterialsFilter]
+    search_fields = ['color__name']
+    autocomplete_fields = ['color']
     extra = 0
 
     def preview(self, obj):

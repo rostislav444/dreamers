@@ -6,7 +6,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.abstract.fields import CustomFileField, CustomImageField, DeletableImageField
+from apps.abstract.fields import CustomFileField, CustomImageField, DeletableImageField, DeletableFileField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
 from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
@@ -28,7 +28,9 @@ class Product(models.Model):
         ordering = ['width', 'height', 'depth']
 
     def __str__(self):
-        return self.product_class.name
+        sku_count = self.sku.all().count()
+        sku_with_images = self.sku.filter(images__isnull=False).count()
+        return f'{self.product_class.name} ({str(sku_with_images)} / {str(sku_count)})'
 
     @property
     def get_image(self):
@@ -124,7 +126,7 @@ class ProductAttribute(models.Model):
 
 class SkuManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('materials', 'options', 'images')
+        return super().get_queryset().prefetch_related('materials', 'options', 'images').distinct()
 
 
 class Sku(models.Model):
@@ -132,10 +134,10 @@ class Sku(models.Model):
     code = models.CharField(max_length=1024, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
 
-    objects = SkuManager()
-
-    class Meta:
-        ordering = ['-materials__material__show_in_catalogue', 'images']
+    # objects = SkuManager()
+    #
+    # class Meta:
+    #     ordering = ['-materials__material__show_in_catalogue', 'images']
 
     def __str__(self):
         img_count = str(self.images.count())

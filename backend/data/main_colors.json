@@ -47,6 +47,10 @@
     {
       "name": "Yellow-Green",
       "hex": "#CDDF17"
+    },
+    {
+      "name": "Gray",
+      "hex": "#808080"
     }
   ]
 }

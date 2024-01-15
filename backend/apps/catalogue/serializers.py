@@ -7,7 +7,7 @@ from apps.product.serializers.serializers_materials import CatalogueProductPartS
 
 class CatalogueProductSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='product_class.name')
-    parts = CatalogueProductPartSerializer(source='product_class.parts', many=True)
+    parts = serializers.SerializerMethodField()
     sku = serializers.SerializerMethodField()
 
     class Meta:
@@ -15,5 +15,23 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'code', 'price', 'parts', 'sku']
 
     @staticmethod
+    def get_parts(obj):
+        parts_qs = obj.product_class.parts.filter()
+        parts = CatalogueProductPartSerializer(obj.product_class.parts, many=True).data
+        materials_ids = [material['id'] for part in parts for material in part['materials']]
+        return {
+            'sku': CatalogueSkuSerializer(
+                obj.sku.filter(images__isnull=False, materials__material__id__in=materials_ids).distinct(), many=True
+            ).data,
+            'parts': parts
+        }
+
+    @staticmethod
     def get_sku(obj):
-        return CatalogueSkuSerializer(obj.sku.filter(images__isnull=False).distinct()[:12], many=True).data
+        return []
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        data = self.get_parts(instance)
+        representation.update(data)
+        return representation

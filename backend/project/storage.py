@@ -1,4 +1,5 @@
 import mimetypes
+import os
 
 import boto3
 from botocore.exceptions import NoCredentialsError
@@ -6,7 +7,7 @@ from django.conf import settings
 from django.core.files.storage import Storage
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
-
+from django.core.files.storage import FileSystemStorage
 
 @deconstructible
 class S3Storage(Storage):
@@ -79,3 +80,22 @@ class S3Storage(Storage):
 
     def url(self, name):
         return f'https://{self.bucket_name}.s3.amazonaws.com/{name}'
+
+
+
+
+class CustomFileSystemStorage(FileSystemStorage):
+    def delete(self, name):
+        if not name:
+            raise ValueError("The name must be given to delete().")
+        name = self.path(name)
+        # If the file or directory exists, delete it from the filesystem.
+        try:
+            if os.path.isdir(name):
+                os.rmdir(name)
+            else:
+                os.remove(name)
+        except:
+            # FileNotFoundError is raised if the file or directory was removed
+            # concurrently.
+            pass

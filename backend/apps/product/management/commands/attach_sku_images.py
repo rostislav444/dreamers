@@ -7,20 +7,20 @@ from project.settings import MEDIA_ROOT
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        dir_path = os.path.join(MEDIA_ROOT, 'product/skuimages')
+        dir_name = 'product/new_skuimages'
+        dir_path = os.path.join(MEDIA_ROOT, 'product/new_skuimages')
 
-        for sku_dir in os.listdir(dir_path):
-            image_file = os.path.join('product/skuimages', sku_dir, 'image.png')
+        for sku_id in os.listdir(dir_path):
+            sku_dir = os.path.join(dir_path, sku_id)
 
-            sku = Sku.objects.filter(id=sku_dir).first()
+            sku = Sku.objects.filter(id=sku_id).first()
+            sku.images.all().delete()
 
-            sku_image = SkuImages.objects.create(
-                sku=sku,
-                image=image_file,
-                image_thumbnails={
-                    'l': image_file,
-                    'm': image_file,
-                    's': image_file
-                })
+            for n, image in enumerate(os.listdir(sku_dir)):
+                sku_image = SkuImages.objects.create(
+                    sku=sku,
+                    image=f'{dir_name}/{sku_id}/{image}',
+                    index=n
+                )
 
             print(sku_image.pk)

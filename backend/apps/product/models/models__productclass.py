@@ -152,7 +152,7 @@ class ProductPartMaterials(models.Model):
     objects = ProductPartMaterialsManager()
 
     class Meta:
-        ordering = ['-show_in_catalogue']
+        ordering = ['color__ral', 'material']
 
     def __str__(self):
         value = self.get_value
