@@ -143,7 +143,7 @@ class Sku(models.Model):
     objects = SkuPrefetchedManager()
 
     class Meta:
-        ordering = ['-materials__material__show_in_catalogue', 'images']
+        ordering = ['code']
 
     def __str__(self):
         img_count = str(self.images.count())
@@ -165,7 +165,7 @@ class Sku(models.Model):
 
 class SkuMaterialsManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('material__group__product_part')
+        return super().get_queryset().select_related('material__group__product_part').distinct()
 
 
 class SkuMaterials(models.Model):

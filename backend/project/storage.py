@@ -12,7 +12,7 @@ from django.core.files.storage import FileSystemStorage
 @deconstructible
 class S3Storage(Storage):
     def __init__(self):
-        self.bucket_name = 'dreamersnew'  # ваш бакет
+        self.bucket_name = 'dreamers'  # ваш бакет
         self.client = boto3.client('s3',
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
