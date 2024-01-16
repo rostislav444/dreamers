@@ -6,7 +6,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.abstract.fields import CustomFileField, DeletableImageField
+from apps.abstract.fields import CustomFileField, DeletableImageField, DeletableFileField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
 from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
@@ -80,8 +80,8 @@ class Product(models.Model):
 
 class Product3DBlenderModel(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='model_3d')
-    obj = CustomFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["obj"])])
-    mtl = CustomFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["mtl"])])
+    obj = DeletableFileField(blank=True, null=True)
+    mtl = DeletableFileField(blank=True, null=True)
 
     @property
     def get_name(self):
