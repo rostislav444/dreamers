@@ -80,8 +80,8 @@ class Product(models.Model):
 
 class Product3DBlenderModel(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='model_3d')
-    obj = DeletableFileField(blank=True, null=True)
-    mtl = DeletableFileField(blank=True, null=True)
+    obj = DeletableFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["obj"])])
+    mtl = DeletableFileField(blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["mtl"])])
 
     @property
     def get_name(self):
