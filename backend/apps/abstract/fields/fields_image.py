@@ -186,6 +186,8 @@ class DeletableVideoField(DeletableMediaField):
 
 
 class DeletableFileField(DeletableMediaField):
+    valid_extensions = ['.obj', '.mtl']
+
     def formfield(self, **kwargs):
         return super().formfield(form_class=CustomFileInput, **kwargs)
 
