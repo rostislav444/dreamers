@@ -5,6 +5,7 @@ const nextConfig = {
         domains: [
             'dreamers.s3.eu-north-1.amazonaws.com',
             'dreamers.s3.amazonaws.com',
+            'dreamers.com.ua',
             '0.0.0.0'
         ],
     },
