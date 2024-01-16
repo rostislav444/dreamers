@@ -1,2 +1,3 @@
-pm2 kill
-pm2 start npm --name "frontend" --cwd /var/www/moami/frontend -- start
+pm2 delete dreamers
+pm2 start npm --name "dreamers" --cwd /var/www/dreamers/frontend -- start -- --port 3001
+
