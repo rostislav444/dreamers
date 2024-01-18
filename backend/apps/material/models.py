@@ -57,6 +57,22 @@ def find_closest_color_cie76(target_color, color_list):
     return closest_color
 
 
+def srgb_to_linearrgb(c):
+    if c < 0:
+        return 0
+    elif c < 0.04045:
+        return c / 12.92
+    else:
+        return ((c + 0.055) / 1.055) ** 2.4
+
+def hex_to_rgb(hex_color, alpha=1):
+    hex_value = int(hex_color.lstrip('#'), 16)
+    r = (hex_value & 0xff0000) >> 16
+    g = (hex_value & 0x00ff00) >> 8
+    b = hex_value & 0x0000ff
+    return tuple([srgb_to_linearrgb(c / 0xff) for c in (r, g, b)] + [alpha])
+
+
 class Color(NameSlug):
     mid_color = models.ForeignKey(BaseColor, on_delete=models.CASCADE, null=True, blank=True)
     ral = models.CharField(max_length=24, null=True, blank=True)
@@ -89,7 +105,8 @@ class Color(NameSlug):
         return colors.filter(rgb=closest).first()
 
     def save(self, *args, **kwargs):
-        self.rgb = PIL.ImageColor.getrgb(self.hex)
+        [r, g, b, _] = hex_to_rgb(self.hex)
+        self.rgb = [r, g, b]
         self.mid_color = self.closest_color(self.rgb)
         super(Color, self).save(*args, **kwargs)
 
