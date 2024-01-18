@@ -25,12 +25,17 @@ class ProductRender3DBlenderModelSerializer(serializers.ModelSerializer):
 
 
 class ProductRenderSerializer(serializers.ModelSerializer):
-    sku = SkuRenderSerializer(many=True, read_only=True)
+    sku = serializers.SerializerMethodField()
     model_3d = ProductRender3DBlenderModelSerializer(read_only=True)
 
     class Meta:
         model = Product
         fields = ['id', 'code', 'model_3d', 'sku', ]
+
+    @staticmethod
+    def get_sku(self, obj):
+        qs = obj.sku.filter(images__isnull=True).distict()
+        return SkuRenderSerializer(qs, many=True, read_only=True).data
 
 
 
