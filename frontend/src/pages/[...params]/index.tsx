@@ -19,9 +19,9 @@ export default function Catalogue({products}: CatalogueProps) {
         return <ErrorPage statusCode={404}/>;
     }
 
-    return products ? <Layout breadcrumbs={breadcrumbs} description={'description'} title={'Каталог'}>
+    return <Layout breadcrumbs={breadcrumbs} description={'description'} title={'Каталог'}>
         <ProductsList products={products}/>
-    </Layout> : null
+    </Layout>
 
 }
 
@@ -29,9 +29,11 @@ export default function Catalogue({products}: CatalogueProps) {
 export const getStaticProps = (async (context) => {
     const api = fetchApi()
     const response = await api.get('catalogue/products/')
+
     if (response.ok) {
         return {props: {products: response.data}}
     }
+
     return {notFound: true}
 }) satisfies GetStaticProps<{ products: any }>
 

@@ -1,4 +1,4 @@
-import {Box, Flex, Grid, Text} from "@chakra-ui/react";
+import {Box, Flex, Grid, Text, useMediaQuery} from "@chakra-ui/react";
 import {MEDIA_URL} from "@/local";
 import React, {useEffect, useRef, useState} from "react";
 import {FilterMaterialsProps, PartInterface, ProductCardProps, SkuInterface, SkuMaterialsResponse} from "@/components/App/Catalogue/ProductCard/interfaces";
@@ -68,6 +68,7 @@ const filterMaterials = ({parts, skus, selectedMaterials = {}}: FilterMaterialsP
 };
 
 export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMaterialProps) => {
+  const [mobile] = useMediaQuery('(max-width: 960px)')
   const productParts = useRef(product.parts);
   const [selectedMaterials, setSelectedMaterials] = useState<Record<string, number>>({});
   const [filteredParts, setFilteredParts] = useState<PartInterface[]>([]);
@@ -98,7 +99,7 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
           <Text as="span" mt={2}>
             {part.name}
           </Text>
-          <Grid mt={2} gridTemplateColumns={"repeat(auto-fill, 34px)"} gridTemplateRows={"repeat(auto-fill, 34px)"} gap={1}>
+          <Grid mt={2} gridTemplateColumns={"repeat(auto-fill, 40px)"} gridTemplateRows={"repeat(auto-fill, 40px)"} gap={1}>
             {part.materials.map((material) => (
               <Flex
                 key={material.id}
@@ -108,8 +109,8 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
                 borderWidth={2}
                 borderColor={selectedMaterials[part.id] === material.id ? "brown" : "transparent"}
               >
-                {material.color && <Box w={6} h={6} backgroundColor={material.color.hex}/>}
-                {material.material && <Box w={6} h={6} backgroundSize="cover" backgroundImage={material.material.image}/>}
+                {material.color && <Box w={8} h={8} backgroundColor={material.color.hex}/>}
+                {material.material && <Box w={8} h={8} backgroundSize="cover" backgroundImage={material.material.image}/>}
               </Flex>
             ))}
           </Grid>

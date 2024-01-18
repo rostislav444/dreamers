@@ -1,4 +1,4 @@
-import {Box, Button, Heading, Text, useMediaQuery} from "@chakra-ui/react";
+import {Box, Button, Flex, Heading, Text, useMediaQuery} from "@chakra-ui/react";
 import Layout from "@/components/Shared/Layout";
 import fetchApi from "@/utils/fetch";
 import {GetStaticPaths, GetStaticProps} from "next";
@@ -60,28 +60,26 @@ const Product = (product: ProductInterface) => {
 
 
     return <Layout breadcrumbs={processBreadCrumbs(categories, name, code)} description={'description'} title={name}>
-        <Box
+        <Flex
             mb='2'
-            display='grid'
-            gridTemplateColumns={isLessThen960 ? '1fr' : '55fr 45fr'}
-            gap={2}
+            flexDir={mobile ? 'column' : 'row'}
         >
             <ProductGallery images={images}/>
-            <Box pl={mobile ? 0 : 4}>
+            <Box w={mobile ? '100%' : '45%'} pl={mobile ? 0 : 4} mt={mobile ? 8 : 0}>
                 <Heading mb={mobile ? 4 : 8}>{name}</Heading>
-                <ProductCharacteristics product={product}/>
                 <InfoHeading mobile={mobile}>Колір</InfoHeading>
                 <ProductMaterials
                     parts={parts}
                     materials={currentSku.materials}
                     selectSkuByMaterials={selectSkuByMaterials}
                 />
-                <Text color={'brown.500'} fontSize={24} mt={8}>{price} грн.</Text>
-                <Button w={'100%'} mt={8} p={6} onClick={handleAddCartItem}>Придбати</Button>
+                <ProductCharacteristics product={product}/>
                 <InfoHeading mobile={mobile}>Опис</InfoHeading>
                 <Text maxH='48' overflowY="hidden" fontSize={14} mt={4}>{product.description}</Text>
+                <Text color={'brown.500'} fontSize={24} mt={8}>{price} грн.</Text>
+                <Button w={'100%'} mt={8} p={6} onClick={handleAddCartItem}>Придбати</Button>
             </Box>
-        </Box>
+        </Flex>
     </Layout>
 }
 

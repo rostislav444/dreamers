@@ -19,8 +19,16 @@ export const Header = () => {
 
     return (
         <Box borderBottom="4px solid" borderBottomColor={'brown.500'}>
-            <Grid as="header" w="calc(100% - 24px)" h={24}
-                  alignItems={"center"} gap={6} templateColumns="auto 32px" p={mobile ? "0 16px 0 8px" : "0 24px"} m={'0 12px'}>
+            <Grid
+                as="header"
+                w="calc(100% - 24px)"
+                h={mobile ? 16 : 24}
+                alignItems='center'
+                gap='6'
+                templateColumns="auto 32px"
+                p={mobile ? "0 16px 0 8px" : "0 24px"}
+                m='0 auto'
+            >
                 <Flex alignItems="center" justifyContent="flex-start">
                     <Burger isOpen={burgerOpen} setOpen={setBurgerOpen}/>
                     <Link href={'/'}>

@@ -11,7 +11,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
     const sku = product.sku[selectedSku || 0]
 
     return (
-        <Box borderWidth="3px" borderColor={"brown.500"} margin={"-3px -3px 0 0"} overflow="hidden">
+        <Box
+            borderWidth="3px"
+            borderColor={"brown.500"}
+            overflow="hidden"
+        >
             <Link href={`/product/${product.code}`}>
                 <CatalogueProductImages sku={sku}/>
             </Link>

@@ -36,7 +36,7 @@ export default function Layout({children, title, description, breadcrumbs}: Layo
                 <Header/>
                 <Box
                     as='main'
-                    w={mobile ? 'calc(100% - 24px)' : 'calc(100% - 24px)'}
+                    w='calc(100% - 24px)'
                     minH='calc(100vh - 196px)'
                     p={mobile ? 0 : 6}
                     m={'0 12px'}

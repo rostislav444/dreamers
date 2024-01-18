@@ -9,13 +9,13 @@ interface ProductsListInterface {
 
 export const ProductsList = ({products}: ProductsListInterface) => {
   return <Box mt={8}>
-    <Grid templateColumns='repeat(auto-fill, minmax(360px, 1fr))' gap={0}>
+    <Grid templateColumns='repeat(auto-fill, minmax(340px, 1fr))' gap={0}>
       {
-        products.map((product, key) => {
-          return <GridItem position={'relative'} key={key} >
+        products.map((product, key) =>
+          <GridItem position={'relative'} key={key} >
             <ProductCard product={product}/>
           </GridItem>
-        })
+        )
       }
     </Grid>
   </Box>

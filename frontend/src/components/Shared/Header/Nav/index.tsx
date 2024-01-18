@@ -24,11 +24,13 @@ export const Nav = ({isOpen, setOpen}: { isOpen: boolean, setOpen: (isOpen: bool
   return <Grid
     w={80}
     position={'fixed'}
-    borderRight="4px solid brown"
-    borderBottom="4px solid brown"
+    borderRight="4px solid"
+    borderRightColor='brown.500'
+    borderBottom="4px solid"
+    borderBottomColor='brown.500'
     bg={'brown.50'}
     p={2}
-    mt={-1}
+    mt={0}
     zIndex={100}
   >
     <List pl={4} pt={0}>
