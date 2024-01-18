@@ -29,7 +29,7 @@ export default function Layout({children, title, description, breadcrumbs}: Layo
         <>
             <Head>
                 <title>{`Dreamers ✨${title || ''}`}</title>
-                <meta name="viewport" content="width=380, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+                <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
                 {description && <meta name="description" content={description}/>}
             </Head>
             <Box>

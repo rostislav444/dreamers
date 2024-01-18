@@ -30,9 +30,9 @@ export const Header = () => {
                 m='0 auto'
             >
                 <Flex alignItems="center" justifyContent="flex-start">
-                    <Burger isOpen={burgerOpen} setOpen={setBurgerOpen}/>
+                    <Burger mobile={mobile} isOpen={burgerOpen} setOpen={setBurgerOpen}/>
                     <Link href={'/'}>
-                        <Text fontSize="36px" fontWeight="700">Dreamers ✨</Text>
+                        <Text fontSize={mobile ? 28 : 36} fontWeight="700">Dreamers ✨</Text>
                     </Link>
                 </Flex>
                 {/*<Search/>*/}
