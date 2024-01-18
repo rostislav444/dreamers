@@ -31,7 +31,10 @@ export const getStaticProps = (async (context) => {
     const response = await api.get('catalogue/products/')
 
     if (response.ok) {
-        return {props: {products: response.data}}
+        return {
+            props: {products: response.data},
+            revalidate: 60 * 5,
+        }
     }
 
     return {notFound: true}
@@ -43,6 +46,6 @@ export const getStaticPaths = (async () => {
         paths: [
             '/catalogue'
         ],
-        fallback: true,
+        fallback: 'blocking',
     }
 }) satisfies GetStaticPaths

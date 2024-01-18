@@ -95,7 +95,10 @@ export const getStaticProps = (async ({params}) => {
     const response = await api.get(`product/product/${slug}`);
 
     if (response.ok) {
-        return {props: response.data};
+        return {
+            props: response.data,
+            revalidate: 60 * 5,
+        };
     }
     return {notFound: true};
 }) as GetStaticProps<{ products: any; }>;
@@ -108,7 +111,7 @@ export const getStaticPaths = (async () => {
 
     return {
         paths,
-        fallback: true,
+        fallback: 'blocking',
     }
 }) satisfies GetStaticPaths
 
