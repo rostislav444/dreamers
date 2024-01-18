@@ -12,15 +12,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
 
     return (
         <Box borderWidth="3px" borderColor={"brown.500"} margin={"-3px -3px 0 0"} overflow="hidden">
-            <Link href={`/product/${product.code}`}>
+            {/*<Link href={`/product/${product.code}`}>*/}
                 <CatalogueProductImages sku={sku}/>
-            </Link>
+            {/*</Link>*/}
             <Box p="4">
-                <Link href={`/product/${product.code}`}>
+                {/*<Link href={`/product/${product.code}`}>*/}
                     <Box fontWeight="semibold" as="h4" lineHeight="tight" noOfLines={1} pb={2}>
                         {product.name}
                     </Box>
-                </Link>
+                {/*</Link>*/}
                 <ProductCardMaterial
                     product={product}
                     setSelectedSku={setSelectedSku}

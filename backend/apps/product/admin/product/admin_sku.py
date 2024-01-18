@@ -15,6 +15,7 @@ class SkuImagesInline(admin.TabularInline):
         path = instance.image.name
 
         if path:
+            print(MEDIA_URL, path)
             return mark_safe(f'''
                     <img src="{MEDIA_URL}{path}" width="120" height="80" style="
                         border: 1px solid #ccc; border-radius: 6px; margin-top: -4px; object-fit: cover

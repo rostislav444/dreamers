@@ -17,7 +17,6 @@ export const Header = () => {
     const [mobile] = useMediaQuery('(max-width: 960px)')
     const [burgerOpen, setBurgerOpen] = useState(false);
 
-
     return (
         <Box borderBottom="4px solid" borderBottomColor={'brown.500'}>
             <Grid as="header" w="calc(100% - 24px)" h={24}

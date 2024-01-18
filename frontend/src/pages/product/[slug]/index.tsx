@@ -11,23 +11,30 @@ import {ProductCharacteristics} from "@/components/App/Product/Info/Characterist
 import {InfoHeading} from "@/components/Shared/Typogrphy";
 import {useCart} from "@/context/Cart";
 import {useRouter} from "next/router";
+import ErrorPage from "next/error";
+import {CategoryState} from "@/interfaces/Categories";
+
+
+const processBreadCrumbs = (categories: CategoryState[], name: string, code: string) => ([
+    ...categories.map(category => ({title: category.name, link: '/catalogue'})),
+    {title: name, link: `/product/${code}`},
+])
 
 
 const Product = (product: ProductInterface) => {
+    const {addItem} = useCart()
     const [mobile] = useMediaQuery('(max-width: 960px)');
     const router = useRouter();
     const {id, name, code, price, sku, parts, categories, width, height, depth} = product
     const [selectedSku, setSelectedSku] = useState<number>(0)
+    const [isLessThen960] = useMediaQuery('(max-width: 1150px)')
+
+    if (!product.sku) {
+        return <ErrorPage statusCode={404}/>;
+    }
+
     const currentSku = sku[selectedSku]
     const images = currentSku.images
-
-    const [isLessThen960] = useMediaQuery('(max-width: 1150px)')
-    const {addItem} = useCart()
-
-    const breadcrumbs = [
-        ...categories.map(category => ({title: category.name, link: '/catalogue'})),
-        {title: name, link: `/product/${code}`},
-    ]
 
     const selectSkuByMaterials = (material: any) => {
         const newSkuIndex = getBestFitSku({...currentSku.materials, ...material}, sku)
@@ -52,7 +59,7 @@ const Product = (product: ProductInterface) => {
     }
 
 
-    return <Layout breadcrumbs={breadcrumbs} description={'description'} title={'title'}>
+    return <Layout breadcrumbs={processBreadCrumbs(categories, name, code)} description={'description'} title={name}>
         <Box
             mb='2'
             display='grid'
@@ -60,7 +67,7 @@ const Product = (product: ProductInterface) => {
             gap={2}
         >
             <ProductGallery images={images}/>
-            <Box pl={mobile ? 0: 4}>
+            <Box pl={mobile ? 0 : 4}>
                 <Heading mb={mobile ? 4 : 8}>{name}</Heading>
                 <ProductCharacteristics product={product}/>
                 <InfoHeading mobile={mobile}>Колір</InfoHeading>
@@ -72,7 +79,7 @@ const Product = (product: ProductInterface) => {
                 <Text color={'brown.500'} fontSize={24} mt={8}>{price} грн.</Text>
                 <Button w={'100%'} mt={8} p={6} onClick={handleAddCartItem}>Придбати</Button>
                 <InfoHeading mobile={mobile}>Опис</InfoHeading>
-                <Text maxH='48'  overflowY="hidden" fontSize={14} mt={4}>{product.description}</Text>
+                <Text maxH='48' overflowY="hidden" fontSize={14} mt={4}>{product.description}</Text>
             </Box>
         </Box>
     </Layout>
@@ -93,9 +100,7 @@ export const getStaticProps = (async ({params}) => {
         return {props: response.data};
     }
     return {notFound: true};
-}) as GetStaticProps<{
-    products: any;
-}>;
+}) as GetStaticProps<{ products: any; }>;
 
 
 export const getStaticPaths = (async () => {

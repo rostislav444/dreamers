@@ -28,12 +28,8 @@ export default function Layout({children, title, description, breadcrumbs}: Layo
     return (
         <>
             <Head>
-                <title>{title ? `Shop: ${title}` : 'Shop'}</title>
-                <link rel="preconnect" href="https://fonts.googleapis.com"/>
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
+                <title>{`Dreamers ✨${title || ''}`}</title>
                 <meta name="viewport" content="width=380, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap"
-                      rel="stylesheet"/>
                 {description && <meta name="description" content={description}/>}
             </Head>
             <Box>
@@ -53,7 +49,8 @@ export default function Layout({children, title, description, breadcrumbs}: Layo
                         overflowX='auto'
                     >
                         {fullBreadcrumbs.map((breadcrumb, index) => (
-                            <BreadcrumbItem whiteSpace={'nowrap'} key={index} isCurrentPage={breadcrumb.link === undefined} >
+                            <BreadcrumbItem whiteSpace={'nowrap'} key={index}
+                                            isCurrentPage={breadcrumb.link === undefined}>
                                 {breadcrumb.link ?
                                     <BreadcrumbLink as={Link}
                                                     href={breadcrumb.link}>{breadcrumb.title}</BreadcrumbLink>

@@ -8,7 +8,6 @@ interface ProductsListInterface {
 
 
 export const ProductsList = ({products}: ProductsListInterface) => {
-
   return <Box mt={8}>
     <Grid templateColumns='repeat(auto-fill, minmax(360px, 1fr))' gap={0}>
       {

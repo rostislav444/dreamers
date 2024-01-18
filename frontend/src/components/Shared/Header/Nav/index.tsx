@@ -18,10 +18,8 @@ const NavItem = ({page}: NavItemProps) => (
 
 export const Nav = ({isOpen, setOpen}: { isOpen: boolean, setOpen: (isOpen: boolean) => void }) => {
   const [pages] = useState([
-    {name: 'Home', link: '/'},
-    {name: 'Catalogue', link: '/catalogue'},
-    {name: 'About', link: '/about'},
-    {name: 'Contact', link: '/contact'},
+    {name: 'Головна', link: '/'},
+    {name: 'Каталог', link: '/catalogue'},
   ]);
   return <Grid
     w={80}

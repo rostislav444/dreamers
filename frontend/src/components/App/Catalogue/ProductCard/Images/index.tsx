@@ -7,19 +7,19 @@ import {ProductImage} from "@/components/App/Catalogue/ProductCard/style";
 
 
 interface CatalogueProductImagesProps {
-  sku: SkuInterface
+    sku: SkuInterface
 }
 
 
 export const CatalogueProductImages = ({sku}: CatalogueProductImagesProps) => {
-  const [imageIndex, setImageIndex] = useState<number>(0)
-  const imagesQty: number = sku.images.length
+    const [imageIndex, setImageIndex] = useState<number>(0)
+    const imagesQty: number = sku.images.length
 
-  return <Box pos="relative" display="block" w="100%" h="auto" pt="66%">
-    <ImagePaginationWrapper>
-      {Array.from({length: imagesQty}, (_, key) =>
-        <ImagePagination onHover={() =>  setImageIndex(key)} key={key}/>)}
-    </ImagePaginationWrapper>
-    <ProductImage unoptimized fill src={MEDIA_URL + sku.images[imageIndex]} alt={'img'}/>
-  </Box>
+    return <Box pos="relative" display="block" w="100%" h="auto" pt="66%">
+        <ImagePaginationWrapper>
+            {Array.from({length: imagesQty}, (_, key) =>
+                <ImagePagination onHover={() => setImageIndex(key)} key={key}/>)}
+        </ImagePaginationWrapper>
+        <ProductImage unoptimized fill src={MEDIA_URL + sku.images[imageIndex]} alt={'img'}/>
+    </Box>
 }

@@ -24,9 +24,8 @@ env = dotenv_values(".env")
 SECRET_KEY = 'django-insecure-zg@1y0y6nkmrhmeigva!jl@sxe)1=vsu96dt5h4(@6)ffel^60'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env['DEBUG']
-PRODUCTION = env['PRODUCTION']
-print('DEBUG', DEBUG)
+DEBUG = env['DEBUG'] == 'true'
+PRODUCTION = env['PRODUCTION'] == 'true'
 
 ALLOWED_HOSTS = ['*']
 
@@ -161,7 +160,7 @@ AWS_BUCKET_URL = env['AWS_BUCKET_URL']
 AWS_ACCESS_KEY_ID = env['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = env['AWS_SECRET_ACCESS_KEY']
 
-FILE_STORAGE = S3Storage if PRODUCTION else CustomFileSystemStorage
+FILE_STORAGE = S3Storage if PRODUCTION else default_storage
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 MEDIA_URL = AWS_BUCKET_URL if PRODUCTION else '/media/'

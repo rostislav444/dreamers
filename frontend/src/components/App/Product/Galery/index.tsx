@@ -64,7 +64,7 @@ export const ProductGallery = ({images}: ProductGalleryInterface) => {
         }
     };
 
-    return <Box w='100%' borderRadius={'8'} overflow={'hidden'}>
+    return <Box w='100%' overflow={'hidden'}>
         <Box ref={sliderRef} className="keen-slider">
             <ChevronLeftIcon
                 onClick={handleSlideLeft}
