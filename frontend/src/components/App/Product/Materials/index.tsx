@@ -27,7 +27,7 @@ export const ProductMaterials = ({parts, materials, selectSkuByMaterials}: Produ
                                 key={material.id}
                                 position='relative'
                                 display='inline-block'
-                                m={'4px'}
+                                m={'0 0 0 4px'}
                                 p='4px'
                                 borderWidth='2px'
                                 borderColor={materials[part.id] === material.id ? 'brown.500' : 'transparent'}
