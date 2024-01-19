@@ -19,33 +19,32 @@ export const ProductMaterials = ({parts, materials, selectSkuByMaterials}: Produ
                     <Box
                         key={group.id}
                         mt={mobile ? 4 : 6}
+                        ml={'-8px'}
                         mb={mobile ? 4 : 6}
-                        display='grid'
-                        gridTemplateColumns={`repeat(auto-fill, minmax(${mobile ? 58 : 72}px, 1fr))`}
-                        gap='0px'
                     >
                         {group.materials.map(material =>
-                            <Box key={material.id}>
-                                <Box
-                                    onClick={() => selectSkuByMaterials({[part.id]: material.id})}
-                                    w={'60px'}
-                                    m={'-4px'}
-                                    p='4px'
-                                    borderWidth='2px'
-                                    borderColor={materials[part.id] === material.id ? 'brown.500' : 'transparent'}
-                                    borderRadius='0'
-                                    cursor='pointer'
-                                    _hover={{
-                                        borderColor: 'orange.500'
-                                    }}
-                                >
-                                    {material.color && <Box w={12} h={12} bg={material.color.hex}/>}
-                                </Box>
+                            <Box
+                                key={material.id}
+                                position='relative'
+                                display='inline-block'
+                                m={'4px'}
+                                p='4px'
+                                borderWidth='2px'
+                                borderColor={materials[part.id] === material.id ? 'brown.500' : 'transparent'}
+                                borderRadius='0'
+                                cursor='pointer'
+                                _hover={{
+                                    borderColor: 'orange.500'
+                                }}
+                                onClick={() => selectSkuByMaterials({[part.id]: material.id})}
+                            >
+                                {material.color && <Box w={12} h={12} bg={material.color.hex}/>}
                             </Box>
                         )}
                     </Box>
                 )}
-            </Box>)
+            </Box>
+        )
         }
     </Box>
 }
