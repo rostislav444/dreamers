@@ -3,6 +3,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {CustomInput, CustomTextarea} from "./style";
 import fetchApi from "@/utils/fetch";
 import {useCart} from "@/context/Cart";
+import {useRouter} from "next/router";
 
 interface FormField {
     name: string;
@@ -13,13 +14,27 @@ interface FormField {
 }
 
 const formFields: FormField[] = [
-    {name: "first_name", colSpan: true, placeholder: "Імʼя *", validation: {required: "Поле обовʼязково до заповнення"}},
+    {
+        name: "first_name",
+        colSpan: true,
+        placeholder: "Імʼя *",
+        validation: {required: "Поле обовʼязково до заповнення"}
+    },
     {name: "last_name", placeholder: "Фамілія *", validation: {required: "Поле обовʼязково до заповнення"}},
     {name: "father_name", placeholder: "По батькові"},
-    {name: "email", placeholder: "E-mail", type: "email", validation: {pattern: {value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: "Неверный формат email"}}},
+    {
+        name: "email",
+        placeholder: "E-mail",
+        type: "email",
+        validation: {pattern: {value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: "Неверный формат email"}}
+    },
     {name: "phone", placeholder: "Номер телефону *", validation: {required: "Поле обовʼязково до заповнення"}},
     {name: "city", placeholder: "Місто", validation: {required: "Вкажіть місто"}},
-    {name: "address", placeholder: "Адреса / Відділеня нової пошти", validation: {required: "Поле обовʼязково до заповнення"}},
+    {
+        name: "address",
+        placeholder: "Адреса / Відділеня нової пошти",
+        validation: {required: "Поле обовʼязково до заповнення"}
+    },
     {name: "comment", type: 'textarea', colSpan: true, placeholder: "Коментар до замовлення"},
 ];
 
@@ -30,6 +45,7 @@ interface FormData {
 export const OrderForm = () => {
     const api = fetchApi('uk')
     const {cart} = useCart();
+    const router = useRouter();
     const [mobile] = useMediaQuery('(max-width: 1367px)');
     const {
         handleSubmit,
@@ -37,15 +53,18 @@ export const OrderForm = () => {
         formState: {errors},
     } = useForm<FormData>();
 
+    const makeRedirect = () => {
+        router.push('/order/successful');
+    }
+
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         const items = cart.map(item => ({sku: item.sku, price: item.price, quantity: item.qty}))
         const payload = {...data, items}
 
-        console.log(payload)
-
         const response = await api.post('/order/', payload)
+
         if (response.ok) {
-            console.log(response)
+            makeRedirect()
         }
     };
 
@@ -76,7 +95,6 @@ export const OrderForm = () => {
                     Підтвердити замовлення
                 </Button>
             </form>
-
             <FormErrorMessage>{errors.comments?.message}</FormErrorMessage>
         </Box>
     );

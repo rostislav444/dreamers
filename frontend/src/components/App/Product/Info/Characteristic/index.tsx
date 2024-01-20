@@ -3,18 +3,15 @@ import {ProductInterface} from "@/interfaces/Product";
 import {InfoHeading} from "@/components/Shared/Typogrphy";
 
 interface ProductCharacteristicsProps {
-    product: ProductInterface
+    product: ProductInterface,
+    materialsSelected: any[]
 }
 
 
-const TdStyled = ({children}: { children: any }) => <Td
-    px={0}
-    pb={3}
-    borderBottom="none"
->{children}</Td>
+const TdStyledLeft = ({children}: { children: any }) => <Td w={52} px={0} pb={3} borderBottom="none">{children}</Td>
+const TdStyled = ({children}: { children: any }) => <Td px={0} pb={3} borderBottom="none">{children}</Td>
 
-
-export const ProductCharacteristics = ({product}: ProductCharacteristicsProps) => {
+export const ProductCharacteristics = ({product, materialsSelected}: ProductCharacteristicsProps) => {
     return <Box>
         <InfoHeading>Характеристики</InfoHeading>
         <Box mt='4' >
@@ -22,17 +19,22 @@ export const ProductCharacteristics = ({product}: ProductCharacteristicsProps) =
                 <Table size='sm'>
                     <Tbody>
                         <Tr>
-                            <TdStyled>Ширина</TdStyled>
+                            <TdStyledLeft>Ширина</TdStyledLeft>
                             <TdStyled>{product.width} см.</TdStyled>
                         </Tr>
                         <Tr>
-                            <TdStyled>Висота</TdStyled>
+                            <TdStyledLeft>Висота</TdStyledLeft>
                             <TdStyled>{product.height} см.</TdStyled>
                         </Tr>
                         <Tr>
-                            <TdStyled>Глибина</TdStyled>
+                            <TdStyledLeft>Глибина</TdStyledLeft>
                             <TdStyled>{product.depth} см.</TdStyled>
                         </Tr>
+                        {...materialsSelected.map((mat, key) => <Tr key={key}>
+                            <TdStyledLeft>{mat.name}</TdStyledLeft>
+                            {mat.material.color && <TdStyled>{mat.material.color.name}</TdStyled>}
+
+                        </Tr>)}
                     </Tbody>
                 </Table>
             </TableContainer>

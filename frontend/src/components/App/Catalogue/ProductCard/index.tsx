@@ -4,6 +4,8 @@ import {ProductCardMaterial} from "@/components/App/Catalogue/ProductCard/Materi
 import {ProductCardProps} from "@/components/App/Catalogue/ProductCard/interfaces";
 import {CatalogueProductImages} from "@/components/App/Catalogue/ProductCard/Images";
 import Link from "next/link";
+import {ProductInterface} from "@/interfaces/Product";
+
 
 
 export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
@@ -16,11 +18,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
             borderColor={"brown.500"}
             overflow="hidden"
         >
-            <Link href={`/product/${product.code}`}>
+            <Link href={`/product/${product.code}/${sku.id}`}>
                 <CatalogueProductImages sku={sku}/>
             </Link>
             <Box p="4">
-                <Link href={`/product/${product.code}`}>
+                <Link href={`/product/${product.code}/${sku.id}`}>
                     <Box fontWeight="semibold" as="h4" lineHeight="tight" noOfLines={1} pb={2}>
                         {product.name}
                     </Box>

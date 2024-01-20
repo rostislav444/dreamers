@@ -8,4 +8,10 @@ class NestedCategoryView(generics.GenericAPIView, mixins.ListModelMixin, viewset
     serializer_class = NestedCategorySerializer
 
     def get_queryset(self):
+        categories = self.request.GET.get('categories')
+        if categories:
+            categories = categories.split(',')
+            if len(categories) > 1:
+                return Category.objects.filter(parent__slug=categories[-2], slug=categories[-1])
+            return Category.objects.filter(slug=categories[-1])
         return Category.objects.filter(level=0)

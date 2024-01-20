@@ -21,33 +21,54 @@ const processBreadCrumbs = (categories: CategoryState[], name: string, code: str
 ])
 
 
-const Product = (product: ProductInterface) => {
+interface ProductProps {
+    product: ProductInterface,
+    skuId?: string
+}
+
+
+const Product = ({product, skuId}: ProductProps) => {
     const {addItem} = useCart()
     const [mobile] = useMediaQuery('(max-width: 960px)');
     const router = useRouter();
-    const {id, name, code, price, sku, parts, categories, width, height, depth} = product
-    const [selectedSku, setSelectedSku] = useState<number>(0)
-    const [isLessThen960] = useMediaQuery('(max-width: 1150px)')
+
+    const skuInitial = product.sku.findIndex(item => String(item.id) === skuId)
+    const [selectedSku, setSelectedSku] = useState<number>(skuInitial > 0 ? skuInitial : 0)
 
     if (!product.sku) {
         return <ErrorPage statusCode={404}/>;
     }
 
-    const currentSku = sku[selectedSku]
+    const currentSku = product.sku[selectedSku]
+
+    const materialsSelected = product.parts.map(part => {
+        const materialGroup = part.material_groups.find(materialGroup =>
+            materialGroup.materials.some(mat => mat.id === currentSku.materials[part.id])
+        );
+
+        const material = materialGroup?.materials.find(mat => mat.id === currentSku.materials[part.id]);
+
+        return {
+            name: part.name,
+            material: material
+        };
+    });
+
+
     const images = currentSku.images
 
     const selectSkuByMaterials = (material: any) => {
-        const newSkuIndex = getBestFitSku({...currentSku.materials, ...material}, sku)
+        const newSkuIndex = getBestFitSku({...currentSku.materials, ...material}, product.sku)
         setSelectedSku(newSkuIndex)
     }
 
     const handleAddCartItem = () => {
         const payload = {
-            product: id,
+            product: product.id,
             sku: currentSku.id,
-            name,
-            code,
-            price,
+            name: product.name,
+            code: product.code,
+            price: product.price,
             qty: 1,
             image: currentSku.images[0].image,
             material: {
@@ -55,28 +76,28 @@ const Product = (product: ProductInterface) => {
             }
         }
         addItem(payload)
-        router.push('/cart')
+        router.push('/order')
     }
 
-
-    return <Layout breadcrumbs={processBreadCrumbs(categories, name, code)} description={'description'} title={name}>
+    return <Layout breadcrumbs={processBreadCrumbs(product.categories, product.name, product.code)}
+                   description={'description'} title={product.name}>
         <Flex
             mb='2'
             flexDir={mobile ? 'column' : 'row'}
         >
             <ProductGallery images={images}/>
             <Box w={mobile ? '100%' : '45%'} pl={mobile ? 0 : 4} mt={mobile ? 8 : 0}>
-                <Heading mb={mobile ? 4 : 8}>{name}</Heading>
+                <Heading mb={mobile ? 4 : 8}>{product.name}</Heading>
                 <InfoHeading mobile={mobile}>Колір</InfoHeading>
                 <ProductMaterials
-                    parts={parts}
+                    parts={product.parts}
                     materials={currentSku.materials}
                     selectSkuByMaterials={selectSkuByMaterials}
                 />
-                <ProductCharacteristics product={product}/>
+                <ProductCharacteristics product={product} materialsSelected={materialsSelected}/>
                 <InfoHeading mobile={mobile}>Опис</InfoHeading>
                 <Text maxH='48' overflowY="hidden" fontSize={14} mt={4}>{product.description}</Text>
-                <Text color={'brown.500'} fontSize={24} mt={8}>{price} грн.</Text>
+                <Text color={'brown.500'} fontSize={24} mt={8}>{product.price} грн.</Text>
                 <Button w={'100%'} mt={8} p={6} onClick={handleAddCartItem}>Придбати</Button>
             </Box>
         </Flex>
@@ -92,11 +113,11 @@ export const getStaticProps = (async ({params}) => {
     }
 
     const api = fetchApi();
-    const response = await api.get(`product/product/${slug}`);
+    const response = await api.get(`product/product/${slug[0]}`);
 
     if (response.ok) {
         return {
-            props: response.data,
+            props: {product: response.data, skuId: slug[1]},
             revalidate: 60 * 5,
         };
     }

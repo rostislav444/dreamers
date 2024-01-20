@@ -5,6 +5,13 @@ export interface CategoryState {
   image?: string,
 }
 
+export interface RecursiveCategoryInterface {
+    id: number;
+    name: string;
+    slug: string;
+    children: RecursiveCategoryInterface[] | null;
+}
+
 export interface CategoryListProps {
   categories: CategoryState[];
 }

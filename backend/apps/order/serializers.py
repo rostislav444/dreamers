@@ -14,4 +14,5 @@ class OrderSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('first_name', 'last_name', 'father_name', 'phone', 'email', 'address', 'items')
+        fields = ('id', 'first_name', 'last_name', 'father_name', 'phone', 'email', 'city', 'address', 'items')
+        read_only_fields = ('id',)

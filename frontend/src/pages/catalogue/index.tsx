@@ -3,15 +3,16 @@ import {ProductsList} from "src/components/App/Catalogue";
 import type {GetStaticPaths, GetStaticProps,} from 'next'
 import fetchApi from "@/utils/fetch";
 import ErrorPage from 'next/error'
+import {CategoriesList} from "@/components/App/Catalogue/CategoriesList";
 
 interface CatalogueProps {
-    products: any
+    products: any,
+    categories: any
 }
 
 
-export default function Catalogue({products}: CatalogueProps) {
+export default function Catalogue({products, categories}: CatalogueProps) {
     const breadcrumbs = [
-        {title: 'Главная', link: '/'},
         {title: 'Каталог'},
     ]
 
@@ -20,6 +21,7 @@ export default function Catalogue({products}: CatalogueProps) {
     }
 
     return <Layout breadcrumbs={breadcrumbs} description={'description'} title={'Каталог'}>
+        <CategoriesList categories={categories} />
         <ProductsList products={products}/>
     </Layout>
 
@@ -28,11 +30,15 @@ export default function Catalogue({products}: CatalogueProps) {
 
 export const getStaticProps = (async (context) => {
     const api = fetchApi()
-    const response = await api.get('catalogue/products/')
+    const productsResp = await api.get('catalogue/products/')
+    const categoriesResp = await api.get('category');
 
-    if (response.ok) {
+    if (productsResp.ok) {
         return {
-            props: {products: response.data},
+            props: {
+                products: productsResp.data,
+                categories: categoriesResp.ok ? categoriesResp.data : []
+            },
             revalidate: 60 * 5,
         }
     }
@@ -40,12 +46,11 @@ export const getStaticProps = (async (context) => {
     return {notFound: true}
 }) satisfies GetStaticProps<{ products: any }>
 
+interface CategoryInterface {
+    id: number;
+    name: string;
+    slug: string;
+    children: CategoryInterface[] | null;
+}
 
-export const getStaticPaths = (async () => {
-    return {
-        paths: [
-            '/catalogue'
-        ],
-        fallback: 'blocking',
-    }
-}) satisfies GetStaticPaths
+

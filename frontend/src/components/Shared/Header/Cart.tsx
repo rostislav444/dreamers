@@ -8,7 +8,7 @@ import Link from "next/link";
 export const CartCounter = () => {
     const {totalQty} = useCart();
 
-    return <Link href={'/cart'} >
+    return <Link href={'/order'} >
         <Box position='relative' w={8} mr={40}>
             <CartIcon/>
             {totalQty > 0 && (
