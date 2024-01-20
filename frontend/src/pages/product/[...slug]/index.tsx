@@ -117,7 +117,7 @@ export const getStaticProps = (async ({params}) => {
 
     if (response.ok) {
         return {
-            props: {product: response.data, skuId: slug[1]},
+            props: {product: response.data, skuId: slug[1] || null},
             revalidate: 60 * 5,
         };
     }
