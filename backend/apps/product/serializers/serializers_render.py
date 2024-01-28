@@ -42,8 +42,8 @@ class ProductRenderSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_sku(obj):
-        # qs = obj.sku.filter(images__isnull=True).distinct()
-        qs = obj.sku.all().distinct()
+        qs = obj.sku.filter(images__isnull=True).distinct()
+        # qs = obj.sku.all().distinct()
         return SkuRenderSerializer(qs, many=True).data
 
 
