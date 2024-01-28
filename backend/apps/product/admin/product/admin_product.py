@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from apps.abstract.admin import ParentLinkMixin
 from apps.product.forms import ProductOptionPriceMultiplierFromSet, ProductOptionPriceMultiplierFrom
-from apps.product.models import Product, Product3DBlenderModel, ProductOptionPriceMultiplier, ProductClass
+from apps.product.models import Product, ProductOptionPriceMultiplier, ProductClass
+from .admin_3d import Product3DBlenderModelInline
 from .admin_product_attribute import ProductAttributeInline
 from .admin_sku import SkuInline
 
@@ -24,10 +25,6 @@ class ProductOptionPriceMultiplierInline(admin.StackedInline):
         return self.calc_num(obj)
 
 
-class Product3DBlenderModelInline(admin.StackedInline):
-    model = Product3DBlenderModel
-
-
 @admin.register(Product)
 class ProductAdmin(ParentLinkMixin, admin.ModelAdmin):
     parent_model = ProductClass
@@ -40,7 +37,7 @@ class ProductAdmin(ParentLinkMixin, admin.ModelAdmin):
     fieldsets = [
         [None, {
             'fields': (
-                'code', ('price', 'stock'), ('render_variants', 'generate_sku'),
+                'code', ('price', 'stock'),  'generate_sku', 'remove_images'
             )
         }, ],
     ]

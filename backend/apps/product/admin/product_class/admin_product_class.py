@@ -40,7 +40,6 @@ class ProductClassAdmin(admin.ModelAdmin):
         ('Options', {
             'fields': (
                 ('generate_sku_from_options', 'generate_variants_from_sizes'),
-                ('generate_products_from_dimensions',),
             )
         }),
     )

@@ -47,7 +47,7 @@ class CatalogueSkuSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_images(obj):
         return [
-            image.image.name
+            image.image_thumbnails['m']
             for image in obj.images.all()
         ]
 

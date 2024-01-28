@@ -1,7 +1,7 @@
 from django.db.models import signals
 from django.dispatch import receiver
 
-from apps.product.models import ProductClass, ProductPartMaterialsGroups, ProductPartMaterials
+from apps.product.models import ProductClass, ProductPartMaterialsGroups, ProductPartMaterials, Product, SkuImages
 from apps.product.utils import generate_sku
 
 
@@ -19,3 +19,10 @@ def add_plette_to_material_group_colors(sender, instance, **kwargs):
             material, _ = ProductPartMaterials.objects.get_or_create(group=instance, color=palette_color.color)
 
         ProductPartMaterialsGroups.objects.filter(pk=instance.pk).update(add_palette=None)
+
+
+@receiver(signals.post_save, sender=Product)
+def delete_all_sku_images(sender, instance, **kwargs):
+    if instance.pk and instance.remove_images:
+        SkuImages.objects.filter(sku__product=instance).delete()
+        Product.objects.filter(pk=instance.pk).update(remove_images=False)

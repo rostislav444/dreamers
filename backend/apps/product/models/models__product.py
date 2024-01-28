@@ -2,11 +2,10 @@ import itertools
 import random
 import string
 
-from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.abstract.fields import CustomFileField, DeletableImageField, DeletableFileField
+from apps.abstract.fields import DeletableImageField, DeletableFileField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
 from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
@@ -24,12 +23,14 @@ class Product(models.Model):
     height = models.PositiveIntegerField(_('Height'), default=0, blank=True)
     depth = models.PositiveIntegerField(_('Depth'), default=0, blank=True)
 
+    remove_images = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['width', 'height', 'depth']
 
     def __str__(self):
         sku_count = self.sku.all().count()
-        sku_with_images = self.sku.filter(images__isnull=False).count()
+        sku_with_images = self.sku.filter(images__isnull=False).distinct().count()
         return f'{self.product_class.name} ({str(sku_with_images)} / {str(sku_count)})'
 
     @property
@@ -86,6 +87,24 @@ class Product3DBlenderModel(models.Model):
     @property
     def get_name(self):
         return self.product.get_name + '_3d'
+
+
+class Lights(models.Model):
+    model_3d = models.ForeignKey(Product3DBlenderModel, on_delete=models.CASCADE, related_name='lights')
+    power = models.IntegerField(default=1000)
+    pos_x = models.DecimalField(default=0, max_digits=20, decimal_places=4)
+    pos_y = models.DecimalField(default=0, max_digits=20, decimal_places=4)
+    pos_z = models.DecimalField(default=0, max_digits=20, decimal_places=4)
+
+
+class CameraLocations(models.Model):
+    model_3d = models.ForeignKey(Product3DBlenderModel, on_delete=models.CASCADE, related_name='cameras')
+    pos_x = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
+    pos_y = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
+    pos_z = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
+    rad_x = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
+    rad_y = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
+    rad_z = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
 
 
 class ProductImage(models.Model):

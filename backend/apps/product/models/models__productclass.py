@@ -38,9 +38,8 @@ class ProductClass(NameSlug):
     square_decimeter_price = models.PositiveIntegerField(_('Square decimeter price'), default=0)
 
     # Booleans
-    generate_sku_from_options = models.BooleanField(default=False)
-    generate_products_from_dimensions = models.BooleanField(default=False)
-    generate_variants_from_sizes = models.BooleanField(default=False)
+    generate_sku_from_options = models.BooleanField(default=False, verbose_name='Сгенерировать Sku и сочетания цветов')
+    generate_variants_from_sizes = models.BooleanField(default=False, verbose_name='Сгенерировать варианты из размеров')
 
     def __str__(self):
         return self.name

@@ -82,8 +82,8 @@ export const ProductGallery = ({images}: ProductGalleryInterface) => {
     return (
         <Box w={mobile ? '100%' : '65%'} overflow="hidden">
             <Box ref={sliderRef} className="keen-slider">
-                <ChevronLeft onClick={handleSlideLeft}/>
-                <ChevronRight onClick={handleSlideRight}/>
+                <ChevronLeft mobile={mobile} onClick={handleSlideLeft}/>
+                <ChevronRight mobile={mobile} onClick={handleSlideRight}/>
                 {images.map((image, key) => (
                     <Box
                         className={`keen-slider__slide number-slide-` + key}
@@ -100,7 +100,6 @@ export const ProductGallery = ({images}: ProductGalleryInterface) => {
                             fill
                             src={image.image}
                             alt={'img-' + key}
-
                         />
                     </Box>
                 ))}

@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.material.serializers import ColorSerializer
 from apps.product.models import Product3DBlenderModel, ProductClass, ProductPart, ProductPartMaterialsGroups, \
-    ProductPartMaterials, Product, Sku
+    ProductPartMaterials, Product, Sku, CameraLocations
 
 
 class SkuRenderSerializer(serializers.ModelSerializer):
@@ -18,10 +18,18 @@ class SkuRenderSerializer(serializers.ModelSerializer):
                 obj.materials.all()}
 
 
+class CameraLocationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CameraLocations
+        fields = '__all__'
+
+
 class ProductRender3DBlenderModelSerializer(serializers.ModelSerializer):
+    cameras = CameraLocationsSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product3DBlenderModel
-        fields = ['obj', 'mtl']
+        fields = ['obj', 'mtl', 'cameras']
 
 
 class ProductRenderSerializer(serializers.ModelSerializer):
@@ -34,10 +42,9 @@ class ProductRenderSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_sku(obj):
-        qs = obj.sku.filter(images__isnull=True).distinct()
+        # qs = obj.sku.filter(images__isnull=True).distinct()
+        qs = obj.sku.all().distinct()
         return SkuRenderSerializer(qs, many=True).data
-
-
 
 
 class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):

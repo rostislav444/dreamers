@@ -5,6 +5,7 @@ import {Search} from "@/components/Shared/Header/Search";
 import {Nav} from "@/components/Shared/Header/Nav";
 import Link from "next/link";
 import dynamic from 'next/dynamic'
+import {Logo} from "@/components/Shared/Header/Logo";
 
 const DynamicCartCounter = dynamic(() =>
         import('@/components/Shared/Header/Cart').then((module) => module.CartCounter),
@@ -32,7 +33,7 @@ export const Header = () => {
                 <Flex alignItems="center" justifyContent="flex-start">
                     <Burger mobile={mobile} isOpen={burgerOpen} setOpen={setBurgerOpen}/>
                     <Link href={'/'}>
-                        <Text fontSize={mobile ? 28 : 36} fontWeight="700">Dreamers ✨</Text>
+                        <Logo mobile={mobile} />
                     </Link>
                 </Flex>
                 {/*<Search/>*/}

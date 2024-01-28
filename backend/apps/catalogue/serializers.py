@@ -16,7 +16,6 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_parts(obj):
-        parts_qs = obj.product_class.parts.filter()
         parts = CatalogueProductPartSerializer(obj.product_class.parts, many=True).data
         materials_ids = [material['id'] for part in parts for material in part['materials']]
         return {
