@@ -31,12 +31,13 @@ class ProductPartMaterialsSubGroupsSerializer(serializers.ModelSerializer):
 
 class ProductPartMaterialsGroupsSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='group.type')
+    name = serializers.CharField(source='group.name')
     materials = serializers.SerializerMethodField()
     sub_groups = ProductPartMaterialsSubGroupsSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductPartMaterialsGroups
-        fields = ('id', 'type', 'sub_groups', 'materials',)
+        fields = ('id', 'type', 'name', 'sub_groups', 'materials',)
 
     @staticmethod
     def get_materials(obj):

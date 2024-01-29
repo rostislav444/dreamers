@@ -28,6 +28,7 @@ export interface SubGroupsInterface {
 export interface MaterialGroupsInterface {
     id: number,
     type: string,
+    name: string,
     materials: MaterialData[],
     sub_groups: SubGroupsInterface[]
 }
