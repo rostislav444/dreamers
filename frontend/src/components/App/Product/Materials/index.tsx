@@ -39,6 +39,7 @@ export const ProductMaterials = ({parts, materials, selectSkuByMaterials}: Produ
                                 onClick={() => selectSkuByMaterials({[part.id]: material.id})}
                             >
                                 {material.color && <Box w={12} h={12} bg={material.color.hex}/>}
+                                {material.material && <Box w={12} h={12} bg={material.material.image}/>}
                             </Box>
                         )}
                     </Box>

@@ -8,7 +8,8 @@ interface Color {
 
 interface Material {
     id: number,
-    name: string
+    name: string,
+    image: string
 }
 
 
