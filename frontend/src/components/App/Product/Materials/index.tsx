@@ -1,4 +1,4 @@
-import {Box, Text, useMediaQuery} from '@chakra-ui/react'
+import {Box, Image, Text, useMediaQuery} from '@chakra-ui/react'
 import {ProductPartsInterface} from "@/interfaces/Materials";
 
 
@@ -40,8 +40,9 @@ export const ProductMaterials = ({parts, materials, selectSkuByMaterials}: Produ
                                     onClick={() => selectSkuByMaterials({[part.id]: material.id})}
                                 >
                                     {material.color && <Box w={12} h={12} bg={material.color.hex}/>}
-                                    {material.material &&
-                                        <Box w={12} h={12} backgroundImage={material.material.image}/>}
+                                    {material.material && <Box w={12} h={12}>
+                                        <Image w='100%' h='100%' src={material.material.image} />
+                                    </Box>}
                                 </Box>
                             )}
                         </Box>

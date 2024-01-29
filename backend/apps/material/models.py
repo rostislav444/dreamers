@@ -1,4 +1,5 @@
 import PIL
+import numpy
 from PIL import ImageColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie1976
@@ -8,10 +9,10 @@ from django.db import models
 from apps.abstract.fields import DeletableFileField, DeletableImageField
 from apps.abstract.models import NameSlug
 
-import numpy
 
 def patch_asscalar(a):
     return a.item()
+
 
 setattr(numpy, "asscalar", patch_asscalar)
 
@@ -65,6 +66,7 @@ def srgb_to_linearrgb(c):
     else:
         return ((c + 0.055) / 1.055) ** 2.4
 
+
 def hex_to_rgb(hex_color, alpha=1):
     hex_value = int(hex_color.lstrip('#'), 16)
     r = (hex_value & 0xff0000) >> 16
@@ -73,15 +75,21 @@ def hex_to_rgb(hex_color, alpha=1):
     return tuple([srgb_to_linearrgb(c / 0xff) for c in (r, g, b)] + [alpha])
 
 
+def hex_to_real_rgb(hex_color):
+    (r, g, b) = ImageColor.getcolor(hex_color, "RGB")
+    return [r, g, b]
+
+
 class Color(NameSlug):
     mid_color = models.ForeignKey(BaseColor, on_delete=models.CASCADE, null=True, blank=True)
     ral = models.CharField(max_length=24, null=True, blank=True)
     hex = models.CharField(max_length=7)
+    rgb_real = models.JSONField(default=list, blank=True)
     rgb = models.JSONField(default=list, blank=True)
     lvl = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['ral']
+        ordering = ['mid_color__lvl', 'mid_color__index']
 
     def __str__(self):
         if self.ral:
@@ -107,7 +115,9 @@ class Color(NameSlug):
     def save(self, *args, **kwargs):
         [r, g, b, _] = hex_to_rgb(self.hex)
         self.rgb = [r, g, b]
-        self.mid_color = self.closest_color(self.rgb)
+
+        self.rgb_real = hex_to_real_rgb(self.hex)
+        self.mid_color = self.closest_color(self.rgb_real)
         super(Color, self).save(*args, **kwargs)
 
 
