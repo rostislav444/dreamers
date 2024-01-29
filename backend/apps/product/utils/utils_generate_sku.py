@@ -1,5 +1,5 @@
 from itertools import product
-
+from django.db.models import Q
 
 def generate_sku(instance):
     from apps.product.models import ProductPartMaterials, Sku, SkuMaterials
@@ -13,14 +13,30 @@ def generate_sku(instance):
     keys = data.keys()
     combinations = [tuple(zip(keys, values)) for values in product(*data.values())]
 
+    ids = []
+
     for variant in instance.products.all():
-        Sku.objects_no_distinct.filter(product=variant).delete()
         for combination in combinations:
+
+            filtered_sku = Sku.objects.all()
+            for material in combination:
+                filtered_sku = filtered_sku.filter(materials__material=material[1])
+
+            sku = filtered_sku.first()
+
+            if sku:
+                ids.append(sku.id)
+                continue
+
             code = '__'.join([variant.code, *[material[1].code for material in combination]])
 
             sku = Sku(product=variant, code=code)
             sku.save()
+            ids.append(sku.id)
 
             for material in combination:
                 sku_material = SkuMaterials(sku=sku, material=material[1])
                 sku_material.save()
+
+        Sku.objects_no_distinct.filter(product=variant).exclude(id__in=ids).delete()
+
