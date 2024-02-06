@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from apps.material.models import MaterialGroups, MaterialSubGroup, Material, Color, BaseColor, BlenderMaterial, Palette, \
-    PaletteColor
+from apps.material.models import MaterialGroups, MaterialSubGroup, Material, Color, BaseColor, BlenderMaterial, \
+    Palette, PaletteColor
 
 
 @admin.register(BlenderMaterial)
@@ -27,7 +27,6 @@ class BaseColorAdmin(admin.ModelAdmin):
     readonly_fields = ('color_preview',)
 
 
-
 class PaletteColorInline(admin.TabularInline):
     model = PaletteColor
     extra = 0
@@ -39,13 +38,13 @@ class PaletteAdmin(admin.ModelAdmin):
         data = []
         for hex_color in obj.colors.all().order_by('color__ral').values_list('color__hex', flat=True):
             data.append(f'<div style="background-color: {hex_color}; width: 48px; height: 48px; margin: 2px;"></div>')
-        return format_html('<div style="display: grid; grid-template-columns: repeat(auto-fill, 48px); gap: 4px;">' + ''.join(
-            data) + '</div>')
+        return format_html(
+            '<div style="display: grid; grid-template-columns: repeat(auto-fill, 48px); gap: 4px;">' + ''.join(
+                data) + '</div>')
 
     inlines = [PaletteColorInline]
     list_display = ('name', 'colors',)
     readonly_fields = ('colors',)
-
 
 
 @admin.register(Color)
@@ -64,7 +63,7 @@ class ColorAdmin(admin.ModelAdmin):
     list_display = ('color_preview', 'name', 'lvl', 'ral', 'mid_color', 'hex',)
     readonly_fields = ('color_preview',)
     inlines = [PaletteColorInline]
-    search_fields=['name', 'ral']
+    search_fields = ['name', 'ral']
 
 
 class MaterialInline(admin.TabularInline):

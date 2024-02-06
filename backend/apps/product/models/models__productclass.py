@@ -1,24 +1,24 @@
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from slugify import slugify
-from unidecode import unidecode
 
 from apps.abstract.fields import CustomFileField
 from apps.abstract.models import NameSlug
 from apps.attribute.abstract.fields import OptionGroupField
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstractWithValueAttribute
 from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute, AttributeSubGroup
-from apps.category.models import Category
-from apps.material.models import Material, MaterialGroups, MaterialSubGroup, Color, Palette
+from apps.category.models import Category, Collection
+from apps.material.models.models_material_set import MaterialsSet
 from apps.product.utils import generate_variants_from_dimensions
 
 
 class ProductClass(NameSlug):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    collection = models.ForeignKey(Collection, null=True, blank=True, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(default='', blank=True, null=True)
+    materials_set = models.ForeignKey(MaterialsSet, on_delete=models.PROTECT, null=True, blank=True)
 
     # Width
     min_width = models.PositiveIntegerField(_('Width'), default=0)
@@ -86,101 +86,6 @@ class ProductClass(NameSlug):
 class ProductClass3DBlenderModel(models.Model):
     product_class = models.OneToOneField(ProductClass, on_delete=models.CASCADE, related_name='model_3d')
     blend = CustomFileField(validators=[FileExtensionValidator(allowed_extensions=["blend"])])
-
-
-'''Materials'''
-
-
-class ProductStaticPart(models.Model):
-    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='static_parts')
-    name = models.CharField(max_length=255)
-    blender_name = models.CharField(max_length=255)
-    group = models.ForeignKey(MaterialGroups, on_delete=models.CASCADE)
-    material = models.ForeignKey(Material, on_delete=models.CASCADE, related_name='product_class_static_materials',
-                                 null=True, blank=True)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='product_class_static_color',
-                              null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-
-class ProductPart(models.Model):
-    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='parts')
-    name = models.CharField(max_length=255)
-    blender_name = models.CharField(max_length=255)
-    area = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='Площадь, м2')
-
-    def __str__(self):
-        return '%s (3d name: %s)' % (self.name, self.blender_name)
-
-
-class ProductPartMaterialsGroups(models.Model):
-    product_part = models.ForeignKey(ProductPart, on_delete=models.CASCADE, related_name='material_groups')
-    group = models.ForeignKey(MaterialGroups, on_delete=models.CASCADE, related_name='product_class_groups')
-    add_palette = models.ForeignKey(Palette, on_delete=models.CASCADE, null=True, blank=True)
-
-    def __str__(self):
-        return '{} / {} ({}: {})'.format(
-            self.product_part.name,
-            self.group.name,
-            self.group.type + 's',
-            self.materials.count()
-        )
-
-
-class ProductPartMaterialsSubGroups(models.Model):
-    product_part = models.ForeignKey(ProductPart, on_delete=models.CASCADE, related_name='material_sub_groups')
-    group = models.ForeignKey(ProductPartMaterialsGroups, on_delete=models.CASCADE, related_name='sub_groups')
-    sub_group = models.ForeignKey(MaterialSubGroup, on_delete=models.CASCADE,
-                                  related_name='product_class_sub_groups')
-
-
-class ProductPartMaterialsManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('group__group')
-
-
-class ProductPartMaterials(models.Model):
-    group = models.ForeignKey(ProductPartMaterialsGroups, on_delete=models.CASCADE, related_name='materials')
-    material = models.ForeignKey(Material, on_delete=models.CASCADE, related_name='product_class_materials', null=True,
-                                 blank=True)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='product_parts', null=True, blank=True)
-    show_in_catalogue = models.BooleanField(default=True)
-    code = models.CharField(max_length=255, null=True, blank=True, editable=False)
-    objects = ProductPartMaterialsManager()
-
-    class Meta:
-        ordering = ['color__ral', 'material']
-
-    def __str__(self):
-        value = self.get_value
-        return ' / '.join([self.group.product_part.name, value])
-
-    @property
-    def group_type(self):
-        return self.group.group.type
-
-    @property
-    def get_value(self):
-        return str(self.material) if self.group_type == 'material' else str(self.color)
-
-    @property
-    def get_code(self):
-        names = [slugify(unidecode(name)) for name in
-                 [self.group.product_part.blender_name, self.group_type, self.get_value]]
-        return '_'.join(names)
-
-    def clean(self):
-        if not any([self.material, self.color]):
-            if self.group_type == 'material':
-                raise ValidationError({'material': 'Choose one'})
-            else:
-                raise ValidationError({'color': 'Choose one'})
-
-    def save(self, *args, **kwargs):
-        self.code = self.get_code
-        super(ProductPartMaterials, self).save()
 
 
 '''Attributes'''

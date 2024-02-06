@@ -189,12 +189,9 @@ class SkuMaterialsManager(models.Manager):
 
 class SkuMaterials(models.Model):
     sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='materials')
-    material = models.ForeignKey('product.ProductPartMaterials', on_delete=models.CASCADE, related_name='sku_materials')
+    material = models.ForeignKey('material.ProductPartMaterials', on_delete=models.CASCADE, related_name='sku_materials')
 
     objects = SkuMaterialsManager()
-
-    class Meta:
-        ordering = ['-material__show_in_catalogue']
 
     @property
     def get_material_part_name(self):

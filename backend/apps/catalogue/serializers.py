@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.product.models import Product
 from apps.product.serializers import CatalogueSkuSerializer
-from apps.product.serializers.serializers_materials import CatalogueProductPartSerializer
+from apps.material.serializers.serializers_materials_set import CatalogueProductPartSerializer
 
 
 class CatalogueProductSerializer(serializers.ModelSerializer):
@@ -16,7 +16,10 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_parts(obj):
-        parts = CatalogueProductPartSerializer(obj.product_class.parts, many=True).data
+        if not obj.product_class.materials_set:
+            return
+
+        parts = CatalogueProductPartSerializer(obj.product_class.materials_set.parts, many=True).data
         materials_ids = [material['id'] for part in parts for material in part['materials']]
         return {
             'sku': CatalogueSkuSerializer(

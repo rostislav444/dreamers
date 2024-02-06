@@ -4,7 +4,7 @@ from pathlib import Path
 from django.core.files.storage import default_storage
 from dotenv import load_dotenv, dotenv_values
 
-from .storage import S3Storage, CustomFileSystemStorage
+from project.storage import S3Storage, CustomFileSystemStorage
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -2,8 +2,8 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from apps.material.serializers import ColorSerializer, MaterialSerializer, ColorLiteSerializer
-from apps.product.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials, \
+from apps.material.serializers.serializers_materials import ColorSerializer, MaterialSerializer, ColorLiteSerializer
+from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials, \
     ProductPartMaterialsSubGroups
 
 
@@ -42,7 +42,7 @@ class ProductPartMaterialsGroupsSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_materials(obj):
         materials_qs = obj.materials.filter(
-            sku_materials__sku__product__product_class=obj.product_part.product_class
+            sku_materials__sku__product__product_class__materials_set=obj.product_part.materials_set
         ).distinct()
         return ProductPartMaterialSerializer(materials_qs, many=True, read_only=True).data
 
@@ -90,6 +90,11 @@ class CatalogueProductPartSerializer(serializers.ModelSerializer):
     def get_materials(obj):
         materials = ProductPartMaterials.objects.filter(
             group__product_part=obj,
-            sku_materials__sku__product__product_class=obj.product_class
+            sku_materials__sku__product__product_class__materials_set=obj.materials_set
         ).distinct()[:8]
+
         return CatalogueProductPartMaterialSerializer(materials, many=True).data
+
+
+
+

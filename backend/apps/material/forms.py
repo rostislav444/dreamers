@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.product.models import ProductStaticPart
+from apps.material.models import ProductStaticPart
 
 
 class ProductStaticPartForm(forms.ModelForm):

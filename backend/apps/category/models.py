@@ -41,3 +41,9 @@ class CategoryAttributeGroup(models.Model):
         if hasattr(self, 'category'):
             return f'{self.category} - {self.attribute_group}'
         return '-'
+
+
+class Collection(NameSlug):
+    def __str__(self):
+        return self.name
+

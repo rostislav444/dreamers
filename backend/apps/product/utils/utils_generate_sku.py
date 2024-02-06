@@ -2,11 +2,15 @@ from itertools import product
 from django.db.models import Q
 
 def generate_sku(instance):
-    from apps.product.models import ProductPartMaterials, Sku, SkuMaterials
+    from apps.product.models import Sku, SkuMaterials
+    from apps.material.models import ProductPartMaterials
 
     data = {}
 
-    for part in instance.parts.all():
+    if not instance.materials_set:
+        return
+
+    for part in instance.materials_set.parts.all():
         data[part] = tuple(ProductPartMaterials.objects.filter(
             group__product_part=part).distinct())
 

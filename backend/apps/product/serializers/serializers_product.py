@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.product.models import Product
-from .serializers_materials import ProductPartSerializer
+from apps.material.serializers import ProductPartSerializer
 from .serializers_sku import SkuSerializer
 from ...category.serializers import CategorySerializer
 
@@ -19,7 +19,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_parts(obj):
-        return ProductPartSerializer(obj.product_class.parts.all(), many=True).data
+        materials_set = obj.product_class.materials_set
+        if materials_set:
+            return ProductPartSerializer(materials_set.parts, many=True).data
 
 
     @staticmethod

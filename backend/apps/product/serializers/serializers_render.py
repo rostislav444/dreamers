@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
+from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials
 from apps.material.serializers import ColorSerializer
-from apps.product.models import Product3DBlenderModel, ProductClass, ProductPart, ProductPartMaterialsGroups, \
-    ProductPartMaterials, Product, Sku, CameraLocations
+from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, CameraLocations
 
 
 class SkuRenderSerializer(serializers.ModelSerializer):
@@ -81,9 +81,15 @@ class ProductPartRenderSerializer(serializers.ModelSerializer):
 
 
 class ProductRenderWithSkuSerializer(serializers.ModelSerializer):
-    parts = ProductPartRenderSerializer(many=True, read_only=True)
+    parts = serializers.SerializerMethodField()
     products = ProductRenderSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductClass
         fields = ['id', 'parts', 'products']
+
+    @staticmethod
+    def get_parts(obj):
+        if obj.materials_set:
+            return ProductPartRenderSerializer(obj.materials_set.parts.all(), many=True, read_only=True).data
+

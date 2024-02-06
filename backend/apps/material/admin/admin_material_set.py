@@ -1,9 +1,10 @@
+from admin_auto_filters.filters import AutocompleteFilter
 from django.contrib import admin
 from django.utils.html import format_html
-from admin_auto_filters.filters import AutocompleteFilter
-from apps.material.models import Material
-from apps.product.forms.product_class.forms_product_class_parts import ProductStaticPartForm
-from apps.product.models import ProductStaticPart, ProductPartMaterialsGroups, ProductPart, ProductPartMaterials
+
+from apps.material.models import Material, ProductStaticPart, ProductPartMaterialsGroups, ProductPart, \
+    ProductPartMaterials, MaterialsSet
+from apps.material.forms import ProductStaticPartForm
 
 
 class ProductStaticPartInline(admin.StackedInline):
@@ -41,7 +42,7 @@ class ProductPartMaterialsInline(admin.TabularInline):
 
     def get_fields(self, request, obj=None):
         self._obj = obj
-        fields = ['material', 'color', 'show_in_catalogue', 'preview', 'code', ]
+        fields = ['material', 'color', 'preview', 'code', ]
         if obj:
             if obj.group.type == 'material':
                 fields.remove('color')
@@ -88,3 +89,8 @@ class ProductPartInline(admin.TabularInline):
 @admin.register(ProductPart)
 class ProductPartAdmin(admin.ModelAdmin):
     inlines = [ProductPartMaterialsGroupsInline]
+
+
+@admin.register(MaterialsSet)
+class MaterialsSetAdmin(admin.ModelAdmin):
+    inlines = [ProductPartInline]

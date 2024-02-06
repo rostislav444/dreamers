@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.product.models import Sku, SkuMaterials, SkuImages
-from apps.product.serializers.serializers_materials import ProductPartMaterialSerializer
+from apps.material.serializers.serializers_materials_set import ProductPartMaterialSerializer
 
 
 class SkuMaterialsSerializer(serializers.ModelSerializer):

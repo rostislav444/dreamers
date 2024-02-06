@@ -19,3 +19,10 @@ class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
         fields = ('id', 'name', 'image',)
+
+
+__all__ = [
+    'ColorSerializer',
+    'ColorLiteSerializer',
+    'MaterialSerializer'
+]
