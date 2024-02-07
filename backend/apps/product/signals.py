@@ -1,7 +1,7 @@
 from django.db.models import signals
 from django.dispatch import receiver
 
-from apps.product.models import ProductClass, Product, SkuImages
+from apps.product.models import ProductClass, Product, SkuImages, ProductCustomizedPart
 from apps.product.utils import generate_sku
 
 
@@ -25,3 +25,8 @@ def delete_all_sku_images(sender, instance, **kwargs):
     if instance.pk and instance.remove_images:
         SkuImages.objects.filter(sku__product=instance).delete()
         Product.objects.filter(pk=instance.pk).update(remove_images=False)
+
+    if instance.pk and instance.product_class.materials_set:
+        for part in instance.product_class.materials_set.parts.all():
+            obj, _ = ProductCustomizedPart.objects.get_or_create(part=part, product=instance)
+

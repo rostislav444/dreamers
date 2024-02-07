@@ -79,6 +79,17 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)
 
 
+class ProductCustomizedPart(models.Model):
+    custom_name = models.CharField(max_length=255, blank=True, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='customized_parts')
+    part = models.ForeignKey('material.ProductPart', on_delete=models.PROTECT)
+    area = models.DecimalField(default=1, decimal_places=1, max_digits=10)
+    price = models.DecimalField(default=0, decimal_places=1, max_digits=10)
+
+    def __str__(self):
+        return str(self.part)
+
+
 class Product3DBlenderModel(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='model_3d')
     obj = DeletableFileField(blank=True, null=True)
