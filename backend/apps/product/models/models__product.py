@@ -87,7 +87,7 @@ class ProductCustomizedPart(models.Model):
     price = models.DecimalField(default=0, decimal_places=1, max_digits=10)
 
     def __str__(self):
-        return str(self.part) if not self.name else self.name
+        return str(self.part)
 
 
 class Product3DBlenderModel(models.Model):

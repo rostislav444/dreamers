@@ -25,7 +25,7 @@ class ProductOptionPriceMultiplierInline(admin.StackedInline):
         return self.calc_num(obj)
 
 
-class ProductCustomizedPart(admin.StackedInline):
+class ProductCustomizedPart(admin.TabularInline):
     model = ProductCustomizedPart
     readonly_fields = ['part']
 
