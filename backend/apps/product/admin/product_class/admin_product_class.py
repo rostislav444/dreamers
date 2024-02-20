@@ -1,5 +1,6 @@
 from django.contrib import admin
-
+from django.urls import reverse
+from django.utils.html import mark_safe
 from apps.product.models import ProductClass, Product
 from .admin_product_class_attribues import ProductClassAttributesInline
 from .admin_product_class_options import ProductClassOptionGroupInline, ProductClassOptionGroupCustomInline
@@ -20,9 +21,16 @@ class ProductInline(admin.TabularInline):
 # Product class
 @admin.register(ProductClass)
 class ProductClassAdmin(admin.ModelAdmin):
+    def materials_set_link(self, obj):
+        instance = obj.materials_set
+        if not instance:
+            return '-'
+        url = reverse('admin:%s_%s_change' % (instance._meta.app_label, instance._meta.model_name), args=[instance.id])
+        return mark_safe('<a href="%s" target="_blank">Открыть</a>' % url)
+
     fieldsets = (
         (None, {
-            'fields': ('category', 'materials_set', 'name', 'description', )
+            'fields': ('category', ('materials_set', 'materials_set_link',), 'name', 'description',)
         }),
         ('Price', {
             'fields': (('initial_price', 'square_decimeter_price'),)
@@ -42,6 +50,8 @@ class ProductClassAdmin(admin.ModelAdmin):
             )
         }),
     )
+
+    readonly_fields = ['materials_set_link']
 
     inlines = [
         ProductClassAttributesInline,
