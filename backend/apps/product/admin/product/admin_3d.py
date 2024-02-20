@@ -21,3 +21,5 @@ class Product3DBlenderModelAdmin(admin.ModelAdmin):
 class Product3DBlenderModelInline(admin.StackedInline):
     model = Product3DBlenderModel
     show_change_link = True
+    extra = 0
+    min_num = 1
