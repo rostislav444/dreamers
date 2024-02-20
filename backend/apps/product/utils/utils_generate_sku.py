@@ -20,9 +20,10 @@ def generate_sku(instance):
     ids = []
 
     for variant in instance.products.all():
+        print(variant, variant)
         for combination in combinations:
 
-            filtered_sku = Sku.objects.all()
+            filtered_sku = Sku.objects.filter(product=variant)
             for material in combination:
                 filtered_sku = filtered_sku.filter(materials__material=material[1])
 
