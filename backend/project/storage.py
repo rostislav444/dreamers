@@ -3,17 +3,22 @@ import os
 
 import boto3
 from botocore.exceptions import NoCredentialsError
+
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import Storage
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
-from django.core.files.storage import FileSystemStorage
+
+from apps.core.tasks import async_s3_file_delete
+
 
 @deconstructible
 class S3Storage(Storage):
     def __init__(self):
         self.bucket_name = 'dreamers'  # ваш бакет
-        self.client = boto3.client('s3',
+        self.client = boto3.client(
+            's3',
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             region_name='eu-north-1',
@@ -31,7 +36,6 @@ class S3Storage(Storage):
             print("Ошибка: Ключи доступа не действительны.")
         except Exception as e:
             print(f"Ошибка: {e}")
-
 
     def _normalize_name(self, name):
         return name
@@ -65,10 +69,7 @@ class S3Storage(Storage):
 
     def delete(self, name):
         print('storage delete', name)
-        try:
-            self.client.delete_object(Bucket=self.bucket_name, Key=name)
-        except NoCredentialsError:
-            print('Credentials not available')
+        async_s3_file_delete.delay(self.bucket_name, name)
 
     def exists(self, name):
         try:

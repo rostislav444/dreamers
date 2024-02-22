@@ -17,7 +17,7 @@ class Product(models.Model):
     price = models.PositiveIntegerField(_('Price'), blank=True, null=True)
     stock = models.PositiveIntegerField(_('Stock'), blank=True, null=True)
     render_variants = models.BooleanField(default=False)
-    generate_sku = models.BooleanField(default=False)
+    generate_sku = models.BooleanField(default=False, verbose_name='Сгенерировать SKU из материалов')
 
     width = models.PositiveIntegerField(_('Width'), default=0, blank=True)
     height = models.PositiveIntegerField(_('Height'), default=0, blank=True)
@@ -200,7 +200,8 @@ class SkuMaterialsManager(models.Manager):
 
 class SkuMaterials(models.Model):
     sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='materials')
-    material = models.ForeignKey('material.ProductPartMaterials', on_delete=models.CASCADE, related_name='sku_materials')
+    material = models.ForeignKey('material.ProductPartMaterials', on_delete=models.CASCADE,
+                                 related_name='sku_materials')
 
     objects = SkuMaterialsManager()
 
