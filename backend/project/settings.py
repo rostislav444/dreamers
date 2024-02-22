@@ -158,7 +158,7 @@ AWS_SECRET_ACCESS_KEY = env['AWS_SECRET_ACCESS_KEY']
 
 FILE_STORAGE = S3Storage if PRODUCTION else default_storage
 
-CELERY_BROKER_URL = env.get('CELERY_BROKER_REDIS_URL', 'redis://localhost:6379')
+CELERY_BROKER_URL = env.get('CELERY_BROKER_URL', 'redis://localhost:6380')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 MEDIA_URL = AWS_BUCKET_URL if PRODUCTION else '/media/'
