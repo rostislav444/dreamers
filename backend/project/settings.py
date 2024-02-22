@@ -122,13 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -161,6 +157,8 @@ AWS_ACCESS_KEY_ID = env['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = env['AWS_SECRET_ACCESS_KEY']
 
 FILE_STORAGE = S3Storage if PRODUCTION else default_storage
+
+CELERY_BROKER_URL = env.get('CELERY_BROKER_REDIS_URL', 'redis://localhost:6379')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 MEDIA_URL = AWS_BUCKET_URL if PRODUCTION else '/media/'
