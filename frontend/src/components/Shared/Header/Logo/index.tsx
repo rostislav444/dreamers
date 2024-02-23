@@ -4,7 +4,7 @@ import { Box, Flex, Image, keyframes, usePrefersReducedMotion } from "@chakra-ui
 
 const pulsate = keyframes`
   0%, 100% {
-    transform: scale(0.8);
+    transform: scale(0.6);
   }
   50% {
     transform: scale(1.2);
@@ -14,9 +14,9 @@ const pulsate = keyframes`
 export const Logo = ({ mobile }: { mobile: boolean }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const animation1 = prefersReducedMotion ? undefined : `${pulsate} 4s infinite`;
-  const animation2 = prefersReducedMotion ? undefined : `${pulsate} 3s infinite`;
-  const animation3 = prefersReducedMotion ? undefined : `${pulsate} 2s infinite`;
+  const animation1 = prefersReducedMotion ? undefined : `${pulsate} 5s infinite`;
+  const animation2 = prefersReducedMotion ? undefined : `${pulsate} 7s infinite`;
+  const animation3 = prefersReducedMotion ? undefined : `${pulsate} 4s infinite`;
 
   const imageUrl = '/icons/sparkle.svg';
 

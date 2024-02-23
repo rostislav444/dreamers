@@ -12,9 +12,12 @@ interface BurgerProps {
 export const Burger = ({isOpen, setOpen, mobile}: BurgerProps) => {
   const w = mobile ? 24 : 32
   const h = mobile ? 3 : 4
-  const topBarAnimation = isOpen ? {rotate: 45, translateY: '10px'} : {rotate: 0, translateY: '0px'};
+  const topTranslateY = mobile ? '7.5px' : '10px'
+  const bottomTranslateY = mobile ? '-7.5px' : '-10px'
+
+  const topBarAnimation = isOpen ? {rotate: 45, translateY: topTranslateY} : {rotate: 0, translateY: '0px'};
   const middleBarAnimation = isOpen ? {opacity: 0, marginLeft: '-80px'} : {opacity: 1, marginLeft: '0px'};
-  const bottomBarAnimation = isOpen ? {rotate: -45, translateY: '-10px'} : {rotate: 0, translateY: '0px'};
+  const bottomBarAnimation = isOpen ? {rotate: -45, translateY: bottomTranslateY} : {rotate: 0, translateY: '0px'};
 
   return (
     <Flex as="button" mr={3} w={w+'px'} h={mobile ? "18px" : "24px"}  direction={'column'} justify={'space-between'} alignItems={'center'}
