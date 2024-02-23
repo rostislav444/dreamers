@@ -1,10 +1,10 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
 from django.dispatch import receiver
-from .tasks import task_generate_product_class_sku, task_generate_product_sku
 
 from apps.product.models import ProductClass, Product, SkuImages, ProductCustomizedPart, Product3DBlenderModel, \
-    CameraLocations
+    CameraLocations, ProductPartScene, ProductPartSceneMaterial
+from .tasks import task_generate_product_class_sku, task_generate_product_sku
 
 
 @receiver(signals.post_save, sender=ProductClass)
@@ -30,10 +30,6 @@ def delete_all_sku_images(sender, instance, **kwargs):
             Product.objects.filter(pk=instance.pk).update(generate_sku=False)
 
 
-
-
-
-
 @receiver(signals.post_save, sender=Product3DBlenderModel)
 def generate_camera_locations(sender, instance, **kwargs):
     if instance.pk:
@@ -52,3 +48,38 @@ def generate_camera_locations(sender, instance, **kwargs):
                 rad_z=90
             )
             direct_location.save()
+
+
+# @receiver(signals.post_save, sender=CameraLocations)
+# def create_scene_product_part_materials(sender, instance, **kwargs):
+#     if instance.pk:
+#         product = instance.model_3d.product
+#         materials_set = product.product_class.material_set
+#         if materials_set:
+#             for part in materials_set.parts.all():
+#                 product_part_scene, _ = ProductPartScene.objects.get_or_create(camera=instance, part=part)
+#                 for material_group in part.material_groups.all():
+#                     for material in material_group.materials.all():
+#                         ProductPartSceneMaterial.objects.get_or_create(part=product_part_scene, material=material)
+
+
+@receiver(signals.post_save, sender=CameraLocations)
+def create_scene_product_part_materials(sender, instance, **kwargs):
+    def create_product_part_scenes(materials_set):
+        for part in materials_set.parts.all():
+            product_part_scene, _ = get_or_create_product_part_scene(instance, part)
+            create_product_part_scene_materials(product_part_scene, part)
+
+    def get_or_create_product_part_scene(camera, part):
+        return ProductPartScene.objects.get_or_create(camera=camera, part=part)
+
+    def create_product_part_scene_materials(product_part_scene, part):
+        for material_group in part.material_groups.all():
+            for material in material_group.materials.all():
+                ProductPartSceneMaterial.objects.get_or_create(part=product_part_scene, material=material)
+
+    if instance.pk:
+        product = instance.model_3d.product
+        materials_set = product.product_class.materials_set
+        if materials_set:
+            create_product_part_scenes(materials_set)
