@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.abstract.fields import DeletableImageField, DeletableFileField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
-from .models__productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
+from .models_productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
 
 
 class Product(models.Model):
