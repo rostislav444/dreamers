@@ -39,6 +39,8 @@ class ProductCustomizedPart(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def calc_num(self, obj):
+        if not obj:
+            return 0
         self.materials_set = obj.product_class.materials_set
         if self.materials_set:
             return self.materials_set.parts.count()
