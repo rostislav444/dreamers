@@ -19,7 +19,7 @@ class ProductPartSceneMaterialSerializer(serializers.ModelSerializer):
         fields = ['id', 'material', 'image']
 
     def get_image(self, obj):
-        if obj.image:
+        if hasattr(obj, 'image'):
             request = self.context.get('request')
             domain = request.build_absolute_uri('/')[:-1] if request else ''
             return domain + obj.image.image.url if obj.image.image else None
