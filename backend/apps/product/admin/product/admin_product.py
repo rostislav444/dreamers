@@ -16,6 +16,8 @@ class ProductOptionPriceMultiplierInline(admin.StackedInline):
 
     @staticmethod
     def calc_num(obj):
+        if not obj:
+            return 0
         return obj.get_price_sub_group_multiplier_attribute_groups.count()
 
     def get_min_num(self, request, obj=None, **kwargs):
