@@ -41,18 +41,25 @@ class ProductPartMaterialsGroupsSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_materials(obj):
-        materials_qs = obj.materials.filter(
-            sku_materials__sku__product__product_class__materials_set=obj.product_part.materials_set
-        ).distinct()
+        materials_qs = obj.materials.all()
+        # materials_qs = obj.materials.filter(
+        #     sku_materials__sku__product__product_class__materials_set=obj.product_part.materials_set
+        # ).distinct()
         return ProductPartMaterialSerializer(materials_qs, many=True, read_only=True).data
 
 
-class ProductPartSerializer(serializers.ModelSerializer):
+class ProductPartSerializerLite(serializers.ModelSerializer):
+    class Meta:
+        model = ProductPart
+        fields = ('id', 'name', 'blender_name')
+
+
+class ProductPartSerializer(ProductPartSerializerLite):
     material_groups = ProductPartMaterialsGroupsSerializer(many=True, read_only=True)
 
     class Meta:
-        model = ProductPart
-        fields = ('id', 'name', 'material_groups')
+        model = ProductPartSerializerLite.Meta.model
+        fields = (*ProductPartSerializerLite.Meta.fields, 'material_groups',)
 
 
 ''' Catalogue '''

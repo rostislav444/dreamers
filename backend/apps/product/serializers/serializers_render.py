@@ -3,6 +3,7 @@ from rest_framework import serializers
 from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials
 from apps.material.serializers import ColorSerializer
 from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, CameraLocations
+from apps.product.serializers.serializers_scene_parts import ProductPartSceneSerializer
 
 
 class SkuRenderSerializer(serializers.ModelSerializer):
@@ -19,6 +20,8 @@ class SkuRenderSerializer(serializers.ModelSerializer):
 
 
 class CameraLocationsSerializer(serializers.ModelSerializer):
+    parts = ProductPartSceneSerializer(many=True, read_only=True)
+
     class Meta:
         model = CameraLocations
         fields = '__all__'

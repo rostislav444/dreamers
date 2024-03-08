@@ -1,17 +1,25 @@
 import {Box, Image, Text, useMediaQuery} from '@chakra-ui/react'
 import {ProductPartsInterface} from "@/interfaces/Materials";
+import {InfoHeading} from "@/components/Shared/Typogrphy";
 
 
 interface ProductMaterialsInterface {
     parts: ProductPartsInterface[]
     materials: { [key: number]: number };
-    selectSkuByMaterials: any
+    setSelectedMaterials: any
 }
 
-export const ProductMaterials = ({parts, materials, selectSkuByMaterials}: ProductMaterialsInterface) => {
+export const ProductMaterials = ({parts, materials, setSelectedMaterials}: ProductMaterialsInterface) => {
     const [mobile] = useMediaQuery('(max-width: 960px)');
 
+    const handleMaterialsSet = (partId: number, materialId: number) => {
+        const newMaterials = {...materials, [partId]: materialId}
+        setSelectedMaterials(newMaterials)
+    }
+
+
     return <Box mt={mobile ? 4 : 6}>
+        <InfoHeading mobile={mobile}>Колір</InfoHeading>
         {parts.map(part =>
             <Box key={part.id}>
                 <Text fontSize='md'>{part.name}</Text>
@@ -37,7 +45,7 @@ export const ProductMaterials = ({parts, materials, selectSkuByMaterials}: Produ
                                     _hover={{
                                         borderColor: 'orange.500'
                                     }}
-                                    onClick={() => selectSkuByMaterials({[part.id]: material.id})}
+                                    onClick={() => handleMaterialsSet(part.id, material.id)}
                                 >
                                     {material.color && <Box w={12} h={12} bg={material.color.hex}/>}
                                     {material.material && <Box w={12} h={12}>

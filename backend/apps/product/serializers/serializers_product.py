@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from apps.product.models import Product
 from apps.material.serializers import ProductPartSerializer
+from apps.product.models import Product
+from .serializers_render import ProductRender3DBlenderModelSerializer
 from .serializers_sku import SkuSerializer
 from ...category.serializers import CategorySerializer
 
@@ -12,10 +13,12 @@ class ProductSerializer(serializers.ModelSerializer):
     sku = SkuSerializer(read_only=True, many=True)
     parts = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
+    model_3d = ProductRender3DBlenderModelSerializer(read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'code', 'sku', 'parts', 'categories', 'width', 'height', 'depth']
+        fields = ['id', 'name', 'description', 'price', 'code', 'sku', 'parts', 'categories', 'width', 'height',
+                  'depth', 'model_3d']
 
     @staticmethod
     def get_parts(obj):
@@ -23,7 +26,7 @@ class ProductSerializer(serializers.ModelSerializer):
         if materials_set:
             return ProductPartSerializer(materials_set.parts, many=True).data
 
-
     @staticmethod
     def get_categories(obj):
-        return [CategorySerializer(category).data for category in obj.product_class.category.get_ancestors(include_self=True)]
+        return [CategorySerializer(category).data for category in
+                obj.product_class.category.get_ancestors(include_self=True)]

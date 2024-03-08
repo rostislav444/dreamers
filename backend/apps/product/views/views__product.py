@@ -11,10 +11,10 @@ class ProductViewSet(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retr
     lookup_field = 'code'
 
     def get_queryset(self):
-        print(self.request)
-        return Product.objects.all().prefetch_related(
-            Prefetch('sku', Sku.objects.filter(images__isnull=False))
-        )
+        return Product.objects.all()
+        # return Product.objects.all().prefetch_related(
+        #     Prefetch('sku', Sku.objects.filter(images__isnull=False))
+        # )
 
 
 def products_list(request):
