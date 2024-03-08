@@ -19,6 +19,7 @@ class ProductClass(NameSlug):
     collection = models.ForeignKey(Collection, null=True, blank=True, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(default='', blank=True, null=True)
     materials_set = models.ForeignKey(MaterialsSet, on_delete=models.PROTECT, null=True, blank=True)
+    images_by_sku = models.BooleanField(default=False)
 
     # Width
     min_width = models.PositiveIntegerField(_('Width'), default=0)

@@ -1,12 +1,21 @@
 from django.contrib import admin
+from django.utils.html import mark_safe
 
 from apps.product.models import Product3DBlenderModel, Lights, CameraLocations, ProductPartScene, \
     ProductPartSceneMaterial
+from project.settings import MEDIA_URL
 
 
 class ProductPartSceneMaterialInline(admin.TabularInline):
     def image_preview(self, obj):
-        return '-'
+        path = obj.image.image.name
+
+        if path:
+            return mark_safe(f'''
+                   <img src="{MEDIA_URL}{path}" width="133" height="100" style="
+                       border: 1px solid #ccc; border-radius: 6px; margin-top: -4px; object-fit: cover
+                   " />
+              ''')
 
     show_change_link = True
     model = ProductPartSceneMaterial

@@ -1,5 +1,6 @@
 from django import forms
-from apps.product.models import ProductOptionPriceMultiplier
+
+from apps.product.models import ProductOptionPriceMultiplier, ProductPartSceneMaterialImage
 
 
 class ProductOptionPriceMultiplierFrom(forms.ModelForm):
@@ -25,7 +26,6 @@ class ProductOptionPriceMultiplierFrom(forms.ModelForm):
             self.fields['option_group'].empty_label = None
 
 
-
 class ProductOptionPriceMultiplierFromSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance')
@@ -35,3 +35,9 @@ class ProductOptionPriceMultiplierFromSet(forms.BaseInlineFormSet):
                 'initial': [{'option_group': multiplier.id} for multiplier in sub_group_multipliers],
             })
         super(ProductOptionPriceMultiplierFromSet, self).__init__(*args, **kwargs)
+
+
+class ProductPartSceneMaterialImageForm(forms.ModelForm):
+    class Meta:
+        model = ProductPartSceneMaterialImage
+        fields = ['image']

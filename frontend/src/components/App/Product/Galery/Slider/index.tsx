@@ -5,7 +5,7 @@ import {Box, useMediaQuery} from "@chakra-ui/react";
 import {useKeenSlider} from "keen-slider/react";
 import "keen-slider/keen-slider.min.css"
 import {useEffect, useRef, useState} from "react";
-import {ChevronLeft, ChevronRight} from "@/components/App/Product/Galery/components";
+import {ChevronLeft, ChevronRight} from "@/components/App/Product/Galery/Slider/components";
 
 interface ProductGalleryInterface {
     images: SkuImageInterface[]
@@ -33,7 +33,7 @@ function ThumbnailPlugin(mainRef: any) {
 }
 
 
-export const ProductGallery = ({images}: ProductGalleryInterface) => {
+export const ProductSlider = ({images}: ProductGalleryInterface) => {
     const [mobile] = useMediaQuery('(max-width: 960px)');
     const mountedRef = useRef(false)
     const [imagesLoaded, setImagesLoaded] = useState(0);

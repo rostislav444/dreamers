@@ -1,5 +1,6 @@
 import {CategoryState} from "@/interfaces/Categories";
 import {ProductPartsInterface} from "@/interfaces/Materials";
+import {CameraInterface} from "@/interfaces/Product/Camera";
 
 
 export interface ProductProps {
@@ -18,17 +19,6 @@ export interface SkuInterface {
     images: SkuImageInterface[],
     code: string
     materials: { [key: number]: number };
-}
-
-
-export interface CameraInterface {
-    parts: any;
-    pos_x: number;
-    pos_y: number;
-    pos_z: number;
-    rad_x: number;
-    rad_y: number;
-    rad_z: number;
 }
 
 export interface Model3dInterface {
@@ -51,5 +41,5 @@ export interface ProductInterface {
     height: number;
     depth: number;
     images_by_sku: boolean
-    model_3d: Model3dInterface[]
+    model_3d: Model3dInterface
 }
