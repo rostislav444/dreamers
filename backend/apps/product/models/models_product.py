@@ -117,7 +117,7 @@ class Product3DBlenderModel(models.Model):
         return self.product.get_name + '_3d'
 
     def __str__(self):
-        return 'ID: %d' % self.id
+        return str(self.id)
 
 
 class Lights(models.Model):
