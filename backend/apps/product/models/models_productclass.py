@@ -51,6 +51,12 @@ class ProductClass(NameSlug):
         return self.name
 
     @property
+    def get_parts_images(self):
+        product = self.products.first()
+        if product:
+            return product.get_parts_images
+
+    @property
     def possible_option_groups(self):
         categories = self.category.get_ancestors(include_self=True)
         attributes_groups = self.products.all().values_list('attributes__group', flat=True)

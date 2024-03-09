@@ -41,9 +41,20 @@ class Product(models.Model):
         return sku.images.filter(index=0).first().image.url if sku else None
 
     @property
-    def get_images(self):
+    def get_sku_images(self):
         sku = self.sku.filter(images__isnull=False).first()
         return [obj.image.url for obj in sku.images.all()] if sku else None
+
+    @property
+    def get_parts_images(self):
+        links = []
+        if hasattr(self, 'model_3d'):
+            camera = self.model_3d.cameras.first()
+            for part in camera.parts.all():
+                material = part.materials.first()
+                if hasattr(material, 'image'):
+                    links.append(material.image.image.url)
+        return links
 
     def generate_sku_from_options(self):
         options_groups = [list(group.options.all()) for group in
