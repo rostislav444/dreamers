@@ -9,10 +9,14 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='product_class.name')
     parts = serializers.SerializerMethodField()
     sku = serializers.SerializerMethodField()
+    part_images = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'code', 'price', 'parts', 'sku']
+        fields = ['id', 'name', 'code', 'price', 'parts', 'sku', 'part_images']
+
+    def get_part_images(self, obj):
+        return obj.get_parts_images
 
     @staticmethod
     def get_parts(obj):

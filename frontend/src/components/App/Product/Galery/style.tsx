@@ -7,7 +7,7 @@ export const CameraImagesWrapper = styled.div`
   width: 100%;
   height: auto;
   padding-top: calc(100% / 3 * 2);
-  background-color: white;
+  //background-color: white;
 `
 
 

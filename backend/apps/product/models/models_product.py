@@ -53,7 +53,7 @@ class Product(models.Model):
             for part in camera.parts.all():
                 material = part.materials.first()
                 if hasattr(material, 'image'):
-                    links.append(material.image.image.url)
+                    links.append(material.image.image.name)
         return links
 
     def generate_sku_from_options(self):

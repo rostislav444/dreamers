@@ -38,8 +38,10 @@ export interface ProductCardProps {
     code: string;
     price: number;
     parts: PartInterface[];
+    part_images: string[];
     sku: SkuInterface[];
   };
+  part_images: string[];
 }
 
 export interface SkuMaterialsResponse {

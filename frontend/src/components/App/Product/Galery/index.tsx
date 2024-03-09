@@ -2,7 +2,7 @@ import {Model3dInterface, ProductInterface} from "@/interfaces/Product";
 import {selectedMaterialsInterface} from "@/components/App/Product";
 import {CameraImage, CameraImagesWrapper} from "@/components/App/Product/Galery/style";
 import {Box} from "@chakra-ui/react";
-
+import {MEDIA_URL} from "@/local";
 
 interface ProductGalleryProps {
     mobile: boolean
@@ -33,7 +33,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     return <Box mb={4} mr={mobile ? 0 : 20} w={mobile ? '100%' : '80%'}>{
         cameras.map((camera, key) =>
             <CameraImagesWrapper onContextMenu={handleContextMenuOpen} key={key}>
-                {camera.map((image, imageKey) => <CameraImage className={'camera-image'} key={imageKey} src={image}/>)}
+                {camera.map((image, imageKey) => <CameraImage className={'camera-image'} key={imageKey} src={MEDIA_URL+image}/>)}
             </CameraImagesWrapper>
         )
     }</Box>

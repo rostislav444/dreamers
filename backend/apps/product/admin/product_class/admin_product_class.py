@@ -6,7 +6,7 @@ from apps.product.models import ProductClass, Product
 from .admin_product_class_attribues import ProductClassAttributesInline
 from .admin_product_class_options import ProductClassOptionGroupInline, ProductClassOptionGroupCustomInline
 from .admin_product_class_product_attributes import ProductClassProductAttributeGroupsInline
-
+from project.settings import MEDIA_URL
 
 # Product
 class ProductInline(admin.TabularInline):
@@ -38,7 +38,7 @@ class ProductClassAdmin(admin.ModelAdmin):
             'top': 0,
         }
         images_style_inline = ''.join(['%s: %s;' % (key, value) for key, value in images_style.items()])
-        images_html = ['<img src="%s" style="%s">' % (image, images_style_inline) for image in obj.get_parts_images]
+        images_html = ['<img src="%s%s" style="%s">' % (MEDIA_URL, image, images_style_inline) for image in obj.get_parts_images]
         return mark_safe(''.join(
             ['<div style="position: relative; width: 300px; height: 200px; margin: 5px;">', *images_html, '</div>']
         ))

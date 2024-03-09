@@ -9,28 +9,25 @@ import {ProductInterface} from "@/interfaces/Product";
 
 
 export const ProductCard: React.FC<ProductCardProps> = ({product}) => {
-    const [selectedSku, setSelectedSku] = useState<number | null>(null)
-    const sku = product.sku[selectedSku || 0]
-
     return (
         <Box
             borderWidth="3px"
             borderColor={"brown.500"}
             overflow="hidden"
         >
-            <Link href={`/product/${product.code}/${sku.id}`}>
-                <CatalogueProductImages sku={sku}/>
+            <Link href={`/product/${product.code}`}>
+                <CatalogueProductImages product={product}/>
             </Link>
             <Box p="4">
-                <Link href={`/product/${product.code}/${sku.id}`}>
+                <Link href={`/product/${product.code}`}>
                     <Box fontWeight="semibold" as="h4" lineHeight="tight" noOfLines={1} pb={2}>
                         {product.name}
                     </Box>
                 </Link>
-                <ProductCardMaterial
-                    product={product}
-                    setSelectedSku={setSelectedSku}
-                />
+                {/*<ProductCardMaterial*/}
+                {/*    product={product}*/}
+                {/*    setSelectedSku={setSelectedSku}*/}
+                {/*/>*/}
                 <Box>
                     <Box as="span" fontSize="l">
                         {product.price} {"грн."}
