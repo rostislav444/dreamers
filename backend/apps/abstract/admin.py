@@ -23,6 +23,8 @@ class GetParentFromRequestAbstract:
 
 # Place at the start og your class inline arguments
 class ParentLinkMixin:
+    _parent_model = None
+
     class Meta:
         abstract = True
 
@@ -30,13 +32,17 @@ class ParentLinkMixin:
         super(ParentLinkMixin, self).__init__(*args, **kwargs)
 
         for field in self.model._meta.get_fields():
-            if isinstance(field, models.ForeignKey) and field.remote_field.model == self.parent_model:
+            if isinstance(field, models.ForeignKey):
+                if field.remote_field.model == self.parent_model:
+                    self.parent_model_field_name = field.name
+                    break
                 self.parent_model_field_name = field.name
+                self._parent_model = field.remote_field.model
+                break
 
     @property
-    @abstractmethod
     def parent_model(self):
-        pass
+        return self._parent_model
 
     def parent_link(self, obj=None, **kwargs):
         app_name = self.parent_model._meta.app_label

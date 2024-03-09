@@ -30,21 +30,21 @@ class ProductClassAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('category', ('materials_set', 'materials_set_link',), 'name', 'description',)
+            'fields': ('category', 'collection', ('materials_set', 'materials_set_link',), 'name', 'description',)
         }),
-        ('Price', {
+        ('Цена', {
             'fields': (('initial_price', 'square_decimeter_price'),)
         }),
-        ('Width', {
+        ('Ширина', {
             'fields': (('min_width', 'max_width', 'width_step',),)
         }),
-        ('Height', {
+        ('Высота', {
             'fields': (('min_height', 'max_height', 'height_step',),)
         }),
-        ('Depth', {
+        ('Глубина', {
             'fields': (('min_depth', 'max_depth', 'depth_step',),)
         }),
-        ('Options', {
+        ('Опции', {
             'fields': (
                 ('generate_sku_from_options', 'generate_variants_from_sizes'),
             )

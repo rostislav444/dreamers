@@ -40,3 +40,6 @@ class ProductClassProductAttributesInline(admin.TabularInline):
 @admin.register(ProductClassProductAttributeGroups)
 class ProductClassProductAttributeGroupsAdmin(admin.ModelAdmin):
     inlines = [ProductClassProductAttributesInline]
+
+    def get_model_perms(self, request):
+        return {}

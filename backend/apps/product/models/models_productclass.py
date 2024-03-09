@@ -22,17 +22,17 @@ class ProductClass(NameSlug):
     images_by_sku = models.BooleanField(default=False)
 
     # Width
-    min_width = models.PositiveIntegerField(_('Width'), default=0)
-    max_width = models.PositiveIntegerField(_('Max width'), blank=True, null=True)
-    width_step = models.PositiveIntegerField(_('Width step'), blank=True, null=True)
+    min_width = models.PositiveIntegerField(_('Ширина'), default=0)
+    max_width = models.PositiveIntegerField(_('Макс. ширина'), blank=True, null=True)
+    width_step = models.PositiveIntegerField(_('Шаг ширины'), blank=True, null=True)
     # Height
-    min_height = models.PositiveIntegerField(_('Height'), default=0)
-    max_height = models.PositiveIntegerField(_('Max height'), blank=True, null=True)
-    height_step = models.PositiveIntegerField(_('Height step'), blank=True, null=True)
+    min_height = models.PositiveIntegerField(_('Высота'), default=0)
+    max_height = models.PositiveIntegerField(_('Макс высота'), blank=True, null=True)
+    height_step = models.PositiveIntegerField(_('Шаг высоты'), blank=True, null=True)
     # Depth
-    min_depth = models.PositiveIntegerField(_('Depth'), default=0)
-    max_depth = models.PositiveIntegerField(_('Max depth'), blank=True, null=True)
-    depth_step = models.PositiveIntegerField(_('Depth step'), blank=True, null=True)
+    min_depth = models.PositiveIntegerField(_('Глубина'), default=0)
+    max_depth = models.PositiveIntegerField(_('Макс. глубина'), blank=True, null=True)
+    depth_step = models.PositiveIntegerField(_('Шаг глубины'), blank=True, null=True)
 
     # Initial price
     initial_price = models.PositiveIntegerField(_('Initial price'), default=0)
@@ -41,6 +41,11 @@ class ProductClass(NameSlug):
     # Booleans
     generate_sku_from_options = models.BooleanField(default=False, verbose_name='Сгенерировать Sku и сочетания цветов')
     generate_variants_from_sizes = models.BooleanField(default=False, verbose_name='Сгенерировать варианты из размеров')
+
+    class Meta:
+        verbose_name = 'Товар'
+        verbose_name_plural = '1. Товары'
+        ordering = ['name']
 
     def __str__(self):
         return self.name

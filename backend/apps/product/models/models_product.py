@@ -26,6 +26,8 @@ class Product(models.Model):
     remove_images = models.BooleanField(default=False)
 
     class Meta:
+        verbose_name = 'Вариант'
+        verbose_name_plural = '2. Варианты'
         ordering = ['width', 'height', 'depth']
 
     def __str__(self):
@@ -95,9 +97,16 @@ class Product3DBlenderModel(models.Model):
     obj = DeletableFileField(blank=True, null=True)
     mtl = DeletableFileField(blank=True, null=True)
 
+    class Meta:
+        verbose_name = '3D модель'
+        verbose_name_plural = '3D модели'
+
     @property
     def get_name(self):
         return self.product.get_name + '_3d'
+
+    def __str__(self):
+        return 'ID: %d' % self.id
 
 
 class Lights(models.Model):

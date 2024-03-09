@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
 
+from apps.abstract.admin import ParentLinkMixin
 from apps.product.models import Product3DBlenderModel, Lights, CameraLocations, ProductPartScene, \
-    ProductPartSceneMaterial
+    ProductPartSceneMaterial, Product
 from project.settings import MEDIA_URL
 
 
@@ -25,8 +26,11 @@ class ProductPartSceneMaterialInline(admin.TabularInline):
 
 
 @admin.register(ProductPartScene)
-class ProductPartSceneAdmin(admin.ModelAdmin):
+class ProductPartSceneAdmin(ParentLinkMixin, admin.ModelAdmin):
     inlines = [ProductPartSceneMaterialInline]
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class ProductPartSceneInline(admin.TabularInline):
@@ -36,8 +40,11 @@ class ProductPartSceneInline(admin.TabularInline):
 
 
 @admin.register(CameraLocations)
-class CameraLocationsAdmin(admin.ModelAdmin):
+class CameraLocationsAdmin(ParentLinkMixin, admin.ModelAdmin):
     inlines = [ProductPartSceneInline]
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class CameraLocationsInline(admin.TabularInline):
@@ -52,8 +59,12 @@ class LightsInline(admin.TabularInline):
 
 
 @admin.register(Product3DBlenderModel)
-class Product3DBlenderModelAdmin(admin.ModelAdmin):
+class Product3DBlenderModelAdmin(ParentLinkMixin, admin.ModelAdmin):
+    parent_model = Product
     inlines = [CameraLocationsInline, LightsInline]
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class Product3DBlenderModelInline(admin.StackedInline):

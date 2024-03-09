@@ -14,8 +14,8 @@ class Category(MPTTModel, NameSlug):
         return ' > '.join(names)
 
     class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = 'Категория'
+        verbose_name_plural = '1. Категории'
 
     class MPTTMeta:
         order_insertion_by = ['name']

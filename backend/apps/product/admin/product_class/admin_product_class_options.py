@@ -99,6 +99,9 @@ class ProductClassOptionGroupAdmin(ParentLinkMixin, admin.ModelAdmin):
             'fields': ['parent_link', ('type', 'name'), 'option_price_required', 'image_dependency', ],
         }),
 
+    def get_model_perms(self, request):
+        return {}
+
 
 class ProductClassOptionGroupCustomInline(admin.TabularInline):
     model = ProductClassOptionGroup

@@ -47,6 +47,9 @@ class SkuAdmin(ParentLinkMixin, admin.ModelAdmin):
         SkuImagesInline
     ]
 
+    def get_model_perms(self, request):
+        return {}
+
 
 class SkuInline(TabularInlinePaginated):
     show_change_link = True
