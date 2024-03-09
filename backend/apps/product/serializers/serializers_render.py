@@ -91,8 +91,7 @@ class ProductRenderWithSkuSerializer(serializers.ModelSerializer):
         model = ProductClass
         fields = ['id', 'parts', 'products']
 
-    @staticmethod
-    def get_parts(obj):
+    def get_parts(self, obj):
         if obj.materials_set:
-            return ProductPartRenderSerializer(obj.materials_set.parts.all(), many=True, read_only=True).data
-
+            return ProductPartRenderSerializer(obj.materials_set.parts.all(), many=True, read_only=True,
+                                               context=self._context).data

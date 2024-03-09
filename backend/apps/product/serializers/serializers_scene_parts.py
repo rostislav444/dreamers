@@ -27,11 +27,21 @@ class ProductPartSceneMaterialSerializer(serializers.ModelSerializer):
 
 class ProductPartSceneSerializer(serializers.ModelSerializer):
     part = ProductPartSerializerLite()
-    materials = ProductPartSceneMaterialSerializer(many=True, read_only=True)
+    materials = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductPartScene
         fields = ['part', 'materials']
+
+    def get_materials(self, obj):
+        only_new = False
+        request = self.context.get('request')
+        if request:
+            only_new = request.GET.get('only_new')
+
+        qs = obj.materials.filter(image__isnull=True) if only_new else obj.materials.all()
+
+        return ProductPartSceneMaterialSerializer(qs, many=True, read_only=True).data
 
 
 __all__ = [

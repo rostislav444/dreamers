@@ -35,8 +35,8 @@ class ProductClass(NameSlug):
     depth_step = models.PositiveIntegerField(_('Шаг глубины'), blank=True, null=True)
 
     # Initial price
-    initial_price = models.PositiveIntegerField(_('Initial price'), default=0)
-    square_decimeter_price = models.PositiveIntegerField(_('Square decimeter price'), default=0)
+    initial_price = models.PositiveIntegerField(_('Стартовая цена'), default=0)
+    square_decimeter_price = models.PositiveIntegerField(_('Цена за м2'), default=0)
 
     # Booleans
     generate_sku_from_options = models.BooleanField(default=False, verbose_name='Сгенерировать Sku и сочетания цветов')
