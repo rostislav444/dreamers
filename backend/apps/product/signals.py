@@ -40,7 +40,7 @@ def generate_camera_locations(sender, instance, **kwargs):
 
             direct_location = CameraLocations(
                 model_3d=instance,
-                pos_x=product.height / 1000 * 2.44,
+                pos_x=product.height / 1000 * 2.4,
                 pos_y=0,
                 pos_z=product.height / 1000 / 2,
                 rad_x=90,
