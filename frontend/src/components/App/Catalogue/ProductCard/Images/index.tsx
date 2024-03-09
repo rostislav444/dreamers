@@ -6,7 +6,7 @@ import {ProductImage} from "@/components/App/Catalogue/ProductCard/style";
 
 
 interface CatalogueProductImagesProps {
-    product: ProductCardProps
+    product: any
 }
 
 
@@ -23,7 +23,7 @@ export const CatalogueProductImages = ({product}: CatalogueProductImagesProps) =
         {/*</ImagePaginationWrapper>*/}
         {/*<ProductImage unoptimized fill src={MEDIA_URL + sku.images[imageIndex]} alt={'img'}/>*/}
 
-        {product.part_images.map((image, key) => {
+        {product.part_images.map((image: string, key: number) => {
             return <ProductImage key={key} src={MEDIA_URL + image} alt={'img'}/>
         })}
 
