@@ -1,14 +1,22 @@
 import Layout from "@/components/Shared/Layout";
 import {ProductsList} from "src/components/App/Catalogue";
-import type {GetStaticPaths, GetStaticProps,} from 'next'
+import type {GetStaticProps,} from 'next'
 import fetchApi from "@/utils/fetch";
-import ErrorPage from 'next/error'
+
 import {CategoriesList} from "@/components/App/Catalogue/CategoriesList";
 
 interface CatalogueProps {
     products: any,
     categories: any
 }
+
+interface CategoryInterface {
+    id: number;
+    name: string;
+    slug: string;
+    children: CategoryInterface[] | null;
+}
+
 
 
 export default function Catalogue({products, categories}: CatalogueProps) {
@@ -17,7 +25,9 @@ export default function Catalogue({products, categories}: CatalogueProps) {
     ]
 
     if (!products) {
-        return <ErrorPage statusCode={404}/>;
+        return <Layout breadcrumbs={breadcrumbs} description={'description'} title={'Каталог'}>
+            <h1>Нет товаров</h1>
+        </Layout>
     }
 
     return <Layout breadcrumbs={breadcrumbs} description={'description'} title={'Каталог'}>
@@ -46,11 +56,5 @@ export const getStaticProps = (async (context) => {
     return {notFound: true}
 }) satisfies GetStaticProps<{ products: any }>
 
-interface CategoryInterface {
-    id: number;
-    name: string;
-    slug: string;
-    children: CategoryInterface[] | null;
-}
 
 

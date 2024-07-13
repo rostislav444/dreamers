@@ -1,11 +1,12 @@
 import {CategoryState} from "@/interfaces/Categories";
 import {ProductPartsInterface} from "@/interfaces/Materials";
 import {CameraInterface} from "@/interfaces/Product/Camera";
+import {ProductPart} from "@/interfaces/Product/Parts";
 
 
 export interface ProductProps {
     product: ProductInterface,
-    skuId?: string
+    skuId?: string,
 }
 
 
@@ -28,6 +29,21 @@ export interface Model3dInterface {
 }
 
 
+
+export interface CameraPartsInterface {
+    materials: {
+        material: number,
+        image: string
+    }[]
+    part: {
+        id: number
+        name: string
+        blender_name: string
+    }
+}
+
+
+
 export interface ProductInterface {
     id: number;
     name: string;
@@ -42,4 +58,7 @@ export interface ProductInterface {
     depth: number;
     images_by_sku: boolean
     model_3d: Model3dInterface
+    material_parts: ProductPart[]
+    camera: CameraInterface
 }
+

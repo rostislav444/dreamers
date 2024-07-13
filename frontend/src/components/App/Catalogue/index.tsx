@@ -1,9 +1,10 @@
 import {Box, Grid} from "@chakra-ui/react";
 import {ProductCard} from "@/components/App/Catalogue/ProductCard";
+import {ProductInterface} from "@/interfaces/Product";
 
 
 interface ProductsListInterface {
-    products: any[]
+    products: ProductInterface[]
 }
 
 

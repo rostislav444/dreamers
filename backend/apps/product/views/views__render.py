@@ -1,15 +1,15 @@
 from rest_framework import viewsets, mixins, generics
 
-from apps.product.models import ProductClass, SkuImages, ProductPartSceneMaterialImage
-from apps.product.serializers import SkuImagesSerializer, ProductRenderWithSkuSerializer
+from apps.product.models import SkuImages, ProductPartSceneMaterialImage, Product
+from apps.product.serializers import SkuImagesSerializer, ProductRenderSerializer
 from apps.product.serializers.serializers_scene_parts import ProductPartSceneMaterialImageSerializer
 
 
-class ProductClassRenderViewSet(generics.GenericAPIView, mixins.RetrieveModelMixin, viewsets.ViewSet):
-    serializer_class = ProductRenderWithSkuSerializer
+class ProductRenderViewSet(generics.GenericAPIView, mixins.RetrieveModelMixin, viewsets.ViewSet):
+    serializer_class = ProductRenderSerializer
 
     def get_queryset(self):
-        return ProductClass.objects.all()
+        return Product.objects.all()
 
 
 class LoadSkuImageView(generics.GenericAPIView, mixins.CreateModelMixin, viewsets.ViewSet):

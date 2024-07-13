@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: web
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
+    volumes:
+      - ./backend/static_root:/home/app/web/static_root
+      - ./backend/media:/home/app/web/media
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - nginx_net
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: postgres
+    env_file:
+      - ./backend/.env
+    networks:
+      - nginx_net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    networks:
+      - nginx_net
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: celery -A project worker --loglevel=info -Q default,payments
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - nginx_net
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: celery -A project beat --loglevel=info
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - nginx_net
+
+volumes:
+  postgres_data:
+
+networks:
+  nginx_net:
+    name: nginx_net
+    external: true

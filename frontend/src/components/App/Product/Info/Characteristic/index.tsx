@@ -1,11 +1,11 @@
 import {Box, Table, TableContainer, Tbody, Td, Tr} from '@chakra-ui/react'
 import {ProductInterface} from "@/interfaces/Product";
 import {InfoHeading} from "@/components/Shared/Typogrphy";
-import {selectedMaterialsInterface} from "@/components/App/Product";
+import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 
 interface ProductCharacteristicsProps {
     product: ProductInterface,
-    selectedMaterials: selectedMaterialsInterface
+    selectedMaterials: SelectedMaterialsInterface
 }
 
 
@@ -13,14 +13,14 @@ const TdStyledLeft = ({children}: { children: any }) => <Td w={52} px={0} pb={3}
 const TdStyled = ({children}: { children: any }) => <Td px={0} pb={3} borderBottom="none">{children}</Td>
 
 export const ProductCharacteristics = ({product, selectedMaterials}: ProductCharacteristicsProps) => {
-
-    const selectedParts = product.parts.map(part => ({
-        name: part.name,
-        material: part.material_groups.flatMap(group => group.materials.find(
-            material => material.id === selectedMaterials[part.id]
-        ))[0]
-    }))
-
+    const selectedParts = product.material_parts.map((part, i) => {
+        return {
+            name: part.name,
+            material: part.material_groups.flatMap(group => group.materials.find(
+                material => material.id == selectedMaterials[part.id]
+            ))[0]
+        }
+    })
 
     return <Box>
         <InfoHeading>Характеристики</InfoHeading>

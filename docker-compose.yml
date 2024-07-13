@@ -1,20 +1,52 @@
-version: '3.8'
-
 services:
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/home/app/web
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - rabbitmq
+
   db:
-    image: postgres:12.0-alpine
-    platform: linux/amd64
+    image: postgres:13-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ecommerce_db
-    ports:
-      - 5434:5432
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=dreamers
+    env_file:
+      - ./backend/.env
 
-  redis:
-    image: redis:7
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A project worker --loglevel=info
+    volumes:
+      - ./backend:/home/app/web
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - rabbitmq
+
 
 volumes:
   postgres_data:

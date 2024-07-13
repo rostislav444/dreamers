@@ -39,3 +39,8 @@ export interface ProductPartsInterface {
     name: string,
     material_groups: MaterialGroupsInterface[]
 }
+
+
+export interface SelectedMaterialsInterface {
+    [key: number]: number
+}

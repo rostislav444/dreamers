@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials
 from apps.material.serializers import ColorSerializer
-from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, CameraLocations
+from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, CameraLocations, \
+    ProductPartSceneMaterialImage, ProductPartSceneMaterial
 from apps.product.serializers.serializers_scene_parts import ProductPartSceneSerializer
 
 
@@ -36,18 +37,20 @@ class ProductRender3DBlenderModelSerializer(serializers.ModelSerializer):
 
 
 class ProductRenderSerializer(serializers.ModelSerializer):
-    sku = serializers.SerializerMethodField()
     model_3d = ProductRender3DBlenderModelSerializer(read_only=True)
+    parts = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'code', 'model_3d', 'sku', ]
+        fields = ['id', 'code', 'model_3d', 'parts']
 
-    @staticmethod
-    def get_sku(obj):
-        qs = obj.sku.filter(images__isnull=True).distinct()
-        # qs = obj.sku.all().distinct()
-        return SkuRenderSerializer(qs, many=True).data
+    def get_parts(self, obj):
+        context = self.context.copy()
+        context['product_id'] = obj.id
+
+        if obj.product_class.materials_set:
+            return ProductPartRenderSerializer(
+                obj.product_class.materials_set.parts.all(), many=True, read_only=True, context=context).data
 
 
 class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
@@ -68,30 +71,37 @@ class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
 
 class ProductPartRenderMaterialsGroupsSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='group.type')
-    materials = ProductPartRenderMaterialSerializer(many=True, read_only=True)
+    materials = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductPartMaterialsGroups
         fields = ('product_part', 'type', 'materials',)
 
+    def get_materials(self, obj):
+        product = Product.objects.get(id=self.context['product_id'])
+        product_part_scene_material = ProductPartSceneMaterial.objects.filter(
+            part__camera__model_3d__product=product,
+            part__part=obj.product_part,
+            image__image__isnull=True
+        )
+
+        qs = ProductPartMaterials.objects.filter(
+            material_scene__in=product_part_scene_material
+        )
+
+        return ProductPartRenderMaterialSerializer(qs, many=True, read_only=True).data
+
 
 class ProductPartRenderSerializer(serializers.ModelSerializer):
-    material_groups = ProductPartRenderMaterialsGroupsSerializer(many=True, read_only=True)
+    material_groups = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductPart
         fields = ('blender_name', 'name', 'material_groups')
 
 
-class ProductRenderWithSkuSerializer(serializers.ModelSerializer):
-    parts = serializers.SerializerMethodField()
-    products = ProductRenderSerializer(many=True, read_only=True)
+    def get_material_groups(self, obj):
+        return ProductPartRenderMaterialsGroupsSerializer(obj.material_groups.all(), many=True, read_only=True,
+                                                          context=self.context).data
 
-    class Meta:
-        model = ProductClass
-        fields = ['id', 'parts', 'products']
 
-    def get_parts(self, obj):
-        if obj.materials_set:
-            return ProductPartRenderSerializer(obj.materials_set.parts.all(), many=True, read_only=True,
-                                               context=self._context).data

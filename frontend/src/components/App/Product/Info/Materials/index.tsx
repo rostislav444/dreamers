@@ -1,26 +1,36 @@
 import {Box, Image, Text, useMediaQuery} from '@chakra-ui/react'
-import {ProductPartsInterface} from "@/interfaces/Materials";
+import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import {InfoHeading} from "@/components/Shared/Typogrphy";
-
+import {useRouter} from 'next/router';
+import {ProductPart} from "@/interfaces/Product/Parts";
 
 interface ProductMaterialsInterface {
-    parts: ProductPartsInterface[]
-    materials: { [key: number]: number };
+    parts: ProductPart[]
+    selectedMaterials: SelectedMaterialsInterface
     setSelectedMaterials: any
 }
 
-export const ProductMaterials = ({parts, materials, setSelectedMaterials}: ProductMaterialsInterface) => {
+export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials}: ProductMaterialsInterface) => {
+    const router = useRouter()
     const [mobile] = useMediaQuery('(max-width: 960px)');
 
     const handleMaterialsSet = (partId: number, materialId: number) => {
-        const newMaterials = {...materials, [partId]: materialId}
-        setSelectedMaterials(newMaterials)
-    }
+        const newMaterials = {...selectedMaterials, [partId]: materialId};
+        setSelectedMaterials(newMaterials);
 
+        const query = {...router.query, materials: JSON.stringify(newMaterials)};
+        const as = `${router.pathname}?materials=${JSON.stringify(newMaterials)}`;
+
+        router.push({
+            pathname: router.pathname,
+            query: query,
+        }, as, {shallow: true});
+
+    }
 
     return <Box mt={mobile ? 4 : 6}>
         <InfoHeading mobile={mobile}>Колір</InfoHeading>
-        {parts.map(part =>
+        {parts.map((part, i) =>
             <Box key={part.id}>
                 <Text fontSize='md'>{part.name}</Text>
                 {part.material_groups.map(group =>
@@ -36,10 +46,10 @@ export const ProductMaterials = ({parts, materials, setSelectedMaterials}: Produ
                                     key={material.id}
                                     position='relative'
                                     display='inline-block'
-                                    m={'0 0 0 4px'}
-                                    p='4px'
+                                    m={'0 0 0 2px'}
+                                    p='2px'
                                     borderWidth='2px'
-                                    borderColor={materials[part.id] === material.id ? 'brown.500' : 'transparent'}
+                                    borderColor={selectedMaterials[part.id] === material.id ? 'brown.500' : 'transparent'}
                                     borderRadius='0'
                                     cursor='pointer'
                                     _hover={{
@@ -47,9 +57,9 @@ export const ProductMaterials = ({parts, materials, setSelectedMaterials}: Produ
                                     }}
                                     onClick={() => handleMaterialsSet(part.id, material.id)}
                                 >
-                                    {material.color && <Box w={12} h={12} bg={material.color.hex}/>}
-                                    {material.material && <Box w={12} h={12}>
-                                        <Image w='100%' h='100%' src={material.material.image} />
+                                    {material.color && <Box w={10} h={10} bg={material.color.hex}/>}
+                                    {material.material && <Box w={10} h={10}>
+                                        <Image w='100%' h='100%' src={material.material.image}/>
                                     </Box>}
                                 </Box>
                             )}

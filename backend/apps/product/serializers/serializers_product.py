@@ -11,17 +11,17 @@ class ProductSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='product_class.name')
     description = serializers.CharField(source='product_class.description')
     sku = SkuSerializer(read_only=True, many=True)
-    parts = serializers.SerializerMethodField()
+    material_parts = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
     model_3d = ProductRender3DBlenderModelSerializer(read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'code', 'sku', 'parts', 'categories', 'width', 'height',
+        fields = ['id', 'name', 'description', 'price', 'code', 'sku', 'material_parts', 'categories', 'width', 'height',
                   'depth', 'model_3d']
 
     @staticmethod
-    def get_parts(obj):
+    def get_material_parts(obj):
         materials_set = obj.product_class.materials_set
         if materials_set:
             return ProductPartSerializer(materials_set.parts, many=True).data
@@ -30,3 +30,6 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_categories(obj):
         return [CategorySerializer(category).data for category in
                 obj.product_class.category.get_ancestors(include_self=True)]
+
+
+

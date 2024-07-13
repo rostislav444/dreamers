@@ -1,24 +1,24 @@
 import {Box, Heading, Text} from "@chakra-ui/react";
 import {ProductMaterials} from "src/components/App/Product/Info/Materials";
 import {ProductInterface} from "@/interfaces/Product";
-import {selectedMaterialsInterface} from "@/components/App/Product";
 import {ProductCharacteristics} from "@/components/App/Product/Info/Characteristic";
 import {ButButton} from "@/components/App/Product/Info/BuyButton";
 import {InfoHeading} from "@/components/Shared/Typogrphy";
+import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 
 interface ProductInfoProps {
     mobile: boolean
     product: ProductInterface
-    selectedMaterials: selectedMaterialsInterface
+    selectedMaterials: SelectedMaterialsInterface
     setSelectedMaterials: any
 }
 
 export const ProductInfo = ({mobile, product, selectedMaterials, setSelectedMaterials}: ProductInfoProps) => {
-    return <Box>
+    return <Box minW='400'>
         <Heading mb={mobile ? 4 : 8}>{product.name}</Heading>
         <ProductMaterials
-            parts={product.parts}
-            materials={selectedMaterials}
+            parts={product.material_parts}
+            selectedMaterials={selectedMaterials}
             setSelectedMaterials={setSelectedMaterials}
         />
         <ButButton product={product} selectedMaterials={selectedMaterials}/>

@@ -28,7 +28,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Вариант'
         verbose_name_plural = '2. Варианты'
-        ordering = ['width', 'height', 'depth']
+        ordering = ['product_class', 'width', 'height', 'depth']
 
     def __str__(self):
         sku_count = self.sku.all().count()
@@ -49,11 +49,17 @@ class Product(models.Model):
     def get_parts_images(self):
         links = []
         if hasattr(self, 'model_3d'):
-            camera = self.model_3d.cameras.first()
-            for part in camera.parts.all():
-                material = part.materials.first()
-                if hasattr(material, 'image'):
-                    links.append(material.image.image.name)
+            try:
+                camera = self.model_3d.cameras.get(rad_z=90)
+            except CameraLocations.DoesNotExist:
+                camera = self.model_3d.cameras.filter(rad_z__gte=70, rad_z__lte=100).first()
+            if not camera:
+                camera = self.model_3d.cameras.first()
+            if camera:
+                for part in camera.parts.all():
+                    material = part.materials.first()
+                    if hasattr(material, 'image'):
+                        links.append(material.image.image.name)
         return links
 
     def generate_sku_from_options(self):
@@ -136,6 +142,11 @@ class CameraLocations(models.Model):
     rad_x = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
     rad_y = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
     rad_z = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
+
+    class Meta:
+        verbose_name = 'Камера'
+        verbose_name_plural = 'Камеры'
+        ordering = ['-rad_z']
 
 
 class ProductImage(models.Model):

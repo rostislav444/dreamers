@@ -38,7 +38,8 @@ class ProductClassAdmin(admin.ModelAdmin):
             'top': 0,
         }
         images_style_inline = ''.join(['%s: %s;' % (key, value) for key, value in images_style.items()])
-        images_html = ['<img src="%s%s" style="%s">' % (MEDIA_URL, image, images_style_inline) for image in obj.get_parts_images]
+        images  = obj.get_parts_images if obj.get_parts_images else []
+        images_html = ['<img src="%s%s" style="%s">' % (MEDIA_URL, image, images_style_inline) for image in images  ]
         return mark_safe(''.join(
             ['<div style="position: relative; width: 300px; height: 200px; margin: 5px;">', *images_html, '</div>']
         ))

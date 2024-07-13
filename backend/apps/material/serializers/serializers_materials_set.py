@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from apps.material.serializers.serializers_materials import ColorSerializer, MaterialSerializer, ColorLiteSerializer
 from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials, \
-    ProductPartMaterialsSubGroups
+    ProductPartMaterialsSubGroups, MaterialsSet
 
 
 class ProductPartMaterialSerializer(serializers.ModelSerializer):
@@ -51,15 +51,23 @@ class ProductPartMaterialsGroupsSerializer(serializers.ModelSerializer):
 class ProductPartSerializerLite(serializers.ModelSerializer):
     class Meta:
         model = ProductPart
-        fields = ('id', 'name', 'blender_name')
+        fields = ('id', 'name', 'blender_name',)
 
 
 class ProductPartSerializer(ProductPartSerializerLite):
     material_groups = ProductPartMaterialsGroupsSerializer(many=True, read_only=True)
 
     class Meta:
-        model = ProductPartSerializerLite.Meta.model
-        fields = (*ProductPartSerializerLite.Meta.fields, 'material_groups',)
+        model = ProductPart
+        fields = ('id', 'name', 'blender_name', 'material_groups',)
+
+
+class MaterialSetSerializer(serializers.ModelSerializer):
+    parts = ProductPartSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = MaterialsSet
+        fields = ['id', 'name', 'slug', 'parts']
 
 
 ''' Catalogue '''
