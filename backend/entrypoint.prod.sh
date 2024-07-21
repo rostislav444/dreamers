@@ -21,5 +21,8 @@ chown app:app /home/app/web/celerybeat-schedule
 # Collect static files
 python manage.py collectstatic --no-input
 
+# Set PYTHONPATH
+export PYTHONPATH=/home/app/web
+
 # Start Gunicorn
 exec gunicorn backend.wsgi:application --bind 0.0.0.0:8000
