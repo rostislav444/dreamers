@@ -11,17 +11,13 @@ then
     echo "PostgreSQL started"
 fi
 
+# Collect static files
+echo "Collecting static files"
+python manage.py collectstatic --noinput
+
+# Apply database migrations
+echo "Applying database migrations"
 python manage.py migrate
 
-# change owner of celerybeat-schedule file to app user
-touch /home/app/web/celerybeat-schedule
-chown app:app /home/app/web/celerybeat-schedule
-
-# change owner of static_root file to app user
-touch /home/app/web/static_root
-chown app:app /home/app/web/static_root
-
-# Collect static files
-python manage.py collectstatic --no-input
-
-exec "$@"
+# Start server
+exec gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
