@@ -11,9 +11,15 @@ then
     echo "PostgreSQL started"
 fi
 
-python manage.py migrate
+# Run migrations
+python manage.py migrate --no-input
 
-# change owner of celerybeat-schedule file to app user
+# Ensure the celerybeat-schedule file exists
+touch /home/app/web/celerybeat-schedule
 chown app:app /home/app/web/celerybeat-schedule
 
-exec "$@"
+# Collect static files
+python manage.py collectstatic --no-input
+
+# Start Gunicorn
+exec gunicorn backend.wsgi:application --bind 0.0.0.0:8000
