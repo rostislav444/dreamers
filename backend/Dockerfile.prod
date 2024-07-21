@@ -11,12 +11,10 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE=backend.settings.production
+ENV DJANGO_SETTINGS_MODULE=project.settings.production
 
 # Install wkhtmltopdf and system dependencies
 RUN apt-get update && apt-get install -y \
-    wkhtmltopdf \
-    xvfb \
     gcc \
     build-essential \
     --no-install-recommends && \
@@ -49,8 +47,8 @@ RUN addgroup --system app && adduser --system --group app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
-RUN mkdir $APP_HOME/static
-RUN mkdir $APP_HOME/media
+RUN mkdir $APP_HOME/staticfiles
+RUN mkdir $APP_HOME/mediafiles
 WORKDIR $APP_HOME
 
 # install dependencies
@@ -58,22 +56,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends netcat
 
 # Install wkhtmltopdf dependencies
 RUN apt-get update && apt-get install -y \
-    wkhtmltopdf \
-    xvfb \
     gcc \
     build-essential \
     --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Проверка наличия wkhtmltopdf
-RUN which wkhtmltopdf
 
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
-RUN pip install backports.weakref gunicorn
+RUN pip install backports.weakref
 
 # copy entrypoint.prod.sh
 COPY ./entrypoint.prod.sh .
