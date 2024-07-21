@@ -8,10 +8,12 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /home/app/web
 
-# Install wkhtmltopdf dependencies
+# Install wkhtmltopdf dependencies and build tools
 RUN apt-get update && apt-get install -y \
     wkhtmltopdf \
     xvfb \
+    gcc \
+    build-essential \
     --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
