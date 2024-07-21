@@ -25,4 +25,4 @@ python manage.py collectstatic --no-input
 export PYTHONPATH=/home/app/web
 
 # Start Gunicorn
-exec gunicorn backend.wsgi:application --bind 0.0.0.0:8000
+exec gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
