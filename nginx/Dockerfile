@@ -4,7 +4,7 @@ FROM nginx:1.25
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy your custom Nginx configuration file
-COPY nginx.conf_v2 /etc/nginx/nginx.conf
+COPY nginx.conf_v1 /etc/nginx/nginx.conf
 
 # Copy proxy params if required by your configuration
 COPY proxy_params /etc/nginx/proxy_params
