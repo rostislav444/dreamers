@@ -156,7 +156,16 @@ STATICFILES_FINDERS = (
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://ecommerce-backend:8000"
+    'https://dreamers.com.ua',
+    'https://www.dreamers.com.ua'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:3000',
+    'https://dreamers.com.ua',
+    'https://www.dreamers.com.ua'
 ]
 
 AWS_BUCKET_URL = os.environ.get('AWS_BUCKET_URL')
