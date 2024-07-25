@@ -2,15 +2,13 @@ import {ProductInterface} from "@/interfaces/Product";
 import {Box, Button, Text} from "@chakra-ui/react";
 import {useCart} from "@/context/Cart";
 import {useRouter} from "next/router";
-import {selectedMaterialsInterface} from "@/components/App/Product";
 
 
 interface ButButtonProps {
     product: ProductInterface
-    selectedMaterials: selectedMaterialsInterface
 }
 
-export const ButButton = ({product, selectedMaterials}: ButButtonProps) => {
+export const ButButton = ({product}: ButButtonProps) => {
     const router = useRouter();
     const {addItem} = useCart()
 
