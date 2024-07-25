@@ -1,13 +1,10 @@
-import {ProductProps, SkuInterface} from "@/interfaces/Product";
-import {useEffect, useState} from "react";
-import {chooseInitialMaterials, findSkuWithMaterialsSet} from "./utils";
+import {ProductProps} from "@/interfaces/Product";
+import {useState} from "react";
 import {ProductGallery} from "@/components/App/Product/Galery";
-import {ProductMaterials} from "src/components/App/Product/Info/Materials";
-import {Box, Button, Flex, Heading, Text, useMediaQuery} from "@chakra-ui/react";
+import {Flex, useMediaQuery} from "@chakra-ui/react";
 import {ProductInfo} from "@/components/App/Product/Info";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import {setInitialMaterials} from "@/utils/Product/Materials";
-
 
 
 export const ProductComponent = ({product, skuId}: ProductProps) => {
