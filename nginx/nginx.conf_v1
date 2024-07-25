@@ -3,6 +3,8 @@ events {
 }
 
 http {
+    resolver 127.0.0.11 valid=30s;
+
     upstream backend_app {
         server web:8000;
     }
@@ -39,14 +41,14 @@ http {
         }
 
         location / {
+            error_page 502 = /empty.html;
+            proxy_intercept_errors on;
+
             proxy_pass http://frontend_app;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-
-            error_page 502 = /empty.html;
-            proxy_intercept_errors on;
         }
 
         location /502.html {
@@ -56,7 +58,6 @@ http {
 
         location /empty.html {
             root /home/app/web/templates/;
-            internal;
         }
 
         location /static/ {
