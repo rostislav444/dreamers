@@ -21,7 +21,7 @@ export const ProductInfo = ({mobile, product, selectedMaterials, setSelectedMate
             selectedMaterials={selectedMaterials}
             setSelectedMaterials={setSelectedMaterials}
         />
-        <ButButton product={product} selectedMaterials={selectedMaterials}/>
+        <ButButton product={product} />
         <ProductCharacteristics product={product} selectedMaterials={selectedMaterials}/>
         <InfoHeading mobile={mobile}>Опис</InfoHeading>
         <Text maxH='48' overflowY="hidden" fontSize={14} mt={4}>{product.description}</Text>
