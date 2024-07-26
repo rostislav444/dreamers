@@ -17,9 +17,7 @@ ENV DJANGO_SETTINGS_MODULE=backend.settings.production
 RUN apt-get update && apt-get install -y \
     gcc \
     build-essential \
-    libpq-dev \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    libpq-dev
 
 # lint
 RUN pip install --upgrade pip
@@ -28,7 +26,6 @@ COPY . /usr/src/app/
 # install python dependencies
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
-
 
 #########
 # FINAL #
@@ -58,10 +55,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends netcat
 RUN apt-get update && apt-get install -y \
     gcc \
     build-essential \
-    libpq-dev \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    libpq-dev
 
+# Clean up APT when done
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
