@@ -13,7 +13,4 @@ fi
 
 python manage.py migrate
 
-# change owner of celerybeat-schedule file to app user
-chown app:app /home/app/web/celerybeat-schedule
-
 exec "$@"
