@@ -37,7 +37,8 @@ class ProductPartSceneSerializer(serializers.ModelSerializer):
         if request:
             only_new = request.GET.get('only_new')
 
-        qs = obj.materials.filter(image__isnull=True) if only_new else obj.materials.all()
+        # qs = obj.materials.filter(image__isnull=True) if only_new else obj.materials.all()
+        qs = obj.materials.all()
 
         return ProductPartSceneMaterialSerializer(qs, many=True, read_only=True).data
 
