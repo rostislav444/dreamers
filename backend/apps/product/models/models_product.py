@@ -31,9 +31,7 @@ class Product(models.Model):
         ordering = ['product_class', 'width', 'height', 'depth']
 
     def __str__(self):
-        sku_count = self.sku.all().count()
-        sku_with_images = self.sku.filter(images__isnull=False).distinct().count()
-        return f'{self.product_class.name} ({str(sku_with_images)} / {str(sku_count)})'
+        return self.product_class.name
 
     @property
     def get_image(self):
@@ -111,8 +109,8 @@ class ProductCustomizedPart(models.Model):
 
 class Product3DBlenderModel(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='model_3d')
-    obj = DeletableFileField(blank=True, null=True)
-    mtl = DeletableFileField(blank=True, null=True)
+    obj = DeletableFileField(blank=True, null=True, parent_names_paths=['product'])
+    mtl = DeletableFileField(blank=True, null=True, parent_names_paths=['product'])
 
     class Meta:
         verbose_name = '3D модель'

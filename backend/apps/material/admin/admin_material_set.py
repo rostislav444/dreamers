@@ -51,6 +51,7 @@ class ProductPartMaterialsInline(admin.TabularInline):
         return fields
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        print(self._obj, self._obj.group)
         if db_field.name == 'material':
             kwargs['queryset'] = Material.objects.filter(group=self._obj.group)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)

@@ -54,6 +54,8 @@ class DeleteMethods:
 
 
 class FileNaming:
+    parent_names_paths = []
+
     def generate_filename(self, instance, filename):
         new_filename = self.get_dirs(instance, filename)
         return new_filename
@@ -97,7 +99,17 @@ class FileNaming:
             os.makedirs(directory)
 
     def get_dirs(self, instance, filename):
+        parent_paths = []
+        for path in self.parent_names_paths:
+            final_instance = instance
+            for field in path.split('.'):
+                final_instance = getattr(final_instance, field)
+            name = self.get_possible_names(final_instance)
+            if name:
+                parent_paths.append(name)
+
         parts = [
+            *parent_paths,
             instance.__class__._meta.app_label,
             instance.__class__.__name__.lower(),
         ]
@@ -118,8 +130,9 @@ class DeletableMediaField(FileNaming, DeleteMethods, models.FileField):
     class Meta:
         abstract = True
 
-    def __init__(self, *args, get_parent=None, **kwargs):
+    def __init__(self, *args, get_parent=None, parent_names_paths=[], **kwargs):
         self.get_parent = get_parent
+        self.parent_names_paths = parent_names_paths
         kwargs['storage'] = self.storage
         super().__init__(*args, **kwargs)
 
@@ -245,4 +258,3 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
                 thumbnails[key] = thumbnail_name
 
             instance.__class__.objects.filter(pk=instance.pk).update(**{thumbnails_field_name: thumbnails})
-
