@@ -82,7 +82,7 @@ class ProductPartRenderMaterialsGroupsSerializer(serializers.ModelSerializer):
         product_part_scene_material = ProductPartSceneMaterial.objects.filter(
             part__camera__model_3d__product=product,
             part__part=obj.product_part,
-            # image__image__isnull=True
+            image__image__isnull=True
         )
 
         qs = ProductPartMaterials.objects.filter(
