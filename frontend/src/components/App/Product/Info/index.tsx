@@ -14,7 +14,7 @@ interface ProductInfoProps {
 }
 
 export const ProductInfo = ({mobile, product, selectedMaterials, setSelectedMaterials}: ProductInfoProps) => {
-    return <Box minW='400'>
+    return <Box w='100%'>
         <Heading mb={mobile ? 4 : 8}>{product.name}</Heading>
         <ProductMaterials
             parts={product.material_parts}
