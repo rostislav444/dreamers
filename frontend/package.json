@@ -33,6 +33,7 @@
     "typescript": "4.9.5"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/merge-images": "^1.2.4"
   }
 }
