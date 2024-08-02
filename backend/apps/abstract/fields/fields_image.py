@@ -229,9 +229,8 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
                 continue
 
             sizes = (
-                ('s', 220),
-                ('m', 640),
-                ('l', 960),
+                ('s', 80),
+                ('m', 520),
             )
 
             thumbnails_field_name = field.name + '_thumbnails'
