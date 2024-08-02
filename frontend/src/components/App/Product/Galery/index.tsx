@@ -5,9 +5,9 @@ import {
     GalleryArrowWrapper,
     MainImageWrapper
 } from "@/components/App/Product/Galery/style";
-import {Box, Image, Grid, GridItem, Button, IconButton} from "@chakra-ui/react";
+import {Box, Grid, GridItem, IconButton} from "@chakra-ui/react";
 import {MEDIA_URL} from "@/local";
-import {useState, useRef} from "react";
+import {useState} from "react";
 import {CameraImageFromMaterials} from "@/utils/Product/Materials";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import mergeImages from 'merge-images';
