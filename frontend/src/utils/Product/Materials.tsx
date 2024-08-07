@@ -6,6 +6,15 @@ function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
 }
 
+export const setFirstMaterials = (material_parts: ProductPart[]) => {
+    const initialMaterials: SelectedMaterialsInterface = {};
+
+    material_parts.forEach(part => {
+        initialMaterials[part.id] = part.material_groups[0].materials[0].id;
+    });
+    return initialMaterials;
+}
+
 
 export const setInitialMaterials = (material_parts: ProductPart[]) => {
     const initialMaterials: SelectedMaterialsInterface = {};
@@ -22,6 +31,6 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
 export const CameraImageFromMaterials = (parts: CameraProductPartInterface[], selectedMaterials: SelectedMaterialsInterface) => {
     return parts.map(part => {
         const partId = part.part.id
-        return part.materials.find(material => material.material == selectedMaterials[partId])?.image || ''
+        return part.materials.find(material => material.material == selectedMaterials[partId]) || {image: '', thumbnails: {s: '', m: ''}}
     })
 }

@@ -6,7 +6,7 @@ import {ProductPart} from "@/interfaces/Product/Parts";
 
 export interface ProductProps {
     product: ProductInterface,
-    skuId?: string,
+    materials?: string,
 }
 
 

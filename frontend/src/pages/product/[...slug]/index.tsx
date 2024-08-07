@@ -12,10 +12,10 @@ const processBreadCrumbs = (categories: CategoryState[], name: string, code: str
 ])
 
 
-const Product = ({product, skuId}: ProductProps) => {
+const Product = ({product, materials}: ProductProps) => {
     return <Layout breadcrumbs={processBreadCrumbs(product.categories, product.name, product.code)}
                    description={'description'} title={product.name}>
-        <ProductComponent product={product} skuId={skuId}/>
+        <ProductComponent product={product} materials={materials}/>
     </Layout>
 }
 
@@ -32,7 +32,7 @@ export const getStaticProps = (async ({params}) => {
 
     if (response.ok) {
         return {
-            props: {product: response.data, skuId: slug[1] || null},
+            props: {product: response.data, materials: slug[1] || null},
             revalidate: 60 * 5,
         };
     }

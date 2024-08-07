@@ -13,14 +13,21 @@ class ProductPartSceneMaterialImageSerializer(serializers.ModelSerializer):
 class ProductPartSceneMaterialSerializer(serializers.ModelSerializer):
     material = serializers.CharField(source='material.id')
     image = serializers.SerializerMethodField()
+    thumbnails = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductPartSceneMaterial
-        fields = ['id', 'material', 'image']
+        fields = ['id', 'material', 'image', 'thumbnails']
 
     def get_image(self, obj):
         if hasattr(obj, 'image'):
             return obj.image.image.name
+
+    def get_thumbnails(self, obj):
+        if hasattr(obj, 'image'):
+            return obj.image.image_thumbnails
+
+
 
 
 class ProductPartSceneSerializer(serializers.ModelSerializer):

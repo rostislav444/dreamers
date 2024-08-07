@@ -4,23 +4,19 @@ import {ProductGallery} from "@/components/App/Product/Galery";
 import {Flex, Grid, GridItem, useMediaQuery} from "@chakra-ui/react";
 import {ProductInfo} from "@/components/App/Product/Info";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
-import {setInitialMaterials} from "@/utils/Product/Materials";
+import {setFirstMaterials, setInitialMaterials} from "@/utils/Product/Materials";
 
 
-export const ProductComponent = ({product, skuId}: ProductProps) => {
+export const ProductComponent = ({product, materials}: ProductProps) => {
     const [mobile] = useMediaQuery('(max-width: 960px)');
-    const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>(
-        setInitialMaterials(product.material_parts))
+    const parseMaterials = (materials: string) => {
+        return Object.fromEntries(
+            materials.split('_').slice(1).map(pair => pair.split('-').map(Number))
+        );
+    };
 
-    // useEffect(() => {
-    //     const url = new URL(window.location.href)
-    //     const materials = url.searchParams.get('materials')?.split(',')?.map(Number)
-    //
-    //     if (materials?.length === selectedMaterials.length) {
-    //         setSelectedMaterials(materials)
-    //     }
-    //
-    // }, []);
+    const parsedMaterials = materials ? parseMaterials(materials) : setFirstMaterials(product.material_parts);
+    const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>(parsedMaterials)
 
 
     return <Grid mb='2' gridTemplateColumns={mobile ? '1fr' : '3fr 1fr'}>

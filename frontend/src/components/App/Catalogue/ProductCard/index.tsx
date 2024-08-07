@@ -14,6 +14,9 @@ interface Props {
     product: ProductInterface
 }
 
+const objectToMaterialsString = (obj: any) => {
+    return 'materials_' + Object.entries(obj).map(([key, value]) => `${key}-${value}`).join('_');
+};
 
 export const ProductCard = ({product}: Props) => {
     const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>(
@@ -21,7 +24,7 @@ export const ProductCard = ({product}: Props) => {
             ...setInitialMaterials(product.material_parts)
         });
     const images = CameraImageFromMaterials(product.camera.parts, selectedMaterials)
-    const link = `/product/${product.code}?materials=${JSON.stringify(selectedMaterials)}`
+    const link = `/product/${product.code}/${objectToMaterialsString(selectedMaterials)}`
 
 
     return (

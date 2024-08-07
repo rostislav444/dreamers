@@ -2,6 +2,10 @@ export interface CameraProductPartMaterialInterface {
     id: number
     material: number
     image: string
+    thumbnails: {
+        s: string
+        m: string
+    }
 }
 
 

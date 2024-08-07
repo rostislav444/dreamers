@@ -229,7 +229,7 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
                 continue
 
             sizes = (
-                ('s', 80),
+                ('s', 120),
                 ('m', 520),
             )
 
@@ -243,6 +243,7 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
 
             for key, value in sizes:
                 thumbnail_name = f'{name}_{key}.{ext}'
+
                 thumbnail = image.copy()
                 thumbnail.thumbnail((value, value))
 
@@ -256,4 +257,6 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
 
                 thumbnails[key] = thumbnail_name
 
+
             instance.__class__.objects.filter(pk=instance.pk).update(**{thumbnails_field_name: thumbnails})
+

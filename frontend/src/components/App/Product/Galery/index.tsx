@@ -32,6 +32,8 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     const [currentImage, setCurrentImage] = useState<number>(Math.round(cameras.length / 3))
     const [mergedImage, setMergedImage] = useState<any>(null);
 
+    // console.log('cameras', cameras)
+
     const handleContextMenuOpen = (e: any) => {
         if (e.target.tagName.toLowerCase() === 'img') {
             e.preventDefault();
@@ -81,7 +83,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     return <Box w='100%'>
         <MainImageWrapper>
             {cameras[currentImage].map((image, imageKey) =>
-                <CameraImage className={'camera-image'} key={imageKey} src={MEDIA_URL + image}/>)}
+                <CameraImage className={'camera-image'} key={imageKey} src={MEDIA_URL + image.image}/>)}
             <GalleryArrowWrapper
                 left={true}
                 onClick={() => handleArrowClick(currentImage - 1)}>{'<'}</GalleryArrowWrapper>
@@ -89,10 +91,10 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                 left={false}
                 onClick={() => handleArrowClick(currentImage + 1)}>{'>'}</GalleryArrowWrapper>
 
-            <IconButton aria-label='download' icon={<DownloadIcon color='brown.500'/>} position='absolute' top='4' right='4'
-                        onClick={() => handleImageMergeAndDownload(cameras[currentImage])}
-                        variant='ghost'
-            />
+            {/*<IconButton aria-label='download' icon={<DownloadIcon color='brown.500'/>} position='absolute' top='4' right='4'*/}
+            {/*            onClick={() => handleImageMergeAndDownload(cameras[currentImage].image)}*/}
+            {/*            variant='ghost'*/}
+            {/*/>*/}
 
         </MainImageWrapper>
 
@@ -110,8 +112,9 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                     cursor='pointer'
                 >
                     <CameraImagesWrapper onContextMenu={handleContextMenuOpen} key={key}>
-                        {camera.map((image, imageKey) => <CameraImage className={'camera-image'} key={imageKey}
-                                                                      src={MEDIA_URL + image}/>)}
+                        {camera.map((image, imageKey) => {
+                            return <CameraImage className={'camera-image'} key={imageKey} src={MEDIA_URL + image.thumbnails.s}/>
+                        })}
                     </CameraImagesWrapper>
                 </GridItem>
             )}
