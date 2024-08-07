@@ -22,6 +22,8 @@ import {OrderForm} from "@/components/App/Cart/OrderForm";
 import {addSpacesToNumber} from "@/utils/numbers";
 import {OrderTotal} from "@/components/App/Cart/OrderTotal";
 import fetchApi from "@/utils/fetch";
+import {CameraImage, CameraImagesWrapper} from "@/components/App/Product/Galery/style";
+import {MEDIA_URL} from "@/local";
 
 export const CartData = () => {
     const [mobile] = useMediaQuery('(max-width: 1367px)')
@@ -50,8 +52,13 @@ export const CartData = () => {
                     {cart.map(item =>
                         <Card key={item.sku} bg={'#ffffff85'}>
                             <CardBody>
-                                <Link href={`/product/${item.code}`}>
-                                    <Image src={item.image} alt={item.name + '-' + item.sku}/>
+                                <Link href={item.url}>
+                                    <CameraImagesWrapper >
+                                        {item.images.map((image, imageKey) => {
+                                            return <CameraImage className={'camera-image'} key={imageKey}
+                                                                src={MEDIA_URL + image}/>
+                                        })}
+                                    </CameraImagesWrapper>
                                 </Link>
                                 <Stack mt='6' spacing='3'>
                                     <Heading color={'brown.500'} size='md'>{item.name}</Heading>
@@ -59,13 +66,15 @@ export const CartData = () => {
                                         <Box>
                                             <Text fontSize='2xl'>{addSpacesToNumber(item.price)} грн.</Text>
                                             {item.qty > 1 && <Text color='brown.400'
-                                                                   fontSize='xs'>Cума: {addSpacesToNumber(item.price * item.qty)} грн.</Text>}
+                                                                   fontSize='xs'>Cума: {addSpacesToNumber(
+                                                item.price * item.qty)} грн.</Text>}
                                         </Box>
                                         <Flex justifyContent='center' alignItems='center'>
                                             <Button
                                                 size='xs'
                                                 as="span"
-                                                onClick={() => item.qty > 1 && handleQuantityChange(item.sku, item.qty - 1)}
+                                                onClick={() => item.qty > 1 && handleQuantityChange(
+                                                    item.sku, item.qty - 1)}
                                             >-</Button>
                                             <Box as='span' p={4}>{item.qty}</Box>
                                             <Button
@@ -90,7 +99,7 @@ export const CartData = () => {
                         </Card>
                     )}
                 </Grid>
-                <OrderTotal mobile={mobile} calculateTotalQty={calculateTotalQty} calculateTotal={calculateTotal} />
+                <OrderTotal mobile={mobile} calculateTotalQty={calculateTotalQty} calculateTotal={calculateTotal}/>
             </Box>
             <Box>
                 <OrderForm/>

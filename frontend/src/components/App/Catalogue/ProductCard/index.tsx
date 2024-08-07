@@ -19,13 +19,11 @@ const objectToMaterialsString = (obj: any) => {
 };
 
 export const ProductCard = ({product}: Props) => {
-    const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>(
-        {
-            ...setInitialMaterials(product.material_parts)
-        });
+    const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>({
+        ...setInitialMaterials(product.material_parts)
+    });
     const images = CameraImageFromMaterials(product.camera.parts, selectedMaterials)
     const link = `/product/${product.code}/${objectToMaterialsString(selectedMaterials)}`
-
 
     return (
         <Box borderWidth="3px" borderColor={"brown.500"} overflow="hidden">

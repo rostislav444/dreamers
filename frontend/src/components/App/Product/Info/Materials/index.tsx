@@ -3,6 +3,7 @@ import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import {InfoHeading} from "@/components/Shared/Typogrphy";
 import {useRouter} from 'next/router';
 import {ProductPart} from "@/interfaces/Product/Parts";
+import {generateMaterialsSlug} from "@/utils/Product/Materials";
 
 interface ProductMaterialsInterface {
     parts: ProductPart[]
@@ -18,13 +19,14 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
         const newMaterials = {...selectedMaterials, [partId]: materialId};
         setSelectedMaterials(newMaterials);
 
-        const query = {...router.query, materials: JSON.stringify(newMaterials)};
-        const as = `${router.pathname}?materials=${JSON.stringify(newMaterials)}`;
+        const materialsSlug = generateMaterialsSlug(newMaterials);
+        const {slug} = router.query as { slug: string[] };
+        const query = {slug: [slug[0], materialsSlug]};
 
         router.push({
             pathname: router.pathname,
             query: query,
-        }, as, {shallow: true});
+        }, router.pathname, {shallow: true});
 
     }
 
@@ -36,11 +38,7 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                 {part.material_groups.map(group =>
                     <Box key={group.id}>
                         <Text fontSize='sm' mt={1} color={'orange.500'}>{group.name}</Text>
-                        <Box
-                            mt={mobile ? 4 : 4}
-                            ml={'-9px'}
-                            mb={mobile ? 4 : 6}
-                        >
+                        <Box mt={mobile ? 4 : 4} ml={'-9px'} mb={mobile ? 4 : 6}>
                             {group.materials.map(material =>
                                 <Box
                                     key={material.id}

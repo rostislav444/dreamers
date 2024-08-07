@@ -3,7 +3,17 @@ import {ProductPart} from "@/interfaces/Product/Parts";
 import {CameraProductPartInterface} from "@/interfaces/Product/Camera";
 
 function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
+    return Math.floor(Math.random() * max);
+}
+
+export const parseMaterials = (materials: string) => {
+    return Object.fromEntries(
+        materials.split('_').slice(1).map(pair => pair.split('-').map(Number))
+    );
+};
+
+export const generateMaterialsSlug = (materials: SelectedMaterialsInterface) => {
+    return 'materials_' + Object.entries(materials).map(([part, material]) => `${part}-${material}`).join('_');
 }
 
 export const setFirstMaterials = (material_parts: ProductPart[]) => {
@@ -20,7 +30,7 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
     const initialMaterials: SelectedMaterialsInterface = {};
 
     material_parts.forEach(part => {
-        const length =  part.material_groups[0].materials.length
+        const length = part.material_groups[0].materials.length
         const randomIndex = getRandomInt(length)
         initialMaterials[part.id] = part.material_groups[0].materials[randomIndex].id;
     });
@@ -31,6 +41,18 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
 export const CameraImageFromMaterials = (parts: CameraProductPartInterface[], selectedMaterials: SelectedMaterialsInterface) => {
     return parts.map(part => {
         const partId = part.part.id
-        return part.materials.find(material => material.material == selectedMaterials[partId]) || {image: '', thumbnails: {s: '', m: ''}}
+        return part.materials.find(material => material.material == selectedMaterials[partId]) || {
+            image: '',
+            thumbnails: {s: '', m: ''}
+        }
     })
+}
+
+
+export const getThumbnailS = (parts: CameraProductPartInterface[], selectedMaterials: SelectedMaterialsInterface) => {
+    return CameraImageFromMaterials(parts, selectedMaterials).map(part => part.thumbnails.s)
+}
+
+export const getThumbnailM = (parts: CameraProductPartInterface[], selectedMaterials: SelectedMaterialsInterface) => {
+    return CameraImageFromMaterials(parts, selectedMaterials).map(part => part.thumbnails.m)
 }

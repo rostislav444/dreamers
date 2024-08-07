@@ -2,17 +2,23 @@ import {ProductInterface} from "@/interfaces/Product";
 import {Box, Button, Text} from "@chakra-ui/react";
 import {useCart} from "@/context/Cart";
 import {useRouter} from "next/router";
+import {SelectedMaterialsInterface} from "@/interfaces/Materials";
+import {getThumbnailM} from "@/utils/Product/Materials";
 
 
 interface ButButtonProps {
     product: ProductInterface
+    selectedMaterials: SelectedMaterialsInterface
 }
 
-export const ButButton = ({product}: ButButtonProps) => {
+export const ButButton = ({product, selectedMaterials}: ButButtonProps) => {
     const router = useRouter();
     const {addItem} = useCart()
 
+
     const handleAddCartItem = () => {
+        const currentPath = router.asPath
+
         const payload = {
             product: product.id,
             sku: 0,
@@ -20,11 +26,11 @@ export const ButButton = ({product}: ButButtonProps) => {
             code: product.code,
             price: product.price,
             qty: 1,
-            image: 'image',
-            material: {
-                color: ''
-            }
+            images: getThumbnailM(product.model_3d.cameras[3].parts, selectedMaterials),
+            materials: selectedMaterials,
+            url: currentPath
         }
+
         addItem(payload)
         router.push('/order')
     }

@@ -4,7 +4,7 @@ interface CartItem {
     product: number;
     sku: number;
     qty: number;
-    image: string;
+    images: string[];
     code: string,
     name: string;
     price: number;
@@ -12,6 +12,7 @@ interface CartItem {
         color?: string;
         material?: string;
     };
+    url: string;
 }
 
 interface CartContextType {
