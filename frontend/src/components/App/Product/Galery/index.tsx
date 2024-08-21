@@ -110,7 +110,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
         <Box>
             <Flex justifyContent='space-between' alignItems='center' mb='4'>
-                <Heading size='md'>Інтер'ер</Heading>
+                <Heading size='md'>Інтер&apos;ер</Heading>
                 <ChevronUpIcon w='6' h='6' color='brown.500' cursor='pointer'
                                transform={showInterior ? 'rotate(180deg)' : 'rotate(0deg)'}
                                onClick={() => setShowInterior(!showInterior)}/>

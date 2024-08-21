@@ -9,7 +9,7 @@ const OrderSuccessful = () => {
 
     useEffect(() => {
         clearCart()
-    }, []);
+    }, [clearCart]);
 
     const breadcrumbs = [
         {title: 'Оформлення замовлення'},

@@ -59,7 +59,7 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                                 >
                                     {material.color && <Box w={10} h={10} bg={material.color.hex}/>}
                                     {material.material && <Box w={10} h={10}>
-                                        <Image w='100%' h='100%' src={material.material.image}/>
+                                        <Image w='100%' h='100%' src={material.material.image} alt={material.id.toString()}/>
                                     </Box>}
                                 </Box>
                             )}

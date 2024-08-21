@@ -8,7 +8,6 @@ import {
     Flex,
     Grid,
     Heading,
-    Image,
     Stack,
     Text,
     useMediaQuery
@@ -21,7 +20,6 @@ import {useEffect} from "react";
 import {OrderForm} from "@/components/App/Cart/OrderForm";
 import {addSpacesToNumber} from "@/utils/numbers";
 import {OrderTotal} from "@/components/App/Cart/OrderTotal";
-import fetchApi from "@/utils/fetch";
 import {CameraImage, CameraImagesWrapper} from "@/components/App/Product/Galery/style";
 import {MEDIA_URL} from "@/local";
 
@@ -42,7 +40,7 @@ export const CartData = () => {
         if (cart.length === 0) {
             router.push('/');
         }
-    }, [cart.length]);
+    }, [cart.length, router]);
 
     return (
         <Box mt={8} display='grid' gridTemplateColumns={mobile ? '1fr' : '1fr minmax(320px, 1fr)'} gap={8}>
