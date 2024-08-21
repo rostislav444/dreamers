@@ -4,6 +4,7 @@ import {InfoHeading} from "@/components/Shared/Typogrphy";
 import {useRouter} from 'next/router';
 import {ProductPart} from "@/interfaces/Product/Parts";
 import {generateMaterialsSlug} from "@/utils/Product/Materials";
+import {useState} from "react";
 
 interface ProductMaterialsInterface {
     parts: ProductPart[]
@@ -14,6 +15,7 @@ interface ProductMaterialsInterface {
 export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials}: ProductMaterialsInterface) => {
     const router = useRouter()
     const [mobile] = useMediaQuery('(max-width: 960px)');
+    const [showAll, setShowAll] = useState<boolean>(false);
 
     const handleMaterialsSet = (partId: number, materialId: number) => {
         const newMaterials = {...selectedMaterials, [partId]: materialId};

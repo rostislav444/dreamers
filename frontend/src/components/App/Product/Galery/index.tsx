@@ -5,14 +5,14 @@ import {
     GalleryArrowWrapper,
     MainImageWrapper
 } from "@/components/App/Product/Galery/style";
-import {Box, Grid, GridItem, IconButton} from "@chakra-ui/react";
-import {MEDIA_URL} from "@/local";
+import {Box, Flex, Grid, GridItem, Heading, IconButton, Image} from "@chakra-ui/react";
+
+import {BASE_URL, MEDIA_URL} from "@/local";
 import {useState} from "react";
 import {CameraImageFromMaterials} from "@/utils/Product/Materials";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
-import mergeImages from 'merge-images';
-import {saveAs} from 'file-saver';
-import {DownloadIcon} from "@chakra-ui/icons";
+import {ChevronUpIcon, DownloadIcon} from "@chakra-ui/icons";
+import {handleImageMergeAndDownload} from "@/components/App/Product/Galery/utils";
 
 interface ProductGalleryProps {
     mobile: boolean
@@ -30,9 +30,8 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     const imagesBySku: boolean = product.images_by_sku
     const cameras = imagesBySku ? [] : getCameraPartsImages(product.model_3d, selectedMaterials)
     const [currentImage, setCurrentImage] = useState<number>(Math.round(cameras.length / 3))
-    const [mergedImage, setMergedImage] = useState<any>(null);
-
-    // console.log('cameras', cameras)
+    const [selectedInterior, setSelectedInterior] = useState<any[]>([null, null])
+    const [showInterior, setShowInterior] = useState<boolean>(true)
 
     const handleContextMenuOpen = (e: any) => {
         if (e.target.tagName.toLowerCase() === 'img') {
@@ -50,58 +49,46 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
         }
     }
 
-    const handleImageMergeAndDownload = async (images: string[]) => {
-        try {
-            const imageBlobs = await Promise.all(images.map(async (image) => {
-                const response = await fetch(MEDIA_URL + image);
-                const blob = await response.blob();
-                return URL.createObjectURL(blob);
-            }));
 
-            const merged = await mergeImages(imageBlobs);
-            // Конвертируем base64 в Blob
-            const byteString = atob(merged.split(',')[1]);
-            const mimeString = merged.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            const blob = new Blob([ab], {type: mimeString});
-
-            // Генерация рандомного имени файла
-            const randomFileName = `dreamers-${Math.random().toString(36).substr(2, 9)}.png`;
-
-            // Скачивание файла
-            saveAs(blob, randomFileName);
-        } catch (error) {
-            console.error('Error merging images:', error);
+    const interiors = product.model_3d.cameras[currentImage].interior_layers.map(
+        (layer, i) => {
+            return layer.materials[selectedInterior[i]]?.image.replace('/media/', '')
         }
-    };
+    ).filter(Boolean)
+
+
+    const images = [...cameras[currentImage].map(image => mobile ? image.thumbnails.m : image.image), ...interiors]
+
+
+    const handleSelectedInterior = (key: number, materialKey: number | null) => {
+        const newSelectedInterior = [...selectedInterior]
+        newSelectedInterior[key] = materialKey
+        setSelectedInterior(newSelectedInterior)
+    }
 
 
     return <Box w='100%'>
         <MainImageWrapper>
-            {cameras[currentImage].map((image, imageKey) =>
-                <CameraImage className={'camera-image'} key={imageKey} src={MEDIA_URL + image.image}/>)}
+            {images.map((image: string, imageKey: number) =>
+                <CameraImage className={'camera-image'} key={imageKey}
+                             src={MEDIA_URL + image}/>)}
             <GalleryArrowWrapper
                 left={true}
                 onClick={() => handleArrowClick(currentImage - 1)}>{'<'}</GalleryArrowWrapper>
             <GalleryArrowWrapper
                 left={false}
                 onClick={() => handleArrowClick(currentImage + 1)}>{'>'}</GalleryArrowWrapper>
-
-            {/*<IconButton aria-label='download' icon={<DownloadIcon color='brown.500'/>} position='absolute' top='4' right='4'*/}
-            {/*            onClick={() => handleImageMergeAndDownload(cameras[currentImage].image)}*/}
-            {/*            variant='ghost'*/}
-            {/*/>*/}
-
+            <IconButton aria-label='download' icon={<DownloadIcon color='brown.500'/>} position='absolute' top='4'
+                        right='4'
+                        onClick={() => handleImageMergeAndDownload(images)}
+                        variant='ghost'
+            />
         </MainImageWrapper>
 
-        {/*{mergedImage && <Image src={mergedImage}/>}*/}
 
-
-        <Grid mb={4} mr={mobile ? 0 : 20} w={mobile ? '100%' : '80%'} gridTemplateColumns='repeat(6, 1fr)' gap={4}>
+        <Grid mt={2} mb={4} mr={mobile ? 0 : 20} w={mobile ? '100%' : '80%'}
+              gridTemplateColumns={mobile ? 'repeat(auto-fill, minmax(60px, 1fr))' : 'repeat(auto-fill, minmax(80px, 1fr))'}
+              gap={2}>
             {cameras.map((camera, key) =>
                 <GridItem
                     key={key} onClick={() => setCurrentImage(key)}
@@ -113,12 +100,36 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                 >
                     <CameraImagesWrapper onContextMenu={handleContextMenuOpen} key={key}>
                         {camera.map((image, imageKey) => {
-                            return <CameraImage className={'camera-image'} key={imageKey} src={MEDIA_URL + image.thumbnails.s}/>
+                            return <CameraImage className={'camera-image'} key={imageKey}
+                                                src={MEDIA_URL + image.thumbnails.s}/>
                         })}
                     </CameraImagesWrapper>
                 </GridItem>
             )}
         </Grid>
+
+        <Box>
+            <Flex justifyContent='space-between' alignItems='center' mb='4'>
+                <Heading size='md'>Інтер'ер</Heading>
+                <ChevronUpIcon w='6' h='6' color='brown.500' cursor='pointer'
+                               transform={showInterior ? 'rotate(180deg)' : 'rotate(0deg)'}
+                               onClick={() => setShowInterior(!showInterior)}/>
+            </Flex>
+
+            {showInterior && product.model_3d.cameras[currentImage].interior_layers.map((layer, key) => {
+                return <Grid gridTemplateColumns='repeat(auto-fill, minmax(80px, 1fr))' gap={2} mb='2' key={key}>
+                    <Box borderWidth='2px' borderColor={selectedInterior[key] === null ? 'brown.500' : 'white'}
+                         onClick={() => handleSelectedInterior(key, null)}/>
+                    {layer.materials.map((material, materialKey) => {
+                        return <Image
+                            borderWidth='2px'
+                            borderColor={selectedInterior[key] === materialKey ? 'brown.500' : 'white'}
+                            onClick={() => handleSelectedInterior(key, materialKey)}
+                            key={materialKey} src={BASE_URL + material.image}/>
+                    })}
+                </Grid>
+            })}
+        </Box>
     </Box>
 
 }

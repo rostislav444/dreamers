@@ -44,6 +44,8 @@ export interface CameraPartsInterface {
 
 
 
+
+
 export interface ProductInterface {
     id: number;
     name: string;
@@ -59,6 +61,7 @@ export interface ProductInterface {
     images_by_sku: boolean
     model_3d: Model3dInterface
     material_parts: ProductPart[]
-    camera: CameraInterface
+    camera: CameraInterface,
+
 }
 

@@ -22,7 +22,8 @@ export const ProductCard = ({product}: Props) => {
     const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>({
         ...setInitialMaterials(product.material_parts)
     });
-    const images = CameraImageFromMaterials(product.camera.parts, selectedMaterials)
+
+    const images = product.camera ? CameraImageFromMaterials(product.camera.parts, selectedMaterials) : []
     const link = `/product/${product.code}/${objectToMaterialsString(selectedMaterials)}`
 
     return (

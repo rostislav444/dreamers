@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.product.models import Product
-from apps.product.serializers import CatalogueSkuSerializer, CameraLocationsSerializer
+from apps.product.serializers import CatalogueSkuSerializer, CameraSerializer
 from apps.material.serializers.serializers_materials_set import CatalogueProductPartSerializer, ProductPartSerializer, \
     ProductPartSerializerLite, MaterialSetSerializer
 
@@ -29,4 +29,4 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
         if obj.model_3d:
             camera = obj.model_3d.cameras.filter(rad_z=90).first()
             if camera:
-                return CameraLocationsSerializer(camera).data
+                return CameraSerializer(camera).data

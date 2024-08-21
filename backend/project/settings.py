@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'apps.attribute.apps.AttributeConfig',
     'apps.newpost.apps.NewpostConfig',
     'apps.core.apps.CoreConfig',
+    'apps.interior.apps.InteriorConfig',
     'apps.material.apps.MaterialConfig',
     'rest_framework',
 

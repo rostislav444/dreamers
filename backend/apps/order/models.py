@@ -26,11 +26,19 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    sku = models.ForeignKey(Sku, on_delete=models.PROTECT)
+    sku = models.ForeignKey(Sku, on_delete=models.PROTECT, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
     price = models.PositiveIntegerField(default=0, verbose_name='Цена')
 
     def __str__(self):
         return self.sku.product.product_class.name
+
+    def get_image(self):
+        return '-'
+
+
+class OrderItemMaterials(models.Model):
+    item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name='materials')
+    material = models.ForeignKey('material.ProductPartMaterials', on_delete=models.CASCADE)
 
 

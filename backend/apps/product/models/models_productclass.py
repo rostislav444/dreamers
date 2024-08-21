@@ -10,6 +10,7 @@ from apps.attribute.abstract.fields import OptionGroupField
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstractWithValueAttribute
 from apps.attribute.models import AttributeGroupUnit, AttributeGroup, Attribute, AttributeSubGroup
 from apps.category.models import Category, Collection
+from apps.interior.models import Interior
 from apps.material.models.models_material_set import MaterialsSet
 from apps.product.utils import generate_variants_from_dimensions
 
@@ -19,6 +20,7 @@ class ProductClass(NameSlug):
     collection = models.ForeignKey(Collection, null=True, blank=True, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(default='', blank=True, null=True)
     materials_set = models.ForeignKey(MaterialsSet, on_delete=models.PROTECT, null=True, blank=True)
+    interior = models.ForeignKey(Interior,  on_delete=models.PROTECT, null=True, blank=True)
     images_by_sku = models.BooleanField(default=False)
 
     # Width

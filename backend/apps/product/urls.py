@@ -13,6 +13,8 @@ router.register(r'product_class', views.ProductClassViewSet, basename="product_c
 router.register(r'product', views.ProductViewSet, basename="products")
 router.register(r'load_sku_images', views.LoadSkuImageView, basename="sku_images")
 router.register(r'load_scene_material', views.LoadProductPartSceneMaterialImageView, basename="load_scene_material")
+router.register(r'interior', views.RenderInteriorViewSet, basename="interior")
+router.register(r'load_interior', views.LoadInteriorPartImageView, basename="load_interior")
 
 
 urlpatterns = [

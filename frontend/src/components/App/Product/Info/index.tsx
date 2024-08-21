@@ -14,8 +14,11 @@ interface ProductInfoProps {
 }
 
 export const ProductInfo = ({mobile, product, selectedMaterials, setSelectedMaterials}: ProductInfoProps) => {
-    return <Box w='100%'>
+    return <Box w='100%' pl={mobile ? 0 : 8}>
         <Heading mb={mobile ? 4 : 8}>{product.name}</Heading>
+        <Box>
+
+        </Box>
         <ProductMaterials
             parts={product.material_parts}
             selectedMaterials={selectedMaterials}

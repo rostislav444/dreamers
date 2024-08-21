@@ -12,16 +12,20 @@ from apps.material.models import BlenderMaterial, Material
 def crop_and_save_image(blender_material, material):
     storage = material.image.storage
 
+    ext = blender_material.col.name.split('.')[-1]
+
     with blender_material.col.open() as f:
         original_image = Image.open(f)
 
         # Здесь вы можете указать нужные координаты и размеры для обрезки
         x, y = 0, 0
-        w, h = 40, 40
+        w, h = 120, 120
 
         image_file = BytesIO()
         # Обрезаем изображение
         cropped_image = original_image.crop((x, y, x + w, y + h))
+        if ext == 'png':
+            cropped_image = cropped_image.convert('RGB')
         cropped_image.save(image_file, format='JPEG', quality=100)
         image_file.seek(0)
 

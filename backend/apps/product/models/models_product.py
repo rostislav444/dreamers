@@ -5,9 +5,10 @@ import string
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.abstract.fields import DeletableImageField, DeletableFileField
+from apps.abstract.fields import DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
+from .models_3d import Camera
 from .models_productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
 
 
@@ -49,7 +50,7 @@ class Product(models.Model):
         if hasattr(self, 'model_3d'):
             try:
                 camera = self.model_3d.cameras.get(rad_z=90)
-            except CameraLocations.DoesNotExist:
+            except Camera.DoesNotExist:
                 camera = self.model_3d.cameras.filter(rad_z__gte=70, rad_z__lte=100).first()
             if not camera:
                 camera = self.model_3d.cameras.first()
@@ -107,44 +108,7 @@ class ProductCustomizedPart(models.Model):
         return str(self.part)
 
 
-class Product3DBlenderModel(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='model_3d')
-    obj = DeletableFileField(blank=True, null=True, parent_names_paths=['product'])
-    mtl = DeletableFileField(blank=True, null=True, parent_names_paths=['product'])
 
-    class Meta:
-        verbose_name = '3D модель'
-        verbose_name_plural = '3D модели'
-
-    @property
-    def get_name(self):
-        return self.product.get_name + '_3d'
-
-    def __str__(self):
-        return str(self.id)
-
-
-class Lights(models.Model):
-    model_3d = models.ForeignKey(Product3DBlenderModel, on_delete=models.CASCADE, related_name='lights')
-    power = models.IntegerField(default=1000)
-    pos_x = models.DecimalField(default=0, max_digits=20, decimal_places=4)
-    pos_y = models.DecimalField(default=0, max_digits=20, decimal_places=4)
-    pos_z = models.DecimalField(default=0, max_digits=20, decimal_places=4)
-
-
-class CameraLocations(models.Model):
-    model_3d = models.ForeignKey(Product3DBlenderModel, on_delete=models.CASCADE, related_name='cameras')
-    pos_x = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
-    pos_y = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
-    pos_z = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
-    rad_x = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
-    rad_y = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
-    rad_z = models.DecimalField(default=0, max_digits=20, decimal_places=4, blank=True)
-
-    class Meta:
-        verbose_name = 'Камера'
-        verbose_name_plural = 'Камеры'
-        ordering = ['-rad_z']
 
 
 class ProductImage(models.Model):

@@ -8,7 +8,9 @@ from apps.material.models import Material, MaterialGroups, MaterialSubGroup, Col
 
 
 class MaterialsSet(NameSlug):
-    pass
+    class Meta:
+        verbose_name = 'Набор материалов'
+        verbose_name_plural = '1. Наборы материалов'
 
 
 class ProductStaticPart(models.Model):

@@ -27,6 +27,8 @@ class BaseColor(NameSlug):
 
     class Meta:
         ordering = ['index', 'lvl']
+        verbose_name = 'Базовый цвет'
+        verbose_name_plural = 'Базовые цвета'
 
     def save(self, *args, **kwargs):
         self.rgb = PIL.ImageColor.getrgb(self.hex)
@@ -89,6 +91,8 @@ class Color(NameSlug):
 
     class Meta:
         ordering = ['mid_color__lvl', 'mid_color__index']
+        verbose_name = 'Цвет'
+        verbose_name_plural = 'Цвета'
 
     def __str__(self):
         if self.ral:

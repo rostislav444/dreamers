@@ -2,8 +2,9 @@ from rest_framework import serializers
 
 from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials
 from apps.material.serializers import ColorSerializer
-from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, CameraLocations, \
-    ProductPartSceneMaterialImage, ProductPartSceneMaterial
+from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, Camera, \
+    ProductPartSceneMaterialImage, ProductPartSceneMaterial, CameraInteriorLayer, CameraInteriorLayerMaterial, \
+    CameraInteriorLayerMaterialImage
 from apps.product.serializers.serializers_scene_parts import ProductPartSceneSerializer
 
 
@@ -19,17 +20,37 @@ class SkuRenderSerializer(serializers.ModelSerializer):
         return {material.material.group.product_part.blender_name: material.material.id for material in
                 obj.materials.all()}
 
+class ProductCameraInteriorLayerMaterialImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CameraInteriorLayerMaterialImage
+        fields = ['image']
 
-class CameraLocationsSerializer(serializers.ModelSerializer):
+
+class ProductCameraInteriorLayerSerializer(serializers.ModelSerializer):
+    materials = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CameraInteriorLayer
+        fields = ['materials']
+
+    @staticmethod
+    def get_materials(obj):
+        qs = CameraInteriorLayerMaterialImage.objects.filter(scene_material__group__layer=obj)
+        return ProductCameraInteriorLayerMaterialImageSerializer(qs, many=True, read_only=True).data
+
+
+
+class CameraSerializer(serializers.ModelSerializer):
+    interior_layers = ProductCameraInteriorLayerSerializer(many=True, read_only=True)
     parts = ProductPartSceneSerializer(many=True, read_only=True)
 
     class Meta:
-        model = CameraLocations
-        fields = '__all__'
+        model = Camera
+        fields = ['id', 'pos_x', 'pos_y', 'pos_z', 'rad_x', 'rad_y', 'rad_z', 'interior_layers', 'parts']
 
 
 class ProductRender3DBlenderModelSerializer(serializers.ModelSerializer):
-    cameras = CameraLocationsSerializer(many=True, read_only=True)
+    cameras = CameraSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product3DBlenderModel

@@ -22,6 +22,8 @@ class MaterialGroups(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = 'Группа материалов'
+        verbose_name_plural = '2. Группы материалов'
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.type)
@@ -34,6 +36,11 @@ class MaterialSubGroup(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Суб группа материалов'
+        verbose_name_plural = '3. Суб группы материалов'
 
 
 class BlenderMaterial(NameSlug):
@@ -60,6 +67,10 @@ class BlenderMaterial(NameSlug):
                 data[field.name] = getattr(self, field.name).name
         return data
 
+    class Meta:
+        verbose_name = 'Материал Blender'
+        verbose_name_plural = '5. Материалы Blender'
+
 
 class Material(NameSlug):
     group = models.ForeignKey(MaterialGroups, on_delete=models.CASCADE, related_name='materials')
@@ -73,6 +84,11 @@ class Material(NameSlug):
 
     def __str__(self):
         return ' / '.join([self.group.name, self.name])
+
+    class Meta:
+        ordering = ('group', 'sub_group', 'name')
+        verbose_name = 'Материал'
+        verbose_name_plural = '4. Материалы'
 
 
 __all__ = [

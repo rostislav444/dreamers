@@ -4,7 +4,7 @@ from apps.abstract.fields import DeletableImageField
 
 
 class ProductPartScene(models.Model):
-    camera = models.ForeignKey('product.CameraLocations', on_delete=models.CASCADE, related_name='parts')
+    camera = models.ForeignKey('product.Camera', on_delete=models.CASCADE, related_name='parts')
     part = models.ForeignKey('material.ProductPart', on_delete=models.CASCADE)
 
 

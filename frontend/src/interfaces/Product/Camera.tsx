@@ -22,6 +22,12 @@ export interface CameraProductPartInterface {
     materials: CameraProductPartMaterialInterface[]
 }
 
+export interface InteriorLayerInterface {
+    materials: {
+        image: string
+    }[]
+}
+
 
 export interface CameraInterface {
     parts: CameraProductPartInterface[]
@@ -31,4 +37,5 @@ export interface CameraInterface {
     rad_x: number
     rad_y: number
     rad_z: number
+    interior_layers: InteriorLayerInterface[]
 }

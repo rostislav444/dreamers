@@ -6,7 +6,8 @@ import mathutils
 from django.dispatch import receiver
 
 from apps.product.models import ProductClass, Product, SkuImages, ProductCustomizedPart, Product3DBlenderModel, \
-    CameraLocations, ProductPartScene, ProductPartSceneMaterial
+    Camera, ProductPartScene, ProductPartSceneMaterial, CameraInteriorLayer, \
+    CameraInteriorLayerMaterial, CameraInteriorLayerMaterialGroup
 from .tasks import task_generate_product_class_sku, task_generate_product_sku
 
 
@@ -40,7 +41,7 @@ def get_rotation_coordinates(steps=24, radius=4, z=2):
 
     if steps > 360:
         steps = 360
-    step = 180 / steps
+    step = 30
 
     for i in range(steps):
         angle = startAngle + i * step
@@ -66,16 +67,16 @@ def get_rotation_coordinates(steps=24, radius=4, z=2):
 def generate_camera_locations(sender, instance, **kwargs):
     if instance.pk:
         product = instance.product
-        coordinates = get_rotation_coordinates(9, radius=product.height / 1000 * 3.2, z=product.height / 1000 / 2)
+        coordinates = get_rotation_coordinates(5, radius=product.height / 1000 * 3.2, z=product.height / 1000 / 2)
 
         for i, coordinate in enumerate(coordinates):
             location = coordinate['location']
             angle = coordinate['angle']
 
             try:
-                CameraLocations.objects.get(model_3d=instance, rad_z=angle[2])
+                Camera.objects.get(model_3d=instance, rad_z=angle[2])
             except ObjectDoesNotExist:
-                direct_location = CameraLocations(
+                direct_location = Camera(
                     model_3d=instance,
                     pos_x=location[0],
                     pos_y=location[1],
@@ -87,7 +88,7 @@ def generate_camera_locations(sender, instance, **kwargs):
                 direct_location.save()
 
 
-# @receiver(signals.post_save, sender=CameraLocations)
+# @receiver(signals.post_save, sender=Camera)
 # def create_scene_product_part_materials(sender, instance, **kwargs):
 #     if instance.pk:
 #         product = instance.model_3d.product
@@ -121,12 +122,29 @@ def create_scene_product_part_materials(camera_instance):
             create_product_part_scenes(materials_set)
 
 
-@receiver(signals.post_save, sender=CameraLocations)
+def create_interior_layer_materials(camera):
+    if camera.pk:
+        interior = camera.model_3d.product.product_class.interior
+        if interior:
+            for interior_layer in interior.layers.all():
+                camera_interior_layer, _ = CameraInteriorLayer.objects.get_or_create(
+                    camera=camera, interior_layer=interior_layer)
+                for material_group in interior_layer.material_groups.all():
+                    camera_interior_layer_material_group, _ = CameraInteriorLayerMaterialGroup.objects.get_or_create(
+                        layer=camera_interior_layer, material_group=material_group)
+                    for material in material_group.materials.all():
+                        camera_interior_layer_material, _ = CameraInteriorLayerMaterial.objects.get_or_create(
+                            group=camera_interior_layer_material_group, material=material)
+
+
+@receiver(signals.post_save, sender=Camera)
 def camera_location_post_save(sender, instance, **kwargs):
     create_scene_product_part_materials(instance)
+    create_interior_layer_materials(instance)
 
 
 @receiver(signals.post_save, sender=Product3DBlenderModel)
 def model_3d_post_save(sender, instance, **kwargs):
     for camera in instance.cameras.all():
         create_scene_product_part_materials(camera)
+        create_interior_layer_materials(camera)

@@ -48,7 +48,7 @@ class ProductClassAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('category', 'collection', ('materials_set', 'materials_set_link',), 'name', 'description',)
+            'fields': ('category', 'collection', 'interior', ('materials_set', 'materials_set_link',), 'name', 'description',)
         }),
         ('Цена', {
             'fields': (('initial_price', 'square_decimeter_price'),)
