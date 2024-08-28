@@ -109,26 +109,31 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
         </Grid>
 
         <Box>
-            <Flex justifyContent='space-between' alignItems='center' mb='4'>
+            <Flex justifyContent='space-between' alignItems='center' onClick={() => setShowInterior(!showInterior)}>
                 <Heading size='md'>Інтер&apos;ер</Heading>
                 <ChevronUpIcon w='6' h='6' color='brown.500' cursor='pointer'
                                transform={showInterior ? 'rotate(180deg)' : 'rotate(0deg)'}
-                               onClick={() => setShowInterior(!showInterior)}/>
+                               />
             </Flex>
+            {showInterior && <Box mt='4'>
+                {product.model_3d.cameras[currentImage].interior_layers.map((layer, key) => {
+                    return <Grid gridTemplateColumns={mobile ?
+                        'repeat(auto-fill, minmax(60px, 1fr))' :
+                        'repeat(auto-fill, minmax(100px, 1fr))'
+                    } gap={2} mb='2' key={key}>
+                        <Box borderWidth='2px' borderColor={selectedInterior[key] === null ? 'brown.500' : 'white'}
+                             onClick={() => handleSelectedInterior(key, null)}/>
+                        {layer.materials.map((material, materialKey) => {
+                            return <Box borderWidth='2px' key={materialKey}
+                                        borderColor={selectedInterior[key] === materialKey ? 'brown.500' : 'white'}>
+                                <Image onClick={() => handleSelectedInterior(key, materialKey)}
+                                       key={materialKey} src={BASE_URL + material.image}/>
+                            </Box>
 
-            {showInterior && product.model_3d.cameras[currentImage].interior_layers.map((layer, key) => {
-                return <Grid gridTemplateColumns='repeat(auto-fill, minmax(80px, 1fr))' gap={2} mb='2' key={key}>
-                    <Box borderWidth='2px' borderColor={selectedInterior[key] === null ? 'brown.500' : 'white'}
-                         onClick={() => handleSelectedInterior(key, null)}/>
-                    {layer.materials.map((material, materialKey) => {
-                        return <Image
-                            borderWidth='2px'
-                            borderColor={selectedInterior[key] === materialKey ? 'brown.500' : 'white'}
-                            onClick={() => handleSelectedInterior(key, materialKey)}
-                            key={materialKey} src={BASE_URL + material.image}/>
-                    })}
-                </Grid>
-            })}
+                        })}
+                    </Grid>
+                })}
+            </Box>}
         </Box>
     </Box>
 

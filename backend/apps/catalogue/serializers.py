@@ -1,9 +1,16 @@
 from rest_framework import serializers
 
-from apps.product.models import Product
-from apps.product.serializers import CatalogueSkuSerializer, CameraSerializer
-from apps.material.serializers.serializers_materials_set import CatalogueProductPartSerializer, ProductPartSerializer, \
-    ProductPartSerializerLite, MaterialSetSerializer
+from apps.material.serializers.serializers_materials_set import ProductPartSerializer
+from apps.product.models import Product, Camera
+from apps.product.serializers import ProductPartSceneSerializer
+
+
+class CatalogueCameraSerializer(serializers.ModelSerializer):
+    parts = ProductPartSceneSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Camera
+        fields = ['parts']
 
 
 class CatalogueProductSerializer(serializers.ModelSerializer):
@@ -29,4 +36,4 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
         if obj.model_3d:
             camera = obj.model_3d.cameras.filter(rad_z=90).first()
             if camera:
-                return CameraSerializer(camera).data
+                return CatalogueCameraSerializer(camera).data
