@@ -90,7 +90,8 @@ class Color(NameSlug):
     lvl = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['mid_color__lvl', 'mid_color__index']
+        # ordering = ['mid_color__lvl', 'mid_color__index']
+        ordering = ['ral']
         verbose_name = 'Цвет'
         verbose_name_plural = 'Цвета'
 
