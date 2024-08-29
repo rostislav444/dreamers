@@ -51,13 +51,11 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
 
     const interiors = product.model_3d.cameras[currentImage].interior_layers.map(
-        (layer, i) => {
-            return layer.materials[selectedInterior[i]]?.image.replace('/media/', '')
-        }
+        (layer, i) => {return layer.materials[selectedInterior[i]]?.image}
     ).filter(Boolean)
 
 
-    const images = [...cameras[currentImage].map(image => mobile ? image.thumbnails.m : image.image), ...interiors]
+    const images = [...cameras[currentImage].map(image => mobile ? image.thumbnails.m : image.image)]
 
 
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
@@ -69,6 +67,9 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
     return <Box w='100%'>
         <MainImageWrapper>
+            {interiors.map((image: string, imageKey: number) =>
+                <CameraImage className={'camera-image'} key={imageKey}
+                             src={image}/>)}
             {images.map((image: string, imageKey: number) =>
                 <CameraImage className={'camera-image'} key={imageKey}
                              src={MEDIA_URL + image}/>)}
