@@ -21,7 +21,7 @@ class SkuRenderSerializer(serializers.ModelSerializer):
                 obj.materials.all()}
 
 class ProductCameraInteriorLayerMaterialImageSerializer(serializers.ModelSerializer):
-    image = serializers.CharField(source='image.image')
+    image = serializers.CharField()
 
     class Meta:
         model = CameraInteriorLayerMaterialImage
