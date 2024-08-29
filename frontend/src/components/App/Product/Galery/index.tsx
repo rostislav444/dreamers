@@ -59,7 +59,6 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     const images = [...interiors, ...cameras[currentImage].map(
         image => `${MEDIA_URL}${mobile ? image.thumbnails.m : image.image}`)]
 
-
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
         const newSelectedInterior = [...selectedInterior]
         newSelectedInterior[key] = materialKey
