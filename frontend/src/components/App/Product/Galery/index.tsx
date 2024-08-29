@@ -55,7 +55,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     ).filter(Boolean)
 
 
-    const images = [...cameras[currentImage].map(image => mobile ? image.thumbnails.m : image.image)]
+    const images = [...cameras[currentImage].map(image => MEDIA_URL + mobile ? image.thumbnails.m : image.image), ...interiors]
 
 
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
@@ -67,11 +67,9 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
     return <Box w='100%'>
         <MainImageWrapper>
-            {interiors.map((image: string, imageKey: number) =>
-                <CameraImage className={'camera-image'} key={imageKey} src={image}/>)}
             {images.map((image: string, imageKey: number) =>
                 <CameraImage className={'camera-image'} key={imageKey}
-                             src={MEDIA_URL + image}/>)}
+                             src={image}/>)}
             <GalleryArrowWrapper
                 left={true}
                 onClick={() => handleArrowClick(currentImage - 1)}>{'<'}</GalleryArrowWrapper>
