@@ -51,11 +51,13 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
 
     const interiors = product.model_3d.cameras[currentImage].interior_layers.map(
-        (layer, i) => {return layer.materials[selectedInterior[i]]?.image}
+        (layer, i) => {
+            return layer.materials[selectedInterior[i]]?.image
+        }
     ).filter(Boolean)
 
-
-    const images = [...cameras[currentImage].map(image => MEDIA_URL + mobile ? image.thumbnails.m : image.image), ...interiors]
+    const images = [...interiors, ...cameras[currentImage].map(
+        image => `${MEDIA_URL}${mobile ? image.thumbnails.m : image.image}`)]
 
 
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
@@ -111,7 +113,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                 <Heading size='md'>Інтер&apos;ер</Heading>
                 <ChevronUpIcon w='6' h='6' color='brown.500' cursor='pointer'
                                transform={showInterior ? 'rotate(180deg)' : 'rotate(0deg)'}
-                               />
+                />
             </Flex>
             {showInterior && <Box mt='4'>
                 {product.model_3d.cameras[currentImage].interior_layers.map((layer, key) => {
