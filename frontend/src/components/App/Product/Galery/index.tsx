@@ -56,8 +56,8 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
         }
     ).filter(Boolean)
 
-    const images = [...interiors, ...cameras[currentImage].map(
-        image => `${MEDIA_URL}${mobile ? image.thumbnails.m : image.image}`)]
+    const images = [...cameras[currentImage].map(
+        image => `${MEDIA_URL}${mobile ? image.thumbnails.m : image.image}`), ...interiors,]
 
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
         const newSelectedInterior = [...selectedInterior]
