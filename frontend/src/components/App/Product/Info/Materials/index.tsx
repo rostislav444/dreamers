@@ -68,8 +68,8 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                                         }}
                                         onClick={() => handleMaterialsSet(part.id, material.id)}
                                     >
-                                        {material.color && <Box w={10} h={10} bg={material.color.hex}/>}
-                                        {material.material && <Box w={10} h={10}>
+                                        {material.color && <Box w={6} h={6} bg={material.color.hex}/>}
+                                        {material.material && <Box w={6} h={6}>
                                             <Image w='100%' h='100%' src={material.material.image}
                                                    alt={material.id.toString()}/>
                                         </Box>}
