@@ -55,7 +55,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
     ).filter(Boolean)
 
 
-    const images = [...cameras[currentImage].map(image => mobile ? image.thumbnails.m : image.image)]
+    const images = [...cameras[currentImage].map(image => mobile ? image.thumbnails.m : image.image), ...interiors]
 
 
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
@@ -67,9 +67,6 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
     return <Box w='100%'>
         <MainImageWrapper>
-            {interiors.map((image: string, imageKey: number) =>
-                <CameraImage className={'camera-image'} key={imageKey}
-                             src={image}/>)}
             {images.map((image: string, imageKey: number) =>
                 <CameraImage className={'camera-image'} key={imageKey}
                              src={MEDIA_URL + image}/>)}
@@ -128,7 +125,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                             return <Box borderWidth='2px' key={materialKey}
                                         borderColor={selectedInterior[key] === materialKey ? 'brown.500' : 'white'}>
                                 <Image onClick={() => handleSelectedInterior(key, materialKey)}
-                                       key={materialKey} src={BASE_URL + material.image}/>
+                                       key={materialKey} src={material.image}/>
                             </Box>
 
                         })}
