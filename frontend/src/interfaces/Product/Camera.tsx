@@ -25,6 +25,10 @@ export interface CameraProductPartInterface {
 export interface InteriorLayerInterface {
     materials: {
         image: string
+        image_thumbnails: {
+            s: string
+            m: string
+        }
     }[]
 }
 
