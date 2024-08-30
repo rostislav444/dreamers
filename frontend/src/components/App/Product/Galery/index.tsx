@@ -102,16 +102,14 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
 
     const images = [...interiors, ...cameras[currentImage].map(
-        image => `${MEDIA_URL}${mobile ? image.thumbnails.m : image.image}`)] as string[];
-    const imagesAlt = [...interiorsAlt, ...cameras[currentImage].map(image => `${MEDIA_URL}${image.thumbnails.s}`)]
+        image => `${MEDIA_URL}${mobile ? image.thumbnails?.m : image.image}`)] as string[];
+    const imagesAlt = [...interiorsAlt, ...cameras[currentImage].map(image => `${MEDIA_URL}${image.thumbnails?.s}`)]
 
     const handleSelectedInterior = (key: number, materialKey: number | null) => {
         const newSelectedInterior = [...selectedInterior]
         newSelectedInterior[key] = materialKey
         setSelectedInterior(newSelectedInterior)
     }
-
-    console.log(imagesAlt.length, imagesAlt)
 
 
     return <Box w='100%'>
@@ -153,7 +151,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                     <CameraImagesWrapper onContextMenu={handleContextMenuOpen} key={key}>
                         {camera.map((image, imageKey) => {
                             return <CameraImage className={'camera-image'} key={imageKey}
-                                                src={MEDIA_URL + image.thumbnails.s}/>
+                                                src={MEDIA_URL + image.thumbnails?.s}/>
                         })}
                     </CameraImagesWrapper>
                 </GridItem>
@@ -181,7 +179,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                                         borderColor={selectedInterior[key] === materialKey ? 'brown.500' : 'white'}>
                                 <Image fill={true}
                                        onClick={() => handleSelectedInterior(key, materialKey)} quality={100}
-                                       key={materialKey} src={MEDIA_URL + material.image_thumbnails.s}
+                                       key={materialKey} src={MEDIA_URL + material.image_thumbnails?.s}
                                        alt='img'/>
                             </Box>
 
