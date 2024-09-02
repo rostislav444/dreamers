@@ -42,7 +42,7 @@ class ProductPartMaterialsInline(admin.TabularInline):
 
     def get_fields(self, request, obj=None):
         self._obj = obj
-        fields = ['material', 'color', 'preview', 'code', ]
+        fields = ['material', 'color', 'preferred', 'preview',  'code', ]
         if obj:
             if obj.group.type == 'material':
                 fields.remove('color')

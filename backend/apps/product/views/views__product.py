@@ -1,8 +1,7 @@
-from django.db.models import Prefetch
 from django.http import JsonResponse
 from rest_framework import viewsets, mixins, generics
 
-from apps.product.models import Product, Sku
+from apps.product.models import Product
 from apps.product.serializers import ProductSerializer
 
 

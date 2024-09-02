@@ -9,4 +9,4 @@ class CatalogueProductViewSet(generics.GenericAPIView, mixins.ListModelMixin, mi
     serializer_class = CatalogueProductSerializer
 
     def get_queryset(self):
-        return Product.objects.all()
+        return Product.objects.all().prefetch_related('product_class__materials_set__parts')

@@ -57,9 +57,9 @@ class ProductPartMaterialsSubGroups(models.Model):
                                   related_name='product_class_sub_groups')
 
 
-class ProductPartMaterialsManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('group__group')
+# class ProductPartMaterialsManager(models.Manager):
+#     def get_queryset(self):
+#         return super().get_queryset().select_related('group__group')
 
 
 class ProductPartMaterials(models.Model):
@@ -68,7 +68,9 @@ class ProductPartMaterials(models.Model):
                                  blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='product_parts', null=True, blank=True)
     code = models.CharField(max_length=255, null=True, blank=True, editable=False)
-    objects = ProductPartMaterialsManager()
+    preferred = models.BooleanField(default=False)
+
+    # objects = ProductPartMaterialsManager()
 
     class Meta:
         ordering = ['color__ral', 'material']
