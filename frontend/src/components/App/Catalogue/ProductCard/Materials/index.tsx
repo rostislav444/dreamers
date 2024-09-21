@@ -7,6 +7,7 @@ import {
     SkuInterface,
     SkuMaterialsResponse
 } from "@/components/App/Catalogue/ProductCard/interfaces";
+import {BASE_URL, MEDIA_LOCAL} from "@/local";
 
 interface ProductCardMaterialProps extends ProductCardProps {
     setSelectedSku: React.Dispatch<React.SetStateAction<number | null>>;
@@ -117,7 +118,7 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
                             >
                                 {material.color && <Box w={8} h={8} backgroundColor={material.color.hex}/>}
                                 {material.material &&
-                                    <Box w={8} h={8} backgroundSize="cover" backgroundImage={material.material.image}/>}
+                                    <Box w={8} h={8} backgroundSize="cover" backgroundImage={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}/>}
                             </Flex>
                         ))}
                     </Grid>

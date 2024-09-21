@@ -96,6 +96,8 @@ class ProductClass(NameSlug):
         if self.generate_variants_from_sizes:
             generate_variants_from_dimensions(self)
 
+            ProductClass.objects.filter(pk=self.pk).update(generate_variants_from_sizes=False)
+
 
 class ProductClass3DBlenderModel(models.Model):
     product_class = models.OneToOneField(ProductClass, on_delete=models.CASCADE, related_name='model_3d')

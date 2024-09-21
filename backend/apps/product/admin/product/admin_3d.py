@@ -90,6 +90,7 @@ class CameraInteriorLayerMaterialGroupInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
+
 # - Interior Layer
 @admin.register(CameraInteriorLayer)
 class CameraInteriorLayerAdmin(ParentLinkMixin, admin.ModelAdmin):
@@ -139,3 +140,18 @@ class Product3DBlenderModelInline(admin.StackedInline):
     show_change_link = True
     extra = 0
     min_num = 1
+    fields = ('obj', 'mtl',  ('eye_level', 'render_from_eye_level'), ('steps', 'fov_degrees',))
+
+    # fieldsets = (
+    #     ('Файлы модели', {
+    #         'fields': ('obj', 'mtl')
+    #     }),
+    #     ('Общие настройки', {
+    #         'fields': ('steps', 'render_from_eye_level')
+    #     }),
+    #     ('Параметры камеры', {
+    #         'fields': ('fov_degrees', 'eye_level')
+    #     }),
+    #
+    # )
+

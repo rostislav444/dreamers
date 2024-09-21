@@ -85,6 +85,9 @@ class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
     def get_material(self, obj):
         if obj.material and obj.material.blender_material:
             data = obj.material.blender_material.get_data
+            for k, v in data.items():
+                if not 'http' in v:
+                    data[k] = 'http://localhost:8000/media/' + v
             data['name'] = obj.material.blender_material.name
             return data
         return None

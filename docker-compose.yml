@@ -6,8 +6,8 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/home/app/web
-      - ./backend/static_root:/home/app/web/static_root
-      - ./backend/media:/home/app/web/media
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
     ports:
       - "8000:8000"
     env_file:
@@ -52,5 +52,5 @@ services:
 
 volumes:
   postgres_data:
-#  static_volume:
-#  media_volume:
+  static_volume:
+  media_volume:

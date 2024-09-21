@@ -136,6 +136,15 @@ class DeletableMediaField(FileNaming, DeleteMethods, models.FileField):
         kwargs['storage'] = self.storage
         super().__init__(*args, **kwargs)
 
+
+    @property
+    def url(self):
+        print('url', self.name)
+        try:
+            return self.storage.url(self.name)
+        except ValueError:
+            return
+
     def pre_save(self, model_instance, add):
         file_instance = getattr(model_instance, self.name)
         if not file_instance:
@@ -209,10 +218,20 @@ class DeletableFileField(DeletableMediaField):
 def delete_file_on_delete(sender, instance, **kwargs):
     for field in instance._meta.fields:
         if isinstance(field, (DeletableImageField, DeletableVideoField, DeletableFileField)):
+            # Удаляем основное изображение
             field.delete(instance)
             file_field = getattr(instance, field.name)
             if file_field:
                 file_field.delete(False)
+
+            # Удаляем thumbnails, если они есть
+            thumbnails_field_name = field.name + '_thumbnails'
+            thumbnails = getattr(instance, thumbnails_field_name, None)
+
+            if thumbnails:
+                # Проверяем наличие и удаляем каждый thumbnail
+                for thumbnail in thumbnails.values():
+                    field.storage.delete(thumbnail)
 
 
 @receiver(post_save)

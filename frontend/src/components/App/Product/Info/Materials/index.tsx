@@ -6,6 +6,7 @@ import {ProductPart} from "@/interfaces/Product/Parts";
 import {generateMaterialsSlug} from "@/utils/Product/Materials";
 import {useState} from "react";
 import {ChevronUpIcon} from "@chakra-ui/icons";
+import {BASE_URL, MEDIA_LOCAL, MEDIA_URL} from "@/local";
 
 interface ProductMaterialsInterface {
     parts: ProductPart[]
@@ -70,7 +71,8 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                                     >
                                         {material.color && <Box w={6} h={6} bg={material.color.hex}/>}
                                         {material.material && <Box w={6} h={6}>
-                                            <Image w='100%' h='100%' src={material.material.image}
+                                            <Image w='100%' h='100%'
+                                                   src={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}
                                                    alt={material.id.toString()}/>
                                         </Box>}
                                     </Box>

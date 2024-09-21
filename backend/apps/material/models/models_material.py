@@ -56,6 +56,16 @@ class BlenderMaterial(NameSlug):
     refl = DeletableFileField(null=True, blank=True, verbose_name='Reflection')
     ao = DeletableFileField(null=True, blank=True, verbose_name='Ambient Occlusion')
 
+    rgh_num = models.DecimalField(max_digits=5, decimal_places=2, default=0.5, verbose_name='Roughness Value',
+                                  blank=True)
+    mtl_num = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, verbose_name='Metalness Value',
+                                  blank=True)
+    refl_num = models.DecimalField(max_digits=5, decimal_places=2, default=0.5, verbose_name='Reflection Value',
+                                   blank=True)
+    ao_num = models.DecimalField(max_digits=5, decimal_places=2, default=1.0, verbose_name='AO Value', blank=True)
+
+    scale = models.DecimalField(max_digits=5, decimal_places=2, default=1, verbose_name='Scale', blank=True)
+
     def __str__(self):
         return self.name
 

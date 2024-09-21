@@ -31,6 +31,7 @@ SECRET_KEY = 'django-insecure-zg@1y0y6nkmrhmeigva!jl@sxe)1=vsu96dt5h4(@6)ffel^60
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'true') == 'true'
 PRODUCTION = os.environ.get('PRODUCTION', 'false') == 'true'
+print('PRODUCTION', PRODUCTION)
 
 ALLOWED_HOSTS = ['*']
 
@@ -174,7 +175,6 @@ AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
 FILE_STORAGE = S3Storage if PRODUCTION else default_storage
-
 # Celery Configuration Options
 CELERY_BROKER_URL = 'amqp://user:password@rabbitmq:5672//'
 # CELERY_RESULT_BACKEND = 'rpc://'

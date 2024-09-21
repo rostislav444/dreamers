@@ -34,31 +34,70 @@ def delete_all_sku_images(sender, instance, **kwargs):
             Product.objects.filter(pk=instance.pk).update(generate_sku=False)
 
 
-def get_rotation_coordinates(steps=24, radius=4, z=2):
+def calculate_camera_position(radius, angle_degrees):
+    # Преобразование угла из градусов в радианы
+    angle_radians = math.radians(angle_degrees)
+
+    # Расчет координат камеры
+    x = radius * math.sin(angle_radians)
+    y = radius * math.cos(angle_radians)
+
+    return x, y
+
+
+def calculate_camera_radius(width_m, height_m, depth_m, fov_degrees, aspect_width=3, aspect_height=2):
+    # Convert the field of view angle from degrees to radians (horizontal FOV)
+    fov_horizontal_radians = math.radians(fov_degrees)
+
+    # Calculate the vertical field of view based on the aspect ratio
+    fov_vertical_radians = 2 * math.atan(math.tan(fov_horizontal_radians / 2) * (aspect_height / aspect_width))
+
+    # Calculate the radius based on the width (assuming the object's width is the limiting dimension)
+    radius_width = width_m / (2 * math.tan(fov_horizontal_radians / 2))
+
+    # Calculate the radius based on the height (assuming the object's height is the limiting dimension)
+    radius_height = height_m / (2 * math.tan(fov_vertical_radians / 2))
+
+    # Use the maximum of the two radii to ensure the object fits within the camera view
+    radius = max(radius_width, radius_height)
+
+    return radius
+
+
+def get_camera_level(height_m, radius, render_from_eye_level, eye_level):
+    rad_x = 90
+    middle_pos = height_m / 2
+
+    if render_from_eye_level:
+        delta_height = eye_level - middle_pos
+        tilt_angle_degrees = math.degrees(math.atan(delta_height / radius))
+        rad_x -= tilt_angle_degrees
+        return rad_x, eye_level
+    else:
+        return rad_x, middle_pos
+
+
+def get_rotation_coordinates(product: Product, instance: Product3DBlenderModel):
     result = []
 
-    startAngle = 30
+    start_angle, step = 30, 30
+    fov_degrees, steps, eye_level, render_from_eye_level = (instance.fov_degrees, instance.steps, instance.eye_level,
+                                                            instance.render_from_eye_level)
 
-    if steps > 360:
-        steps = 360
-    step = 30
+    width_m, height_m, depth_m = product.width / 1000, product.height / 1000, product.depth / 1000
+    radius = calculate_camera_radius(width_m, height_m, depth_m, fov_degrees)
+
+    rad_x, camera_level = get_camera_level(height_m, radius, eye_level, render_from_eye_level)
 
     for i in range(steps):
-        angle = startAngle + i * step
-        x = radius * math.sin(math.radians(angle))
-        y = radius * math.cos(math.radians(angle))
+        angle = start_angle + i * step
+        x, y = calculate_camera_position(radius, angle)
 
-        rotation = math.pi
-        if angle > 0:
-            rotation -= math.pi * 2 * angle / 360
-
-        # Convert rotation angle from radians to degrees
-        rad_x = int(math.degrees(math.pi * 0.40))
-        rad_z = int(math.degrees(rotation))
+        rad_z = -angle + 180
 
         result.append({
-            'location': (x, y, z),
-            'angle': (90, 0, rad_z)
+            'location': (x, y, camera_level),
+            'angle': (rad_x, 0, rad_z)
         })
     return result
 
@@ -66,8 +105,8 @@ def get_rotation_coordinates(steps=24, radius=4, z=2):
 @receiver(signals.post_save, sender=Product3DBlenderModel)
 def generate_camera_locations(sender, instance, **kwargs):
     if instance.pk:
-        product = instance.product
-        coordinates = get_rotation_coordinates(5, radius=product.height / 1000 * 3.2, z=product.height / 1000 / 2)
+        coordinates = get_rotation_coordinates(instance.product, instance)
+        # coordinates = get_rotation_coordinates(9, radius=product.height / 1000 * 3.2, z=product.height / 1000 / 2)
 
         for i, coordinate in enumerate(coordinates):
             location = coordinate['location']
