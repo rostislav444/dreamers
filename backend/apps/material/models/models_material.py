@@ -66,23 +66,11 @@ class BlenderMaterial(NameSlug):
     ao_num = models.DecimalField(max_digits=5, decimal_places=2, default=1.0, verbose_name='AO Value', blank=True)
 
     scale = models.DecimalField(max_digits=5, decimal_places=2, default=1, verbose_name='Scale', blank=True)
-    aspect_ratio = models.DecimalField(max_digits=5, decimal_places=2, default=1, verbose_name='Aspect Ratio', blank=True)
+    aspect_ratio = models.DecimalField(max_digits=5, decimal_places=2, default=1, verbose_name='Aspect Ratio',
+                                       blank=True)
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.col:
-            with self.col.open() as f:
-                image = Image.open(f)
-                width, height = image.size
-                if height != 0:
-                    BlenderMaterial.objects.filter(pk=self.pk).update(aspect_ratio=round(width / height, 2))
-                else:
-                    BlenderMaterial.objects.filter(pk=self.pk).update(aspect_ratio=1)
-
-
 
     @property
     def get_data(self):
