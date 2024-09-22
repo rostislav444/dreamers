@@ -32,7 +32,7 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
     material_parts.forEach(part => {
         const length = part.material_groups[0].materials.length
         const randomIndex = getRandomInt(length)
-        initialMaterials[part.id] = part.material_groups[0].materials[randomIndex].id;
+        initialMaterials[part.id] = part.material_groups[0].materials[randomIndex]?.id;
     });
     return initialMaterials;
 }

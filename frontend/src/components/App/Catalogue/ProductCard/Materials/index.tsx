@@ -117,8 +117,8 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
                                 borderColor={selectedMaterials[part.id] === material.id ? "brown" : "transparent"}
                             >
                                 {material.color && <Box w={8} h={8} backgroundColor={material.color.hex}/>}
-                                {material.material &&
-                                    <Box w={8} h={8} backgroundSize="cover" backgroundImage={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}/>}
+                                {/*{material.material &&*/}
+                                {/*    <Box w={8} h={8} backgroundSize="cover" backgroundImage={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}/>}*/}
                             </Flex>
                         ))}
                     </Grid>
