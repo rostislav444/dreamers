@@ -28,7 +28,6 @@ export const MaterialsSet = ({material_parts, selectedMaterial, setSelectedMater
                     >
                         {part.material_groups.map((group: any, i: number) => {
                             return group.materials.map((material: any, j: number) => {
-                                console.log(material)
                                 return <GridItem
                                     key={j}
                                     p='2px'
