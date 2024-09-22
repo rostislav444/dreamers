@@ -15,7 +15,7 @@ class ProductPartMaterialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductPartMaterials
-        fields = ('id', 'color', 'material', 'sub_group',)
+        fields = ('id', 'color', 'material', 'sub_group','name',)
 
     @staticmethod
     def get_name(obj):
