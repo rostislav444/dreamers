@@ -14,10 +14,9 @@ def crop_and_save_image(blender_material, material):
 
     ext = blender_material.col.name.split('.')[-1]
 
-    with blender_material.col.file.open() as f:
+    with blender_material.col.open() as f:
         original_image = Image.open(f)
 
-        # Здесь вы можете указать нужные координаты и размеры для обрезки
         x, y = 0, 0
         w, h = 120, 120
 

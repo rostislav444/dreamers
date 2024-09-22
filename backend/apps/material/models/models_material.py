@@ -72,15 +72,18 @@ class BlenderMaterial(NameSlug):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.col:
-            img = Image.open(self.col.file)
-            width, height = img.size
-            if height != 0:
-                self.aspect_ratio = round(width / height, 2)
-            else:
-                self.aspect_ratio = 1
-
         super().save(*args, **kwargs)
+        if self.col:
+            with self.col.open() as f:
+                image = Image.open(f)
+
+                width, height = image.size
+                if height != 0:
+                    BlenderMaterial.objects.filter(pk=self.pk).update(aspect_ratio=round(width / height, 2))
+                else:
+                    BlenderMaterial.objects.filter(pk=self.pk).update(aspect_ratio=1)
+
+
 
     @property
     def get_data(self):
