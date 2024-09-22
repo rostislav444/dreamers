@@ -76,7 +76,6 @@ class BlenderMaterial(NameSlug):
         if self.col:
             with self.col.open() as f:
                 image = Image.open(f)
-
                 width, height = image.size
                 if height != 0:
                     BlenderMaterial.objects.filter(pk=self.pk).update(aspect_ratio=round(width / height, 2))
