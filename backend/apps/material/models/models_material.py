@@ -1,3 +1,4 @@
+from PIL import Image
 from django.db import models
 
 from apps.abstract.fields import DeletableFileField, DeletableImageField
@@ -65,9 +66,21 @@ class BlenderMaterial(NameSlug):
     ao_num = models.DecimalField(max_digits=5, decimal_places=2, default=1.0, verbose_name='AO Value', blank=True)
 
     scale = models.DecimalField(max_digits=5, decimal_places=2, default=1, verbose_name='Scale', blank=True)
+    aspect_ratio = models.DecimalField(max_digits=5, decimal_places=2, default=1, verbose_name='Aspect Ratio', blank=True)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.col:
+            img = Image.open(self.col.file)
+            width, height = img.size
+            if height != 0:
+                self.aspect_ratio = round(width / height, 2)
+            else:
+                self.aspect_ratio = 1
+
+        super().save(*args, **kwargs)
 
     @property
     def get_data(self):

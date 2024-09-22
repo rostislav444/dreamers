@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials
 from apps.material.serializers import ColorSerializer
+from apps.material.serializers.serializers_materials import BlenderMaterialSerializer, Material3DSerializer
 from apps.product.models import Product3DBlenderModel, ProductClass, Product, Sku, Camera, \
     ProductPartSceneMaterialImage, ProductPartSceneMaterial, CameraInteriorLayer, CameraInteriorLayerMaterial, \
     CameraInteriorLayerMaterialImage
@@ -20,6 +21,7 @@ class SkuRenderSerializer(serializers.ModelSerializer):
         return {material.material.group.product_part.blender_name: material.material.id for material in
                 obj.materials.all()}
 
+
 class ProductCameraInteriorLayerMaterialImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CameraInteriorLayerMaterialImage
@@ -37,7 +39,6 @@ class ProductCameraInteriorLayerSerializer(serializers.ModelSerializer):
     def get_materials(obj):
         qs = CameraInteriorLayerMaterialImage.objects.filter(scene_material__group__layer=obj)
         return ProductCameraInteriorLayerMaterialImageSerializer(qs, many=True, read_only=True).data
-
 
 
 class CameraSerializer(serializers.ModelSerializer):
@@ -76,21 +77,11 @@ class ProductRenderSerializer(serializers.ModelSerializer):
 
 class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
     color = ColorSerializer(read_only=True)
-    material = serializers.SerializerMethodField()
+    material = Material3DSerializer(read_only=True)
 
     class Meta:
         model = ProductPartMaterials
         fields = ('id', 'color', 'material',)
-
-    def get_material(self, obj):
-        if obj.material and obj.material.blender_material:
-            data = obj.material.blender_material.get_data
-            for k, v in data.items():
-                if not 'http' in v:
-                    data[k] = 'http://localhost:8000/media/' + v
-            data['name'] = obj.material.blender_material.name
-            return data
-        return None
 
 
 class ProductPartRenderMaterialsGroupsSerializer(serializers.ModelSerializer):
@@ -106,14 +97,14 @@ class ProductPartRenderMaterialsGroupsSerializer(serializers.ModelSerializer):
         product_part_scene_material = ProductPartSceneMaterial.objects.filter(
             part__camera__model_3d__product=product,
             part__part=obj.product_part,
-            image__image__isnull=True
+            # image__image__isnull=True
         )
-
         qs = ProductPartMaterials.objects.filter(
             material_scene__in=product_part_scene_material
         )
-
-        return ProductPartRenderMaterialSerializer(qs, many=True, read_only=True).data
+        serializer = ProductPartRenderMaterialSerializer(qs, many=True, read_only=True,
+                                                         context={'request': self.context['request']})
+        return serializer.data
 
 
 class ProductPartRenderSerializer(serializers.ModelSerializer):
@@ -123,9 +114,6 @@ class ProductPartRenderSerializer(serializers.ModelSerializer):
         model = ProductPart
         fields = ('blender_name', 'name', 'material_groups')
 
-
     def get_material_groups(self, obj):
         return ProductPartRenderMaterialsGroupsSerializer(obj.material_groups.all(), many=True, read_only=True,
                                                           context=self.context).data
-
-
