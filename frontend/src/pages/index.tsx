@@ -15,7 +15,7 @@ export default function Home({categories}: Props) {
 
     return (
         <Layout breadcrumbs={[]} description='description' title='Меблі, що надихаюь'>
-            <Grid gridTemplateColumns='repeat(auto-fill, minmax(200px, 1fr))' gap={4}>
+            <Grid gridTemplateColumns='repeat(auto-fill, minmax(200px, 1fr))' gap={4} mt={mobile ? 4 : 0}>
                 {categories.map((category: any) => (
                     <GridItem key={category.id} colSpan={mobile ? 1 : 2}>
                         <Link href='/catalogue/[slug]' as={`/catalogue/${category.slug}`}>
