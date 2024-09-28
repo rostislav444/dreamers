@@ -36,8 +36,8 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
     const api = fetchApi();
     const {categories} = params as { categories: string[] };
 
-    const categoryResp = await api.get('category?categories=' + categories.join(','));
-    const productsResp = await api.get('catalogue/products/');
+    const categoryResp = await api.get('category/?categories=' + categories.join(','));
+    const productsResp = await api.get('catalogue/products/?categories=' + categories.join(','));
 
     if (productsResp.ok) {
         return {
@@ -68,7 +68,7 @@ const getFlatCategories = (categories: RecursiveCategoryInterface[], parentPath 
 
 export const getStaticPaths = async () => {
     try {
-        const api = fetchApi(); // Assuming fetchApi is a function from your fetch API library
+        const api = fetchApi();
         const response = await api.get('category');
 
         if (response.ok) {
