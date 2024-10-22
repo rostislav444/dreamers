@@ -4,7 +4,7 @@ from apps.abstract.fields import DeletableFileField, DeletableImageField
 
 
 class Product3DBlenderModel(models.Model):
-    product = models.OneToOneField('product.Product', on_delete=models.CASCADE, related_name='model_3d')
+    product = models.ForeignKey('product.Product', on_delete=models.CASCADE, related_name='model_3d')
     fov_degrees = models.IntegerField(default=30)
     eye_level = models.DecimalField(default=1.5, max_digits=3, decimal_places=2)
     render_from_eye_level = models.BooleanField(default=False)

@@ -17,7 +17,7 @@ interface ProductMaterialsInterface {
 export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials}: ProductMaterialsInterface) => {
     const router = useRouter()
     const [mobile] = useMediaQuery('(max-width: 960px)');
-    const [showAll, setShowAll] = useState<boolean[]>(parts.map((_, i) => i === 0));
+    const [showAll, setShowAll] = useState<boolean[]>(parts.map((_, i) => true));
 
     const handleMaterialsSet = (partId: number, materialId: number) => {
         const newMaterials = {...selectedMaterials, [partId]: materialId};

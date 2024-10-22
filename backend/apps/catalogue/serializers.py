@@ -45,7 +45,8 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_camera(obj):
-        if obj.model_3d:
-            camera = obj.model_3d.cameras.filter(rad_z=90).prefetch_related('parts__materials').first()
+        model_3d = obj.model_3d.first()
+        if model_3d:
+            camera = model_3d.cameras.filter(rad_z=90).prefetch_related('parts__materials').first()
             if camera:
                 return CatalogueCameraSerializer(camera).data

@@ -59,7 +59,7 @@ class ProductRender3DBlenderModelSerializer(serializers.ModelSerializer):
 
 
 class ProductRenderSerializer(serializers.ModelSerializer):
-    model_3d = ProductRender3DBlenderModelSerializer(read_only=True)
+    model_3d = ProductRender3DBlenderModelSerializer(read_only=True, many=True)
     parts = serializers.SerializerMethodField()
 
     class Meta:

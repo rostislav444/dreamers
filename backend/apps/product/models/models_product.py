@@ -18,7 +18,8 @@ class Product(models.Model):
     price = models.PositiveIntegerField(_('Price'), blank=True, null=True)
     stock = models.PositiveIntegerField(_('Stock'), blank=True, null=True)
     render_variants = models.BooleanField(default=False)
-    generate_sku = models.BooleanField(default=False, verbose_name='Сгенерировать SKU из материалов')
+
+    generate_sku_from_materials = models.BooleanField(default=False, verbose_name='Сгенерировать SKU из материалов')
 
     width = models.PositiveIntegerField(_('Width'), default=0, blank=True)
     height = models.PositiveIntegerField(_('Height'), default=0, blank=True)
@@ -47,34 +48,20 @@ class Product(models.Model):
     @property
     def get_parts_images(self):
         links = []
-        if hasattr(self, 'model_3d'):
+        model_3d = self.model_3d.first()
+        if model_3d:
             try:
-                camera = self.model_3d.cameras.get(rad_z=90)
+                camera = model_3d.cameras.get(rad_z=90)
             except Camera.DoesNotExist:
-                camera = self.model_3d.cameras.filter(rad_z__gte=70, rad_z__lte=100).first()
+                camera = model_3d.cameras.filter(rad_z__gte=70, rad_z__lte=100).first()
             if not camera:
-                camera = self.model_3d.cameras.first()
+                camera = model_3d.cameras.first()
             if camera:
                 for part in camera.parts.all():
                     material = part.materials.first()
                     if hasattr(material, 'image'):
                         links.append(material.image.image.name)
         return links
-
-    def generate_sku_from_options(self):
-        options_groups = [list(group.options.all()) for group in
-                          self.product_class.option_groups.filter(image_dependency=True)]
-        options_groups = itertools.product(*options_groups)
-
-        for num, options_group in enumerate(options_groups):
-            sku = Sku.objects.filter(product=self)
-            for option in options_group:
-                sku = sku.filter(options__option=option)
-            if sku.count() == 0:
-                sku = Sku.objects.create(product=self)
-                for option in options_group:
-                    SkuOptions.objects.create(sku=sku, option=option)
-            print(num, sku)
 
     @property
     def get_name(self):
@@ -90,11 +77,6 @@ class Product(models.Model):
         return self.product_class.option_groups.filter(
             attribute_group__price_required=AttributeGroup.PRICE_RQ_SUB_GROUP_MULTIPLIER)
 
-    def save(self, *args, **kwargs):
-        if self.generate_sku:
-            self.generate_sku_from_options()
-            self.generate_sku = False
-        super(Product, self).save(*args, **kwargs)
 
 
 class ProductCustomizedPart(models.Model):
@@ -106,9 +88,6 @@ class ProductCustomizedPart(models.Model):
 
     def __str__(self):
         return str(self.part)
-
-
-
 
 
 class ProductImage(models.Model):
@@ -147,89 +126,28 @@ class ProductAttribute(models.Model):
         return None
 
 
-class SkuPrefetchedManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related('materials', 'options', 'images').distinct()
-
-
-class SkuManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset()
-
-
 class Sku(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sku')
     code = models.CharField(max_length=1024, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
-
-    objects_no_distinct = SkuManager()
-    objects = SkuPrefetchedManager()
-
-    class Meta:
-        ordering = ['code']
-
-    def __str__(self):
-        img_count = str(self.images.count())
-        return self.code + f' - imgs: {img_count}'
-
-    @property
-    def get_name(self):
-        product = self.product.get_name
-        options = '_'.join(
-            [f'{sku_option.option.attribute_group.get_name}-{sku_option.option.get_name}' for sku_option in
-             self.options.all()])
-        return '__'.join([product, options])
-
-    @property
-    def get_code(self):
-        materials = self.materials.all()
-        return '__'.join([self.product.code, *[material.material.code for material in materials]])
-
-
-class SkuMaterialsManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('material__group__product_part').distinct()
-
-
-class SkuMaterials(models.Model):
-    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='materials')
-    material = models.ForeignKey('material.ProductPartMaterials', on_delete=models.CASCADE,
-                                 related_name='sku_materials')
-
-    objects = SkuMaterialsManager()
-
-    @property
-    def get_material_part_name(self):
-        return self.material.group.product_part.name
-
-
-class SkuOptions(models.Model):
-    sku = models.ForeignKey(Sku, on_delete=models.CASCADE, related_name='options')
-    option = models.ForeignKey('product.ProductClassOption', on_delete=models.PROTECT)
-
-    class Meta:
-        unique_together = (
-            ('sku', 'option'),
-        )
-        ordering = ('sku', 'option')
-
-    def __str__(self):
-        return str(self.option.get_name)
-
-    def validate(self, exclude=None):
-        # TODO validate unique together option_group dynamically here and delete this field from model
-        pass
+    materials = models.ManyToManyField('material.ProductPartMaterials', related_name='sku_materials')
+    generate_images = models.BooleanField(default=True)
 
 
 class SkuImages(models.Model):
     sku = models.ForeignKey(Sku, max_length=1024, on_delete=models.CASCADE, related_name='images')
-    image = DeletableImageField()
+    camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='sku_images', null=True, blank=True)
+    image = DeletableImageField(null=True, blank=True)
     image_thumbnails = models.JSONField(default=dict, blank=True)
     index = models.PositiveIntegerField(default=0)
     local = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('index',)
+
+    @property
+    def name(self):
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
 
     def get_name(self):
         sku = self.sku.get_name

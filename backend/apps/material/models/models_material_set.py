@@ -105,6 +105,51 @@ class ProductPartMaterials(models.Model):
         super(ProductPartMaterials, self).save()
 
 
+class RecommendedCombinations(NameSlug):
+    material_set = models.ForeignKey(MaterialsSet, on_delete=models.CASCADE, related_name='recommended_combinations')
+
+    class Meta:
+        verbose_name = 'Рекомендованная комбинация'
+        verbose_name_plural = '2. Рекомендованные комбинации'
+
+    @property
+    def get_name(self):
+        if self.pk and self.parts.exists():
+            return '-'.join([part.get_name for part in self.parts.all()])
+        return '-'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = self.get_name
+        super(RecommendedCombinations, self).save()
+
+
+class RecommendedCombinationsParts(models.Model):
+    combination = models.ForeignKey(RecommendedCombinations, on_delete=models.CASCADE, related_name='parts')
+    part = models.ForeignKey(ProductPart, on_delete=models.CASCADE, related_name='recommended_combinations')
+    material = models.ForeignKey(ProductPartMaterials, on_delete=models.CASCADE,
+                                 related_name='recommended_combinations_part', null=True, blank=True)
+
+    class Meta:
+        ordering = ('combination', 'part', 'material')
+
+    def __str__(self):
+        if hasattr(self, 'part') and hasattr(self, 'material'):
+            return '{} / {}'.format(self.part, self.material or '-')
+        return '-'
+
+    @property
+    def get_name(self):
+        return '%s %s' % (unidecode(self.part.name), self.material.get_value if hasattr(self, 'material') and getattr(self, 'material') else '-')
+
+    # def save(self):
+    #     name = '-'.join([part.get_name for part in  self.combination.parts.all()])
+    #     RecommendedCombinationsParts.objects.filter(pk=self.pk).update(name=name)
+    #     super(RecommendedCombinationsParts, self).save()
+
+
 __all__ = [
     'MaterialsSet',
     'ProductStaticPart',
@@ -112,4 +157,6 @@ __all__ = [
     'ProductPartMaterialsGroups',
     'ProductPartMaterialsSubGroups',
     'ProductPartMaterials',
+    'RecommendedCombinations',
+    'RecommendedCombinationsParts'
 ]

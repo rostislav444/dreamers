@@ -6,7 +6,7 @@ from django.db.models import signals
 from django.dispatch import receiver
 
 from apps.abstract.fields import FileNaming
-from apps.material.models import BlenderMaterial, Material
+from apps.material.models import BlenderMaterial, Material, RecommendedCombinations, RecommendedCombinationsParts
 
 
 def crop_and_save_image(blender_material, material):
@@ -61,3 +61,10 @@ def get_blender_material_image(sender, instance, **kwargs):
 def get_material_image(sender, instance, **kwargs):
     if instance.blender_material:
         crop_and_save_image(instance.blender_material, instance)
+
+
+
+@receiver(signals.post_save, sender=RecommendedCombinations)
+def generate_combinations_parts_groups(sender, instance, **kwargs):
+    for part in instance.material_set.parts.all():
+        RecommendedCombinationsParts.objects.get_or_create(combination=instance, part=part)

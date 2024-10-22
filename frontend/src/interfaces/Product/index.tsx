@@ -59,7 +59,7 @@ export interface ProductInterface {
     height: number;
     depth: number;
     images_by_sku: boolean
-    model_3d: Model3dInterface
+    model_3d: Model3dInterface[]
     material_parts: ProductPart[]
     camera: CameraInterface,
 

@@ -3,7 +3,7 @@ from django.utils.html import mark_safe
 from django_admin_inline_paginator.admin import TabularInlinePaginated
 
 from apps.abstract.admin import ParentLinkMixin
-from apps.product.models import Product, Sku, SkuOptions, SkuImages, SkuMaterials
+from apps.product.models import Product, Sku, SkuImages
 from project.settings import MEDIA_URL
 
 
@@ -27,23 +27,10 @@ class SkuImagesInline(admin.TabularInline):
     readonly_fields = ('image_tag', )
     image_tag.short_description = 'Image preview'
 
-
-class SkuMaterialsInline(admin.TabularInline):
-    model = SkuMaterials
-    extra = 0
-
-
-class SkuOptionsInline(admin.TabularInline):
-    model = SkuOptions
-    extra = 0
-
-
 @admin.register(Sku)
 class SkuAdmin(ParentLinkMixin, admin.ModelAdmin):
     parent_model = Product
     inlines = [
-        SkuMaterialsInline,
-        SkuOptionsInline,
         SkuImagesInline
     ]
 
@@ -55,20 +42,3 @@ class SkuInline(TabularInlinePaginated):
     show_change_link = True
     model = Sku
     extra = 0
-
-    can_delete = True
-
-    def name(self, object):
-        data = []
-
-        for material in object.materials.all():
-            part = material.get_material_part_name
-            material_name = material.material.get_value
-            material_type = material.material.group_type
-            li_str = f'<li><b>{part}</b> - <span>{material_name} {material_type[0]}</span></li>'
-            data.append(li_str)
-
-        return mark_safe(f'<ul>{"".join(data)}</ul>')
-
-    fields = ('name', 'code', 'quantity',)
-    readonly_fields = ('name',)

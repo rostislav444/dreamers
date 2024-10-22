@@ -60,11 +60,13 @@ const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc
 
 export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGalleryProps) => {
     const imagesBySku: boolean = product.images_by_sku
-    const cameras = imagesBySku ? [] : getCameraPartsImages(product.model_3d, selectedMaterials)
+    const cameras = product.model_3d.flatMap(model_3d => getCameraPartsImages(model_3d, selectedMaterials));
+    const model3dCameras = product.model_3d.flatMap(model_3d => model_3d.cameras)
     const [currentImage, setCurrentImage] = useState<number>(Math.round(cameras.length / 3))
-    const currentCamera = product.model_3d.cameras[currentImage]
+    const currentCamera = model3dCameras[currentImage]
     const [selectedInterior, setSelectedInterior] = useState<any[]>(currentCamera.interior_layers.map(() => null))
     const [showInterior, setShowInterior] = useState<boolean>(true)
+    const hasInterior = currentCamera.interior_layers.length > 0
 
     const handleContextMenuOpen = (e: any) => {
         if (e.target.tagName.toLowerCase() === 'img') {
@@ -158,7 +160,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
             )}
         </Grid>
 
-        <Box>
+        {hasInterior && (<Box>
             <Flex justifyContent='space-between' alignItems='center' onClick={() => setShowInterior(!showInterior)}>
                 <Heading size='md'>Інтер&apos;ер</Heading>
                 <ChevronUpIcon w='6' h='6' color='brown.500' cursor='pointer'
@@ -166,7 +168,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                 />
             </Flex>
             {showInterior && <Box mt='4'>
-                {product.model_3d.cameras[currentImage].interior_layers.map((layer, key) => {
+                {model3dCameras[currentImage].interior_layers.map((layer, key) => {
                     return <Grid gridTemplateColumns={mobile ?
                         'repeat(auto-fill, minmax(60px, 1fr))' :
                         'repeat(auto-fill, minmax(100px, 1fr))'
@@ -187,7 +189,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                     </Grid>
                 })}
             </Box>}
-        </Box>
+        </Box>)}
     </Box>
 
 }

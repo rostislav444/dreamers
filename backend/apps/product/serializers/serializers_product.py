@@ -10,14 +10,15 @@ from ...category.serializers import CategorySerializer
 class ProductSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='product_class.name')
     description = serializers.CharField(source='product_class.description')
-    sku = SkuSerializer(read_only=True, many=True)
     material_parts = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
-    model_3d = ProductRender3DBlenderModelSerializer(read_only=True)
+    model_3d = ProductRender3DBlenderModelSerializer(read_only=True, many=True)
+
+    # sku = SkuSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'code', 'sku', 'material_parts', 'categories', 'width', 'height',
+        fields = ['id', 'name', 'description', 'price', 'code', 'material_parts', 'categories', 'width', 'height',
                   'depth', 'model_3d']
 
     @staticmethod

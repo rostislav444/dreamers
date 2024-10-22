@@ -69,7 +69,7 @@ class ProductAdmin(ParentLinkMixin, admin.ModelAdmin):
     fieldsets = [
         [None, {
             'fields': (
-                'code', ('price', 'stock'),  'generate_sku', 'remove_images'
+                'code', ('price', 'stock'),  'generate_sku_from_materials', 'remove_images'
             )
         }, ],
     ]

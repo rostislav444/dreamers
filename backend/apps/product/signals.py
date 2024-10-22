@@ -1,14 +1,18 @@
+from io import BytesIO
+
+from PIL import Image
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.base import ContentFile
 from django.db.models import signals
 import math
-import mathutils
 
 from django.dispatch import receiver
 
 from apps.product.models import ProductClass, Product, SkuImages, ProductCustomizedPart, Product3DBlenderModel, \
     Camera, ProductPartScene, ProductPartSceneMaterial, CameraInteriorLayer, \
-    CameraInteriorLayerMaterial, CameraInteriorLayerMaterialGroup
-from .tasks import task_generate_product_class_sku, task_generate_product_sku
+    CameraInteriorLayerMaterial, CameraInteriorLayerMaterialGroup, Sku
+from .tasks import task_generate_product_class_sku
+from ..material.models import RecommendedCombinations
 
 
 @receiver(signals.post_save, sender=ProductClass)
@@ -29,9 +33,18 @@ def delete_all_sku_images(sender, instance, **kwargs):
             for part in instance.product_class.materials_set.parts.all():
                 obj, _ = ProductCustomizedPart.objects.get_or_create(part=part, product=instance)
 
-        if instance.generate_sku:
-            task_generate_product_sku.delay(instance.pk)
-            Product.objects.filter(pk=instance.pk).update(generate_sku=False)
+        if instance.generate_sku_from_materials:
+            for combination in RecommendedCombinations.objects.filter(material_set=instance.product_class.materials_set):
+                sku, _ = Sku.objects.get_or_create(
+                    product=instance,
+                    code=str(combination),
+                )
+                materials = [getattr(part, 'material') for part in combination.parts.all()]
+                if materials:
+                    sku.materials.set(materials)
+
+                sku.save()
+            Product.objects.filter(pk=instance.pk).update(generate_sku_from_materials=False)
 
 
 def calculate_camera_position(radius, angle_degrees):
@@ -187,3 +200,62 @@ def model_3d_post_save(sender, instance, **kwargs):
     for camera in instance.cameras.all():
         create_scene_product_part_materials(camera)
         create_interior_layer_materials(camera)
+
+
+def merge_images(images):
+    opened_images = [Image.open(image) for image in images]
+
+    # Берем размеры первого изображения для базы
+    base_image = opened_images[0].copy()
+
+    # Накладываем остальные изображения одно за другим на базовое
+    for img in opened_images[1:]:
+        base_image.paste(img, (0, 0), img)  # Если изображения имеют прозрачность, передаем img как маску
+
+    return base_image
+
+
+def add_white_background(image):
+    # Создаем белый фон с размерами исходного изображения
+    white_bg = Image.new("RGB", image.size, (255, 255, 255))
+
+    # Если у изображения есть альфа-канал, накладываем его на белый фон
+    if image.mode in ('RGBA', 'LA'):
+        white_bg.paste(image, (0, 0), image)  # Используем прозрачность как маску
+    else:
+        white_bg.paste(image, (0, 0))  # Если прозрачности нет, просто накладываем
+
+    return white_bg
+
+@receiver(signals.post_save, sender=Sku)
+def generate_sku_images(sender, instance, **kwargs):
+    if instance.pk and instance.generate_images:
+        for model_3d in instance.product.model_3d.all():
+            for camera in model_3d.cameras.all():
+                images = []
+                for camera_part in camera.parts.all():
+                    sku_material = instance.materials.get(group__product_part=camera_part.part)
+                    try:
+                        material = camera_part.materials.get(material=sku_material)
+                    except ObjectDoesNotExist:
+                        continue
+                    images.append(material.image.image.file)
+                if not images:
+                    continue
+
+                merged_image = merge_images(images)
+
+                # Сохраняем изображение в буфер памяти
+                buffer = BytesIO()
+                merged_image_with_bg = add_white_background(merged_image)
+                merged_image = merged_image_with_bg.convert("RGB")
+                merged_image.save(buffer, format='JPEG', quality=100)
+                buffer.seek(0)
+
+                # Создаем объект SkuImages и передаем буфер как изображение
+                sku_image, _ = SkuImages.objects.get_or_create(sku=instance, camera=camera)
+                sku_image.image.save(f'sku_{instance.pk}_camera_{camera.pk}.jpeg', ContentFile(buffer.read()), save=False)
+                sku_image.save()
+
+        # Обновляем флаг generate_images
+        Sku.objects.filter(pk=instance.pk).update(generate_images=False)

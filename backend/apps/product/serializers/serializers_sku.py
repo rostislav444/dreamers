@@ -1,16 +1,6 @@
 from rest_framework import serializers
 
-from apps.product.models import Sku, SkuMaterials, SkuImages
-from apps.material.serializers.serializers_materials_set import ProductPartMaterialSerializer
-
-
-class SkuMaterialsSerializer(serializers.ModelSerializer):
-    material = ProductPartMaterialSerializer()
-    part_name = serializers.CharField(source='get_material_part_name')
-
-    class Meta:
-        model = SkuMaterials
-        fields = ['id', 'material', 'part_name']
+from apps.product.models import Sku, SkuImages
 
 
 class SkuImagesSerializer(serializers.ModelSerializer):
