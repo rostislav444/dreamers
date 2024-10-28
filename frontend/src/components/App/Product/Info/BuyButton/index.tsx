@@ -26,7 +26,7 @@ export const ButButton = ({product, selectedMaterials}: ButButtonProps) => {
             code: product.code,
             price: product.price,
             qty: 1,
-            images: getThumbnailM(product.model_3d.cameras[3].parts, selectedMaterials),
+            images: getThumbnailM(product.model_3d[0].cameras[3].parts, selectedMaterials),
             materials: selectedMaterials,
             url: currentPath
         }
