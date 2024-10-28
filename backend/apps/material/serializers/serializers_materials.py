@@ -17,6 +17,8 @@ class ColorLiteSerializer(serializers.ModelSerializer):
 
 
 class BlenderMaterialSerializer(serializers.ModelSerializer):
+    color = ColorSerializer(read_only=True)
+
     class Meta:
         model = BlenderMaterial
         fields = '__all__'

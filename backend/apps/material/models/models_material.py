@@ -3,6 +3,7 @@ from django.db import models
 
 from apps.abstract.fields import DeletableFileField, DeletableImageField
 from apps.abstract.models import NameSlug
+import copy
 
 
 class MaterialGroups(models.Model):
@@ -45,7 +46,10 @@ class MaterialSubGroup(models.Model):
 
 
 class BlenderMaterial(NameSlug):
-    col = DeletableFileField(verbose_name='Color')
+    copy_from = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    col = DeletableFileField(null=True, blank=True, verbose_name='Color')
+    color = models.ForeignKey('Color', on_delete=models.CASCADE, null=True, blank=True)
     nrm_gl = DeletableFileField(null=True, blank=True, verbose_name='Norma GL')
     nrm_dx = DeletableFileField(null=True, blank=True, verbose_name='Norma DX')
     bump = DeletableFileField(null=True, blank=True, verbose_name='Bump')
@@ -71,6 +75,23 @@ class BlenderMaterial(NameSlug):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.copy_from and not self.pk:
+            original = self.copy_from
+            for field in original._meta.fields:
+                if field.name not in ['id', 'pk', 'copy_from']:
+                    setattr(self, field.name, getattr(original, field.name))
+            self.copy_from = None
+
+        if not self.col and not self.color:
+            raise ValueError('You must provide either a col or a color')
+
+        if self.color:
+            color_name = self.color.name
+            if color_name not in self.name:
+                self.name = f'{self.name} ({color_name})'
+        super().save(*args, **kwargs)
 
     @property
     def get_data(self):

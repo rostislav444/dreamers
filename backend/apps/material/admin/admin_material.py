@@ -1,3 +1,4 @@
+from admin_auto_filters.filters import AutocompleteFilter
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -5,9 +6,15 @@ from apps.material.models import MaterialGroups, MaterialSubGroup, Material, Col
     Palette, PaletteColor
 
 
+class BlenderMaterialFilter(AutocompleteFilter):
+    title = 'Color'
+    field_name = 'color'
+
+
 @admin.register(BlenderMaterial)
 class BlenderMaterialAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['color__name']
+    autocomplete_fields = ['color']
 
 
 @admin.register(BaseColor)
@@ -66,9 +73,25 @@ class ColorAdmin(admin.ModelAdmin):
     search_fields = ['name', 'ral']
 
 
-class MaterialInline(admin.TabularInline):
+class MaterialInline(admin.StackedInline):
     _obj = None
     model = Material
+    readonly_fields = ('preview',)
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'preview',  'image', ('price', 'sub_group', 'blender_material'))
+        }),
+    )
+
+    @staticmethod
+    def preview(obj):
+        blender_material = obj.blender_material
+        if blender_material.color:
+            return format_html(
+                f'<div style="background-color: {blender_material.color.hex}; width: 48px; height: 48px;"></div>')
+        if obj.image:
+            return format_html(f'<img src="{obj.image.url}" style="width: 48px; height: 48px;">')
+        return '-'
 
     def get_extra(self, request, obj=None, **kwargs):
         self._obj = obj
