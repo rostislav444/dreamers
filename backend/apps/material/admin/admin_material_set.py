@@ -44,6 +44,9 @@ class ProductPartMaterialsInline(admin.TabularInline):
             if obj.color:
                 return format_html('<div style="width: 48px; height: 48px; background-color: {};"></div>',
                                    obj.color.hex)
+            if obj.material and obj.material.blender_material and obj.material.blender_material.color:
+                return format_html('<div style="width: 48px; height: 48px; background-color: {};"></div>',
+                                   obj.material.blender_material.color.hex)
             if obj.material and obj.material.image:
                 return format_html('<img src="{}" style="width: 48px; height: 48px; object-fit: cover;" />',
                                    obj.material.image.url)
