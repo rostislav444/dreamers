@@ -103,7 +103,7 @@ def get_rotation_coordinates(product: Product, instance: Product3DBlenderModel):
     rad_x, camera_level = get_camera_level(height_m, radius, eye_level, render_from_eye_level)
 
     for i in range(steps):
-        angle = 90 if range == 1 else start_angle + i * step
+        angle = 90 if steps == 1 else start_angle + i * step
         x, y = calculate_camera_position(radius, angle)
 
         rad_z = -angle + 180
