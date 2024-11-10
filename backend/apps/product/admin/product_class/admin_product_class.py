@@ -8,6 +8,7 @@ from .admin_product_class_options import ProductClassOptionGroupInline, ProductC
 from .admin_product_class_product_attributes import ProductClassProductAttributeGroupsInline
 from project.settings import MEDIA_URL
 
+
 # Product
 class ProductInline(admin.TabularInline):
     show_change_link = True
@@ -58,7 +59,7 @@ class ProductClassAdmin(admin.ModelAdmin):
 
         # Wrap all variants in a flex container for better layout
         return mark_safe(
-            '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+            '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 120px; min-width: 120px; background-color: rgba(255,255,255, 0.1): padding: 5px;">' +
             ''.join(all_variants_html) +
             '</div>'
         )
@@ -67,7 +68,8 @@ class ProductClassAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('category', 'collection', 'interior', ('materials_set', 'materials_set_link',), 'name', 'description',)
+            'fields': (
+                'category', 'collection', 'interior', ('materials_set', 'materials_set_link',), 'name', 'description',)
         }),
         ('Цена', {
             'fields': (('initial_price', 'square_decimeter_price'),)
