@@ -29,7 +29,7 @@ class ProductClassAdmin(admin.ModelAdmin):
         url = reverse('admin:%s_%s_change' % (instance._meta.app_label, instance._meta.model_name), args=[instance.id])
         return mark_safe('<a href="%s" target="_blank">Открыть</a>' % url)
 
-    def parts_image(selfself, obj):
+    def parts_image(self, obj):
         images_style = {
             'position': 'absolute',
             'object-fit': 'cover',
@@ -38,11 +38,30 @@ class ProductClassAdmin(admin.ModelAdmin):
             'top': 0,
         }
         images_style_inline = ''.join(['%s: %s;' % (key, value) for key, value in images_style.items()])
-        images  = obj.get_parts_images if obj.get_parts_images else []
-        images_html = ['<img src="%s%s" style="%s">' % (MEDIA_URL, image, images_style_inline) for image in images  ]
-        return mark_safe(''.join(
-            ['<div style="position: relative; width: 300px; height: 200px; margin: 5px;">', *images_html, '</div>']
-        ))
+
+        # Container for all product variants
+        all_variants_html = []
+
+        # Get images for each product
+        for product in obj.products.all():
+            parts_images = product.get_parts_images
+            if parts_images:
+                images_html = ['<img src="%s%s" style="%s">' % (MEDIA_URL, image, images_style_inline)
+                               for image in parts_images]
+
+                variant_container = ''.join([
+                    '<div style="position: relative; width: 160px; height: 160px;">',
+                    *images_html,
+                    '</div>'
+                ])
+                all_variants_html.append(variant_container)
+
+        # Wrap all variants in a flex container for better layout
+        return mark_safe(
+            '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+            ''.join(all_variants_html) +
+            '</div>'
+        )
 
     parts_image.short_description = 'Изображение (из частей)'
 
