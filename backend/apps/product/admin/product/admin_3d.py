@@ -140,7 +140,23 @@ class Product3DBlenderModelInline(admin.StackedInline):
     show_change_link = True
     extra = 0
     min_num = 1
-    fields = ('obj', 'mtl',  ('eye_level', 'render_from_eye_level'), ('steps', 'fov_degrees',))
+    fields = ('parts_image', 'obj', 'mtl',  ('eye_level', 'render_from_eye_level'), ('steps', 'fov_degrees',))
+    readonly_fields = ('parts_image',)
+
+    def parts_image(self, obj):
+        images_style = {
+            'position': 'absolute',
+            'object-fit': 'cover',
+            'width': '100%',
+            'height': '100%',
+            'top': 0,
+        }
+        images_style_inline = ''.join(['%s: %s;' % (key, value) for key, value in images_style.items()])
+        images = obj.get_parts_images if obj.get_parts_images else []
+        images_html = ['<img src="%s%s" style="%s">' % (MEDIA_URL, image, images_style_inline) for image in images]
+        return mark_safe(''.join(
+            ['<div style="position: relative; width: 300px; height: 200px; margin: 5px;">', *images_html, '</div>']
+        ))
 
     # fieldsets = (
     #     ('Файлы модели', {

@@ -20,6 +20,22 @@ class Product3DBlenderModel(models.Model):
     def get_name(self):
         return self.product.get_name + '_3d'
 
+    @property
+    def get_parts_images(self):
+        links = []
+        try:
+            camera = self.cameras.get(rad_z=90)
+        except Camera.DoesNotExist:
+            camera = self.cameras.filter(rad_z__gte=70, rad_z__lte=100).first()
+        if not camera:
+            camera = self.cameras.first()
+        if camera:
+            for part in camera.parts.all():
+                material = part.materials.first()
+                if hasattr(material, 'image'):
+                    links.append(material.image.image.name)
+        return links
+
     def __str__(self):
         return str(self.id)
 
