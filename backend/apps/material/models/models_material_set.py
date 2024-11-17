@@ -8,9 +8,17 @@ from apps.material.models import Material, MaterialGroups, MaterialSubGroup, Col
 
 
 class MaterialsSet(NameSlug):
+    copy_from = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+                                 verbose_name='Copy from',
+                                 help_text='Select a MaterialsSet to copy all its data')
+
     class Meta:
         verbose_name = 'Набор материалов'
         verbose_name_plural = '1. Наборы материалов'
+
+    def clean(self):
+        if self.copy_from and self.copy_from.id == self.id:
+            raise ValidationError({'copy_from': 'Cannot copy from self'})
 
 
 class ProductStaticPart(models.Model):

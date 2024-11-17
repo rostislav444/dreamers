@@ -3,10 +3,13 @@ from io import BytesIO
 from PIL import Image
 from django.core.files import File
 from django.db.models import signals
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.abstract.fields import FileNaming
-from apps.material.models import BlenderMaterial, Material, RecommendedCombinations, RecommendedCombinationsParts
+from apps.material.models import BlenderMaterial, Material, RecommendedCombinations, RecommendedCombinationsParts, \
+    ProductPartMaterials, MaterialsSet, ProductStaticPart, ProductPart, ProductPartMaterialsGroups, \
+    ProductPartMaterialsSubGroups
 
 
 def crop_and_save_image(blender_material, material):
@@ -57,14 +60,97 @@ def get_blender_material_image(sender, instance, **kwargs):
         #     crop_and_save_image(instance, instance)
 
 
-@receiver(signals.post_save, sender=Material)
-def get_material_image(sender, instance, **kwargs):
-    if instance.blender_material:
-        crop_and_save_image(instance.blender_material, instance)
-
-
-
 @receiver(signals.post_save, sender=RecommendedCombinations)
-def generate_combinations_parts_groups(sender, instance, **kwargs):
-    for part in instance.material_set.parts.all():
-        RecommendedCombinationsParts.objects.get_or_create(combination=instance, part=part)
+def generate_combinations_parts_groups(sender, instance, created, **kwargs):
+    # Пропускаем автоматическое создание частей при копировании набора материалов
+    if created and not hasattr(instance, '_copying'):
+        for part in instance.material_set.parts.all():
+            RecommendedCombinationsParts.objects.get_or_create(combination=instance, part=part)
+
+
+@receiver(post_save, sender=MaterialsSet)
+def copy_materials_set(sender, instance, created, **kwargs):
+    if created and instance.copy_from is not None:
+        # Copy ProductStaticPart
+        for static_part in instance.copy_from.static_parts.all():
+            ProductStaticPart.objects.create(
+                materials_set=instance,
+                name=static_part.name,
+                blender_name=static_part.blender_name,
+                group=static_part.group,
+                material=static_part.material,
+                color=static_part.color
+            )
+
+        # Copy ProductPart and related
+        for product_part in instance.copy_from.parts.all():
+            # Create new ProductPart
+            new_part = ProductPart.objects.create(
+                materials_set=instance,
+                name=product_part.name,
+                blender_name=product_part.blender_name
+            )
+
+            # Copy ProductPartMaterialsGroups and related
+            for material_group in product_part.material_groups.all():
+                new_material_group = ProductPartMaterialsGroups.objects.create(
+                    product_part=new_part,
+                    group=material_group.group,
+                    add_palette=material_group.add_palette
+                )
+
+                # Copy ProductPartMaterialsSubGroups
+                for sub_group in material_group.sub_groups.all():
+                    ProductPartMaterialsSubGroups.objects.create(
+                        product_part=new_part,
+                        group=new_material_group,
+                        sub_group=sub_group.sub_group
+                    )
+
+                # Copy ProductPartMaterials
+                for material in material_group.materials.all():
+                    ProductPartMaterials.objects.create(
+                        group=new_material_group,
+                        material=material.material,
+                        color=material.color,
+                        preferred=material.preferred
+                    )
+
+        # Copy RecommendedCombinations and related
+        for combination in instance.copy_from.recommended_combinations.all():
+            new_combination = RecommendedCombinations.objects.create(
+                material_set=instance,
+                name=combination.name,
+                _copying=True  # Маркер для пропуска автоматического создания частей
+            )
+
+            # Find corresponding new parts for recommendations
+            for combo_part in combination.parts.all():
+                if combo_part.material:  # Копируем только части с материалами
+                    new_part = instance.parts.get(name=combo_part.part.name)
+
+                    # Find corresponding new material if exists
+                    new_material = None
+                    for material_group in new_part.material_groups.all():
+                        try:
+                            new_material = material_group.materials.get(
+                                material=combo_part.material.material,
+                                color=combo_part.material.color
+                            )
+                            break
+                        except ProductPartMaterials.DoesNotExist:
+                            continue
+
+                    if new_material:
+                        RecommendedCombinationsParts.objects.create(
+                            combination=new_combination,
+                            part=new_part,
+                            material=new_material
+                        )
+
+            # Удаляем временный маркер
+            delattr(new_combination, '_copying')
+            new_combination.save()
+
+        # Clear copy_from after successful copy
+        MaterialsSet.objects.filter(pk=instance.pk).update(copy_from=None)

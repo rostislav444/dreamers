@@ -16,12 +16,14 @@ from apps.product.utils import generate_variants_from_dimensions
 
 
 class ProductClass(NameSlug):
+    name = models.CharField(max_length=255, default='', blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     collection = models.ForeignKey(Collection, null=True, blank=True, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(default='', blank=True, null=True)
     materials_set = models.ForeignKey(MaterialsSet, on_delete=models.PROTECT, null=True, blank=True)
     interior = models.ForeignKey(Interior,  on_delete=models.PROTECT, null=True, blank=True)
     images_by_sku = models.BooleanField(default=False)
+    number_in_collection = models.PositiveIntegerField(default=0)
 
     # Width
     min_width = models.PositiveIntegerField(_('Ширина'), default=0)
@@ -90,12 +92,22 @@ class ProductClass(NameSlug):
         return self._get_attribute_groups(
             Q(product_class_attributes__product_class=self) | Q(product_class_option_group__product_class=self))
 
+    def category_collection_name(self):
+        product_name = self.category.product_name if self.category.product_name else self.category.name
+
+        if self.collection:
+            if not self.number_in_collection:
+                plus = 1 if not self.pk else 0
+                self.number_in_collection = self.collection.products.count() + plus
+            return product_name + ' ' + self.collection.name + ' - ' + str(self.number_in_collection)
+        return product_name + ' ' + str(self.number_in_collection)
+
     def save(self, *args, **kwargs):
+        self.name = self.category_collection_name()
         super(ProductClass, self).save(*args, **kwargs)
 
         if self.generate_variants_from_sizes:
             generate_variants_from_dimensions(self)
-
             ProductClass.objects.filter(pk=self.pk).update(generate_variants_from_sizes=False)
 
 

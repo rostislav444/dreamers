@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from apps.attribute.models import AttributeGroup
 from apps.category.forms import CategoryAttributeGroupFormSet, CategoryAttributeGroupForm
-from apps.category.models import Category, Properties, CategoryAttributeGroup
+from apps.category.models import Category, Properties, CategoryAttributeGroup, Collection
 
 
 class CategoryAttributeGroupInline(admin.TabularInline):
@@ -42,3 +42,7 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines = [
         CategoryAttributeGroupInline,
     ]
+
+@admin.register(Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    pass
