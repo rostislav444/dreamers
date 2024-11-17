@@ -35,6 +35,9 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_material_parts(obj):
+        if not obj.product_class.materials_set:
+            return []
+
         qs = obj.product_class.materials_set.parts.all().prefetch_related(
             Prefetch(
                 'material_groups__materials',
