@@ -12,6 +12,28 @@ export const parseMaterials = (materials: string) => {
     );
 };
 
+export const parseMaterialsWithDefaults = (
+    materials: string | undefined,
+    material_parts: ProductPart[]
+) => {
+    // Сначала парсим переданную строку материалов
+    const parsedMaterials = materials ? Object.fromEntries(
+        materials.split('_')
+            .slice(1)
+            .map(pair => pair.split('-').map(Number))
+    ) : {};
+
+    // Проходим по всем material_parts и заполняем отсутствующие или null значения
+    material_parts.forEach(part => {
+        // Если для данного part.id нет значения или оно null
+        if (!parsedMaterials[part.id] && part.material_groups[0]?.materials[0]) {
+            parsedMaterials[part.id] = part.material_groups[0].materials[0].id;
+        }
+    });
+
+    return parsedMaterials;
+};
+
 export const generateMaterialsSlug = (materials: SelectedMaterialsInterface) => {
     return 'materials_' + Object.entries(materials).map(([part, material]) => `${part}-${material}`).join('_');
 }
@@ -34,6 +56,8 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
         const randomIndex = getRandomInt(length)
         initialMaterials[part.id] = part.material_groups[0].materials[randomIndex]?.id;
     });
+    console.log('material_parts', material_parts)
+    console.log('initialMaterials', initialMaterials)
     return initialMaterials;
 }
 

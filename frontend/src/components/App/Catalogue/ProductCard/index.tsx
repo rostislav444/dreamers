@@ -1,7 +1,5 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Box} from "@chakra-ui/react";
-import {ProductCardMaterial} from "@/components/App/Catalogue/ProductCard/Materials";
-import {ProductCardProps} from "@/components/App/Catalogue/ProductCard/interfaces";
 import {CatalogueProductImages} from "@/components/App/Catalogue/ProductCard/Images";
 import Link from "next/link";
 import {ProductInterface} from "@/interfaces/Product";

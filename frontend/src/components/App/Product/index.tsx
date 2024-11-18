@@ -1,16 +1,16 @@
 import {ProductProps} from "@/interfaces/Product";
 import {useState} from "react";
 import {ProductGallery} from "@/components/App/Product/Galery";
-import {Box, Flex, Grid, GridItem, Heading, useMediaQuery} from "@chakra-ui/react";
+import {Box, Grid, GridItem, useMediaQuery} from "@chakra-ui/react";
 import {ProductInfo} from "@/components/App/Product/Info";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
-import {parseMaterials, setFirstMaterials, setInitialMaterials} from "@/utils/Product/Materials";
+import {parseMaterialsWithDefaults} from "@/utils/Product/Materials";
 
 
 export const ProductComponent = ({product, materials}: ProductProps) => {
     const [mobile] = useMediaQuery('(max-width: 960px)');
 
-    const parsedMaterials = materials ? parseMaterials(materials) : setFirstMaterials(product.material_parts);
+    const parsedMaterials = parseMaterialsWithDefaults(materials, product.material_parts);
     const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>(parsedMaterials)
 
     return <Box>
