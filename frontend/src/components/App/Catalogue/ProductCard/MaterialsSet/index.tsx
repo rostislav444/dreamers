@@ -1,7 +1,6 @@
-import {Box, Text, Grid, GridItem, Img} from "@chakra-ui/react";
+import {Box, Grid, GridItem, Img, Text} from "@chakra-ui/react";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
-import {log} from "next/dist/server/typescript/utils";
-import {BASE_URL} from "@/local";
+import {MEDIA_LOCAL, MEDIA_URL} from "@/local";
 
 
 interface Props {
@@ -36,7 +35,7 @@ export const MaterialsSet = ({material_parts, selectedMaterial, setSelectedMater
                                     onClick={() => handleSetMaterial(part.id, material.id)}
                                 >
                                     {material?.color && (<Box w='26px' h='26px' bg={material.color.hex}/>)}
-                                    {material?.material && (<Img w='26px' h='26px' src={BASE_URL + material.material.image}/>)}
+                                    {material?.material && (<Img w='26px' h='26px' src={MEDIA_LOCAL ? MEDIA_URL + material.material.image : material.material.image}/>)}
                                 </GridItem>
                             })
                         })}

@@ -1,3 +1,5 @@
+import json
+
 from django.db.models import Prefetch
 from rest_framework import serializers
 
@@ -44,7 +46,9 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
                 queryset=ProductPartMaterials.objects.filter(preferred=True)
             )
         )
-        return ProductPartSerializer(qs, many=True, read_only=True).data
+        data =  ProductPartSerializer(qs, many=True, read_only=True).data
+        print(json.dumps(data, indent=4))
+        return data
 
     @staticmethod
     def get_camera(obj):

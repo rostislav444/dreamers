@@ -56,8 +56,8 @@ def calculate_aspect_ratio(instance: BlenderMaterial):
 def get_blender_material_image(sender, instance, **kwargs):
     if instance.col:
         calculate_aspect_ratio(instance)
-        # if hasattr(instance, 'material'):
-        #     crop_and_save_image(instance, instance)
+        if hasattr(instance, 'material'):
+            crop_and_save_image(instance, instance)
 
 
 @receiver(signals.post_save, sender=RecommendedCombinations)

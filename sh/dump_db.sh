@@ -14,7 +14,7 @@ BACKUP_PATH="$DUMP_FOLDER/$BACKUP_FILENAME"
 echo "Создаем бекап базы данных $DB_NAME..."
 
 # Делаем бекап используя docker-compose exec
-if docker-compose exec db pg_dump -U postgres -Fc $DB_NAME > "$BACKUP_PATH"; then
+if docker compose exec db pg_dump -U postgres -Fc $DB_NAME > "$BACKUP_PATH"; then
     echo "Бекап успешно создан: $BACKUP_PATH"
 else
     echo "Ошибка при создании бекапа"
