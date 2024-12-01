@@ -1,3 +1,4 @@
+import uuid
 from io import BytesIO
 
 from PIL import Image
@@ -13,15 +14,16 @@ from apps.material.models import BlenderMaterial, Material, RecommendedCombinati
 
 
 def crop_and_save_image(blender_material, material):
-    storage = material.image.storage
+    storage = material.preview.storage
 
     ext = blender_material.col.name.split('.')[-1]
 
     with blender_material.col.open() as f:
+        # print(f_open)
         original_image = Image.open(f)
 
         x, y = 0, 0
-        w, h = 120, 120
+        w, h = 240, 240
 
         image_file = BytesIO()
         # Обрезаем изображение
@@ -34,10 +36,11 @@ def crop_and_save_image(blender_material, material):
         # Сохраняем в хранилище
         naming = FileNaming()
         naming.name = 'image'
+
         image_name = naming.generate_filename(material, '.jpeg')
         storage.save(image_name, File(image_file))
 
-        Material.objects.filter(pk=material.pk).update(image=image_name)
+        BlenderMaterial.objects.filter(pk=blender_material.pk).update(preview=image_name)
 
 
 def calculate_aspect_ratio(instance: BlenderMaterial):

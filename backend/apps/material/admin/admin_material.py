@@ -15,6 +15,60 @@ class BlenderMaterialFilter(AutocompleteFilter):
 class BlenderMaterialAdmin(admin.ModelAdmin):
     search_fields = ['color__name']
     autocomplete_fields = ['color']
+    readonly_fields = ('show_preview', 'preview')
+
+    fieldsets = (
+        ('General', {
+            'fields': (
+                'name',
+                'copy_from',
+            )
+        }),
+        ('Preview', {
+            'fields': (
+                'show_preview',
+                'preview',
+            )
+        }),
+        ('Base Maps', {
+            'fields': (
+                ('col', 'color'),
+                ('nrm_gl', 'nrm_dx'),
+            )
+        }),
+        ('Detail Maps', {
+            'fields': (
+                ('bump', 'bump16'),
+                ('disp', 'disp16'),
+            )
+        }),
+        ('Material Properties', {
+            'fields': (
+                ('rgh', 'rgh_num'),
+                ('mtl', 'mtl_num'),
+                ('refl', 'refl_num'),
+                ('ao', 'ao_num'),
+            )
+        }),
+        ('Scaling', {
+            'fields': (
+                ('scale', 'aspect_ratio'),
+            ),
+            'classes': ('collapse',),
+            'description': 'Настройки масштабирования текстур'
+        })
+    )
+
+    @staticmethod
+    def show_preview(obj):
+        if obj.color:
+            return format_html(
+                f'<div style="background-color: {obj.color.hex}; width: 120px; height: 120px;"></div>')
+        if obj.preview:
+            return format_html(f'<img src="{obj.preview.url}" style="width: 120px; height: 120px;">')
+        return '-'
+
+    show_preview.short_description = 'Color Preview'
 
 
 @admin.register(BaseColor)
@@ -86,11 +140,12 @@ class MaterialInline(admin.StackedInline):
     @staticmethod
     def preview(obj):
         blender_material = obj.blender_material
-        if blender_material.color:
-            return format_html(
-                f'<div style="background-color: {blender_material.color.hex}; width: 48px; height: 48px;"></div>')
-        if obj.image:
-            return format_html(f'<img src="{obj.image.url}" style="width: 48px; height: 48px;">')
+        if blender_material:
+            if blender_material.color:
+                return format_html(
+                    f'<div style="background-color: {blender_material.color.hex}; width: 96px; height: 96px;"></div>')
+            if blender_material.preview:
+                return format_html(f'<img src="{obj.blender_material.preview.url}" style="width: 96px; height: 96px;">')
         return '-'
 
     def get_extra(self, request, obj=None, **kwargs):

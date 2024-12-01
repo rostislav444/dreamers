@@ -5,6 +5,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import Storage
 from django.utils.deconstruct import deconstructible
@@ -63,9 +64,10 @@ class S3Storage(Storage):
 
         return cleaned_name
 
-    def _open(self, name, mode='rb'):
-        file = self.client.get_object(Bucket=self.bucket_name, Key=name)
-        return file['Body']
+    def open(self, name, mode='rb'):
+        obj = self.client.get_object(Bucket=self.bucket_name, Key=name)
+        content = obj['Body'].read()
+        return ContentFile(content)
 
     def delete(self, name):
         print('storage delete', name)

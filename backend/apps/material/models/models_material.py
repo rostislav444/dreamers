@@ -47,6 +47,7 @@ class MaterialSubGroup(models.Model):
 
 class BlenderMaterial(NameSlug):
     copy_from = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    preview = DeletableImageField(null=True, blank=True, verbose_name='Preview')
 
     col = DeletableFileField(null=True, blank=True, verbose_name='Color')
     color = models.ForeignKey('Color', on_delete=models.CASCADE, null=True, blank=True)
