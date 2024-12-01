@@ -4,6 +4,7 @@ from django.utils.html import format_html
 
 from apps.material.models import MaterialGroups, MaterialSubGroup, Material, Color, BaseColor, BlenderMaterial, \
     Palette, PaletteColor
+from apps.material.utils.blender_matrial_admin_preview import blender_material_preview
 
 
 class BlenderMaterialFilter(AutocompleteFilter):
@@ -61,12 +62,7 @@ class BlenderMaterialAdmin(admin.ModelAdmin):
 
     @staticmethod
     def show_preview(obj):
-        if obj.color:
-            return format_html(
-                f'<div style="background-color: {obj.color.hex}; width: 120px; height: 120px;"></div>')
-        if obj.preview:
-            return format_html(f'<img src="{obj.preview.url}" style="width: 120px; height: 120px;">')
-        return '-'
+        return blender_material_preview(obj)
 
     show_preview.short_description = 'Color Preview'
 
@@ -133,7 +129,7 @@ class MaterialInline(admin.StackedInline):
     readonly_fields = ('preview',)
     fieldsets = (
         (None, {
-            'fields': ('name', 'preview',  'image', ('price', 'sub_group', 'blender_material'))
+            'fields': ('name', 'preview', 'image', ('price', 'sub_group', 'blender_material'))
         }),
     )
 
@@ -141,11 +137,7 @@ class MaterialInline(admin.StackedInline):
     def preview(obj):
         blender_material = obj.blender_material
         if blender_material:
-            if blender_material.color:
-                return format_html(
-                    f'<div style="background-color: {blender_material.color.hex}; width: 96px; height: 96px;"></div>')
-            if blender_material.preview:
-                return format_html(f'<img src="{obj.blender_material.preview.url}" style="width: 96px; height: 96px;">')
+            return blender_material_preview(blender_material)
         return '-'
 
     def get_extra(self, request, obj=None, **kwargs):
