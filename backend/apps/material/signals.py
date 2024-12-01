@@ -38,6 +38,7 @@ def crop_and_save_image(blender_material, material):
         naming.name = 'image'
 
         image_name = naming.generate_filename(material, '.jpeg')
+        print(image_name)
         storage.save(image_name, File(image_file))
 
         BlenderMaterial.objects.filter(pk=blender_material.pk).update(preview=image_name)
@@ -59,8 +60,7 @@ def calculate_aspect_ratio(instance: BlenderMaterial):
 def get_blender_material_image(sender, instance, **kwargs):
     if instance.col:
         calculate_aspect_ratio(instance)
-        if hasattr(instance, 'material'):
-            crop_and_save_image(instance, instance)
+        crop_and_save_image(instance, instance)
 
 
 @receiver(signals.post_save, sender=RecommendedCombinations)
