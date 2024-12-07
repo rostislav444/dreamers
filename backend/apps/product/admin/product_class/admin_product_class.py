@@ -33,7 +33,7 @@ class ProductClassAdmin(admin.ModelAdmin):
     def parts_image(self, obj):
         images_style = {
             'position': 'absolute',
-            'object-fit': 'cover',
+            'object-fit': 'contain',
             'width': '100%',
             'height': '100%',
             'top': 0,
@@ -51,7 +51,7 @@ class ProductClassAdmin(admin.ModelAdmin):
                                for image in parts_images]
 
                 variant_container = ''.join([
-                    '<div style="position: relative; width: 160px; height: 160px;">',
+                    '<div style="position: relative; width: 160px; height: 106px;">',
                     *images_html,
                     '</div>'
                 ])
