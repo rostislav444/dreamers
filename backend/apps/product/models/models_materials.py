@@ -16,7 +16,7 @@ class ProductPartSceneMaterial(models.Model):
 
 class ProductPartSceneMaterialImage(models.Model):
     scene_material = models.OneToOneField(ProductPartSceneMaterial, on_delete=models.CASCADE, related_name='image')
-    image = DeletableImageField(parent_names_paths=['scene_material.part.camera.model_3d.product'])
+    image = DeletableImageField(parent_names_paths=['scene_material.part.camera.model_3d.product'], max_length=1024)
     image_thumbnails = models.JSONField(default=dict, blank=True, null=True)
 
 
