@@ -1,5 +1,6 @@
 from rest_framework import viewsets, mixins, generics
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from apps.product.models import SkuImages, ProductPartSceneMaterialImage, Product, CameraInteriorLayerMaterialGroup, \
     CameraInteriorLayerMaterialImage, CameraInteriorLayerMaterial
@@ -14,9 +15,14 @@ class ProductRenderViewSet(generics.GenericAPIView, mixins.RetrieveModelMixin, v
     def get_queryset(self):
         return Product.objects.all()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['get'])
     def get_all_product_ids(self, request, *args, **kwargs):
-        return Product.objects.all().values_list('id', flat=True)
+        ids = Product.objects.filter(
+            model_3d__isnull=False,
+            model_3d__cameras__isnull=False,
+            model_3d__cameras__parts__materials__image__isnull=True
+        ).values_list('id', flat=True)
+        return Response(ids)
 
 
 class LoadSkuImageView(generics.GenericAPIView, mixins.CreateModelMixin, viewsets.ViewSet):
