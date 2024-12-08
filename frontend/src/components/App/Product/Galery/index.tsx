@@ -37,7 +37,7 @@ const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc
 
     const handleImageLoad = () => {
         setIsLoaded(true);
-        setSrc(highResSrc));
+        setSrc(highResSrc);
     };
 
     return (

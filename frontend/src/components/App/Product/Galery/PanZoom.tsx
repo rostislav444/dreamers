@@ -118,7 +118,7 @@ const ProductGalleryModal = ({
                                         {images.map((image, index) => (
                                             <img
                                                 key={index}
-                                                src={`/api/image-proxy?url=${encodeURIComponent(MEDIA_URL + image)}`}
+                                                src={MEDIA_URL + image}
                                                 alt={`Product layer ${index + 1}`}
                                                 loading="lazy"
                                                 style={{
@@ -172,8 +172,7 @@ const ProductGalleryModal = ({
                                                     <CameraImage
                                                         key={imageKey}
                                                         loading="lazy"
-                                                        src={`/api/image-proxy?url=${encodeURIComponent(
-                                                            MEDIA_URL + image.thumbnails?.s)}`}
+                                                        src={MEDIA_URL + image.thumbnails?.s}
                                                         alt={`Camera view ${key}`}
                                                     />
                                                 ))}
