@@ -24,6 +24,14 @@ http {
 
         location = /favicon.ico { access_log off; log_not_found off; }
 
+        location /pgadmin/ {
+            proxy_pass http://pgadmin/;
+            proxy_set_header X-Script-Name /pgadmin;
+            proxy_set_header X-Scheme $scheme;
+            proxy_set_header Host $host;
+            proxy_redirect off;
+        }
+
         location /static/ {
             alias /home/app/web/static_root/;
             autoindex on;
