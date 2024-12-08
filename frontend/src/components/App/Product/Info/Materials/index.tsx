@@ -17,7 +17,14 @@ interface ProductMaterialsInterface {
 export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials}: ProductMaterialsInterface) => {
     const router = useRouter()
     const [mobile] = useMediaQuery('(max-width: 960px)');
-    const [showAll, setShowAll] = useState<boolean[]>(parts.map((_, i) => true));
+
+    // Filter parts with multiple material groups and materials at initialization
+    const validParts = parts.filter(part =>
+        part.material_groups.length > 1 &&
+        part.material_groups.some(group => group.materials.length > 1)
+    );
+
+    const [showAll, setShowAll] = useState<boolean[]>(validParts.map(() => true));
 
     const handleMaterialsSet = (partId: number, materialId: number) => {
         const newMaterials = {...selectedMaterials, [partId]: materialId};
@@ -31,12 +38,15 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
             pathname: router.pathname,
             query: query,
         }, router.pathname, {shallow: true});
+    }
 
+    if (validParts.length === 0) {
+        return null;
     }
 
     return <Box>
         <InfoHeading mobile={mobile}>Колір</InfoHeading>
-        {parts.map((part, i) =>
+        {validParts.map((part, i) =>
             <Box key={part.id}>
                 <Flex justifyContent='space-between' alignItems='center' onClick={() => setShowAll(old => {
                     const newShowAll = [...old];
@@ -45,45 +55,45 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                 })} mt='4'>
                     <Text fontSize='md'>{part.name}</Text>
                     <ChevronUpIcon w='6' h='6' color='brown.500' cursor='pointer'
-                                   transform={showAll[i] ? 'rotate(180deg)' : 'rotate(0deg)'}
+                                 transform={showAll[i] ? 'rotate(180deg)' : 'rotate(0deg)'}
                     />
                 </Flex>
                 {showAll[i] && (<Box>
                     {part.material_groups.map(group =>
-                        group.materials.length > 1 && (<Box key={group.id}>
-                            <Text fontSize='sm' mt={1} color={'orange.500'}>{group.name}</Text>
-                            <Box mt={mobile ? 4 : 4} ml={'-9px'} mb={mobile ? 4 : 6}>
-                                {group.materials.map(material =>
-                                    <Box
-                                        key={material.id}
-                                        position='relative'
-                                        display='inline-block'
-                                        m={'0 0 0 2px'}
-                                        p='2px'
-                                        borderWidth='2px'
-                                        borderColor={selectedMaterials[part.id] === material.id ? 'brown.500' : 'transparent'}
-                                        borderRadius='0'
-                                        cursor='pointer'
-                                        _hover={{
-                                            borderColor: 'orange.500'
-                                        }}
-                                        onClick={() => handleMaterialsSet(part.id, material.id)}
-                                    >
-                                        {material.color && <Box w={6} h={6} bg={material.color.hex}/>}
-                                        {material.material && <Box w={6} h={6}>
-                                            <Image w='100%' h='100%'
-                                                   src={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}
-                                                   alt={material.id.toString()}/>
-                                        </Box>}
-                                    </Box>
-                                )}
+                        group.materials.length > 0 && (
+                            <Box key={group.id}>
+                                <Text fontSize='sm' mt={1} color={'orange.500'}>{group.name}</Text>
+                                <Box mt={mobile ? 4 : 4} ml={'-9px'} mb={mobile ? 4 : 6}>
+                                    {group.materials.map(material =>
+                                        <Box
+                                            key={material.id}
+                                            position='relative'
+                                            display='inline-block'
+                                            m={'0 0 0 2px'}
+                                            p='2px'
+                                            borderWidth='2px'
+                                            borderColor={selectedMaterials[part.id] === material.id ? 'brown.500' : 'transparent'}
+                                            borderRadius='0'
+                                            cursor='pointer'
+                                            _hover={{
+                                                borderColor: 'orange.500'
+                                            }}
+                                            onClick={() => handleMaterialsSet(part.id, material.id)}
+                                        >
+                                            {material.color && <Box w={6} h={6} bg={material.color.hex}/>}
+                                            {material.material && <Box w={6} h={6}>
+                                                <Image w='100%' h='100%'
+                                                       src={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}
+                                                       alt={material.id.toString()}/>
+                                            </Box>}
+                                        </Box>
+                                    )}
+                                </Box>
                             </Box>
-                        </Box>)
+                        )
                     )}
                 </Box>)}
-                {}
             </Box>
-        )
-        }
+        )}
     </Box>
 }
