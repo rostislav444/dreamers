@@ -27,7 +27,7 @@ const getCameraPartsImages = (models3d: Model3dInterface, selectedMaterials: Sel
 }
 
 const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc: string, alt: string }) => {
-    const [src, setSrc] = useState<string>(`/api/image-proxy?url=${encodeURIComponent(lowResSrc)}`);
+    const [src, setSrc] = useState<string>(lowResSrc);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc
 
     const handleImageLoad = () => {
         setIsLoaded(true);
-        setSrc(`/api/image-proxy?url=${encodeURIComponent(highResSrc)}`);
+        setSrc(highResSrc));
     };
 
     return (
