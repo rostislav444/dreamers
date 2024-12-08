@@ -1,0 +1,1 @@
+scp dreamers:/var/www/dreamers/backups/db-backup-2024-12-08 /Users/rostislavnikolaiev/Desktop/work/dreamers/ecommerce/backups/db-backup

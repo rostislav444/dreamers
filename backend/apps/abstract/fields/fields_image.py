@@ -216,6 +216,7 @@ class DeletableFileField(DeletableMediaField):
 
 @receiver(pre_delete)
 def delete_file_on_delete(sender, instance, **kwargs):
+    print('PRE DELETE', instance)
     for field in instance._meta.fields:
         if isinstance(field, (DeletableImageField, DeletableVideoField, DeletableFileField)):
             # Удаляем основное изображение
