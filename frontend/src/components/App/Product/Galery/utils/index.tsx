@@ -6,7 +6,8 @@ import {saveAs} from "file-saver";
 export const handleImageMergeAndDownload = async (images: string[]) => {
     try {
         const imageBlobs = await Promise.all(images.map(async (image) => {
-            const response = await fetch(MEDIA_URL + image);
+
+            const response = await fetch(`/api/image-proxy?url=${encodeURIComponent(image)}`);
             const blob = await response.blob();
             return URL.createObjectURL(blob);
         }));

@@ -13,6 +13,7 @@ import {CameraImageFromMaterials} from "@/utils/Product/Materials";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import {ChevronUpIcon, DownloadIcon} from "@chakra-ui/icons";
 import {handleImageMergeAndDownload} from "@/components/App/Product/Galery/utils";
+import ProductGalleryModal from "@/components/App/Product/Galery/PanZoom";
 
 interface ProductGalleryProps {
     mobile: boolean
@@ -26,7 +27,7 @@ const getCameraPartsImages = (models3d: Model3dInterface, selectedMaterials: Sel
 }
 
 const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc: string, alt: string }) => {
-    const [src, setSrc] = useState<string>(lowResSrc);
+    const [src, setSrc] = useState<string>(`/api/image-proxy?url=${encodeURIComponent(lowResSrc)}`);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
@@ -36,7 +37,7 @@ const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc
 
     const handleImageLoad = () => {
         setIsLoaded(true);
-        setSrc(highResSrc);
+        setSrc(`/api/image-proxy?url=${encodeURIComponent(highResSrc)}`);
     };
 
     return (
@@ -60,6 +61,7 @@ const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc
 
 export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGalleryProps) => {
     const imagesBySku: boolean = product.images_by_sku
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const cameras = product.model_3d.flatMap(model_3d => getCameraPartsImages(model_3d, selectedMaterials));
     const model3dCameras = product.model_3d.flatMap(model_3d => model_3d.cameras)
     const [currentImage, setCurrentImage] = useState<number>(Math.round(cameras.length / 3))
@@ -116,14 +118,16 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
     return <Box w='100%'>
         <MainImageWrapper>
-            {images.map((image: string, imageKey: number) =>
-                <LazyImage
-                    key={imageKey}
-                    lowResSrc={imagesAlt[imageKey] as string}
-                    highResSrc={image}
-                    alt='img'
-                />
-            )}
+            <Box onClick={() => setIsModalOpen(true)}>
+                {images.map((image: string, imageKey: number) =>
+                    <LazyImage
+                        key={imageKey}
+                        lowResSrc={imagesAlt[imageKey] as string}
+                        highResSrc={image}
+                        alt='img'
+                    />
+                )}
+            </Box>
             <GalleryArrowWrapper
                 left={true}
                 onClick={() => handleArrowClick(currentImage - 1)}>{'<'}</GalleryArrowWrapper>
@@ -137,6 +141,14 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
             />
         </MainImageWrapper>
 
+        <ProductGalleryModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            images={images}
+            cameras={cameras}  // Добавляем проп cameras
+            currentImageIndex={currentImage}
+            onImageChange={setCurrentImage}
+        />
 
         <Grid mt={2} mb={4} mr={mobile ? 0 : 20} w={mobile ? '100%' : '80%'}
               gridTemplateColumns={mobile ? 'repeat(auto-fill, minmax(60px, 1fr))' : 'repeat(auto-fill, minmax(80px, 1fr))'}

@@ -6,13 +6,25 @@ import {CategoryState} from "@/interfaces/Categories";
 import {ProductComponent} from "@/components/App/Product";
 
 
-const processBreadCrumbs = (categories: CategoryState[], name: string, code: string) => ([
-    ...categories.map(category => ({title: category.name, link: '/catalogue'})),
-    {title: name, link: `/product/${code}`},
-])
+const processBreadCrumbs = (categories: CategoryState[], name: string, code: string) => {
+    // Создаем хлебные крошки с накопительными ссылками
+    const breadcrumbs = categories.map((category, index) => ({
+        title: category.name,
+        link: `/catalogue/${categories.slice(0, index + 1).map(cat => cat.slug).join('/')}`
+    }));
 
+    // Добавляем текущий продукт
+    breadcrumbs.push({
+        title: name,
+        link: `/product/${code}`
+    });
+
+    return breadcrumbs;
+};
 
 const Product = ({product, materials}: ProductProps) => {
+    console.log('product>', product)
+
     return <Layout breadcrumbs={processBreadCrumbs(product.categories, product.name, product.code)}
                    description={'description'} title={product.name}>
         <ProductComponent product={product} materials={materials}/>
