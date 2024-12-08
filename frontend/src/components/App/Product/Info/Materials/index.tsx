@@ -50,7 +50,7 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                 </Flex>
                 {showAll[i] && (<Box>
                     {part.material_groups.map(group =>
-                        <Box key={group.id}>
+                        group.materials.length > 1 && (<Box key={group.id}>
                             <Text fontSize='sm' mt={1} color={'orange.500'}>{group.name}</Text>
                             <Box mt={mobile ? 4 : 4} ml={'-9px'} mb={mobile ? 4 : 6}>
                                 {group.materials.map(material =>
@@ -78,7 +78,7 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
                                     </Box>
                                 )}
                             </Box>
-                        </Box>
+                        </Box>)
                     )}
                 </Box>)}
                 {}

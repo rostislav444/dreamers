@@ -101,7 +101,7 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
     return (
         <Box mb={2}>
             {product.parts.map((part) => (
-                <Box key={part.id}>
+                part.materials.length > 1 && (<Box key={part.id}>
                     <Text as="span" mt={2}>
                         {part.name}
                     </Text>
@@ -122,7 +122,7 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
                             </Flex>
                         ))}
                     </Grid>
-                </Box>
+                </Box>)
             ))}
         </Box>
     );
