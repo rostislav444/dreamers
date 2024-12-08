@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 
 export const ProductImage = styled.img`
-    image-rendering: crisp-edges;
+    image-rendering: auto;
     position: absolute;
     display: block;
     width: 100%;

@@ -26,7 +26,7 @@ class Command(BaseCommand):
         })
 
         for state in data['data']:
-            print(state)
+
             state_item, _ = NewPostAreas.objects.get_or_create(
                 ref=state['Ref'],
                 areas_center=state['AreasCenter'],

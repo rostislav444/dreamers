@@ -23,10 +23,12 @@ class Product3DBlenderModel(models.Model):
     @property
     def get_parts_images(self):
         links = []
+        camera = self.cameras.get(rad_z=120)
+        print(camera)
         try:
-            camera = self.cameras.get(rad_z=90)
+            camera = self.cameras.get(rad_z=120)
         except Camera.DoesNotExist:
-            camera = self.cameras.filter(rad_z__gte=70, rad_z__lte=100).first()
+            camera = self.cameras.filter(rad_z__gte=50, rad_z__lte=100).first()
         if not camera:
             camera = self.cameras.first()
         if camera:

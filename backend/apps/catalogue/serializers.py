@@ -47,13 +47,14 @@ class CatalogueProductSerializer(serializers.ModelSerializer):
             )
         )
         data =  ProductPartSerializer(qs, many=True, read_only=True).data
-        print(json.dumps(data, indent=4))
         return data
 
     @staticmethod
     def get_camera(obj):
         model_3d = obj.model_3d.first()
         if model_3d:
-            camera = model_3d.cameras.filter(rad_z=90).prefetch_related('parts__materials').first()
+            camera = model_3d.cameras.filter(rad_z=120).prefetch_related('parts__materials').first()
+            if not camera:
+                camera = model_3d.cameras.filter(rad_z__gte=90, rad_z__lte=90).first()
             if camera:
                 return CatalogueCameraSerializer(camera).data
