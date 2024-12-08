@@ -23,8 +23,6 @@ const processBreadCrumbs = (categories: CategoryState[], name: string, code: str
 };
 
 const Product = ({product, materials}: ProductProps) => {
-    console.log('product>', product)
-
     return <Layout breadcrumbs={processBreadCrumbs(product.categories, product.name, product.code)}
                    description={'description'} title={product.name}>
         <ProductComponent product={product} materials={materials}/>
