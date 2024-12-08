@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef} from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -9,11 +9,11 @@ import {
     IconButton,
     useBreakpointValue,
 } from '@chakra-ui/react';
-import { CloseIcon, AddIcon, MinusIcon } from '@chakra-ui/icons';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
-import { CameraImage, CameraImagesWrapper } from './style';
-import { MEDIA_URL } from '@/local';
+import {CloseIcon, AddIcon, MinusIcon} from '@chakra-ui/icons';
+import {TransformWrapper, TransformComponent} from 'react-zoom-pan-pinch';
+import type {ReactZoomPanPinchRef} from 'react-zoom-pan-pinch';
+import {CameraImage, CameraImagesWrapper} from './style';
+import {MEDIA_URL} from '@/local';
 
 interface ProductGalleryModalProps {
     isOpen: boolean;
@@ -31,17 +31,17 @@ interface ProductGalleryModalProps {
 }
 
 const ProductGalleryModal = ({
-    isOpen,
-    onClose,
-    cameras,
-    currentImageIndex,
-    onImageChange
-}: ProductGalleryModalProps) => {
+                                 isOpen,
+                                 onClose,
+                                 cameras,
+                                 currentImageIndex,
+                                 onImageChange
+                             }: ProductGalleryModalProps) => {
     const images = cameras[currentImageIndex].map(camera => camera.image);
 
     const [loaded, setLoaded] = useState<boolean[]>(new Array(images.length).fill(false));
     const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
-    const isMobile = useBreakpointValue({ base: true, md: false });
+    const isMobile = useBreakpointValue({base: true, md: false});
 
     const handleImageLoad = (index: number) => {
         const newLoaded = [...loaded];
@@ -51,13 +51,13 @@ const ProductGalleryModal = ({
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="full">
-            <ModalOverlay bg="white" />
+            <ModalOverlay bg="white"/>
             <ModalContent
                 maxWidth={'100vw'}
                 maxHeight={'100vh'}
                 bg="transparent"
             >
-                <ModalBody p={0} position="relative">
+                {isOpen && (<ModalBody p={0} position="relative">
                     <TransformWrapper
                         ref={transformRef}
                         initialScale={1}
@@ -67,25 +67,25 @@ const ProductGalleryModal = ({
                         limitToBounds={false}
                         smooth
                     >
-                        {({ zoomIn, zoomOut, resetTransform }) => (
+                        {({zoomIn, zoomOut, resetTransform}) => (
                             <Box position="relative" height={"100vh"}>
                                 {/* Кнопки управления */}
                                 <Flex position="absolute" left={4} top={4} zIndex={2} gap={2}>
                                     <IconButton
                                         aria-label="Zoom in"
-                                        icon={<AddIcon />}
+                                        icon={<AddIcon/>}
                                         onClick={() => zoomIn()}
                                         colorScheme="whiteAlpha"
                                     />
                                     <IconButton
                                         aria-label="Zoom out"
-                                        icon={<MinusIcon />}
+                                        icon={<MinusIcon/>}
                                         onClick={() => zoomOut()}
                                         colorScheme="whiteAlpha"
                                     />
                                     <IconButton
                                         aria-label="Reset"
-                                        icon={<CloseIcon />}
+                                        icon={<CloseIcon/>}
                                         onClick={() => resetTransform()}
                                         colorScheme="whiteAlpha"
                                     />
@@ -94,7 +94,7 @@ const ProductGalleryModal = ({
                                 {/* Кнопка закрытия */}
                                 <IconButton
                                     aria-label="Close modal"
-                                    icon={<CloseIcon />}
+                                    icon={<CloseIcon/>}
                                     position="absolute"
                                     right={4}
                                     top={4}
@@ -120,6 +120,7 @@ const ProductGalleryModal = ({
                                                 key={index}
                                                 src={`/api/image-proxy?url=${encodeURIComponent(MEDIA_URL + image)}`}
                                                 alt={`Product layer ${index + 1}`}
+                                                loading="lazy"
                                                 style={{
                                                     position: 'absolute',
                                                     top: 0,
@@ -160,7 +161,7 @@ const ProductGalleryModal = ({
                                             overflow="hidden"
                                             flexShrink={0}
                                             transition="all 0.2s"
-                                            _hover={{ borderColor: "brown.300" }}
+                                            _hover={{borderColor: "brown.300"}}
                                             width={isMobile ? "60px" : "80px"}
                                             height={isMobile ? "40px" : "53px"}
                                             display="flex"
@@ -170,7 +171,9 @@ const ProductGalleryModal = ({
                                                 {camera.map((image, imageKey) => (
                                                     <CameraImage
                                                         key={imageKey}
-                                                        src={`/api/image-proxy?url=${encodeURIComponent(MEDIA_URL + image.thumbnails?.s)}`}
+                                                        loading="lazy"
+                                                        src={`/api/image-proxy?url=${encodeURIComponent(
+                                                            MEDIA_URL + image.thumbnails?.s)}`}
                                                         alt={`Camera view ${key}`}
                                                     />
                                                 ))}
@@ -181,7 +184,7 @@ const ProductGalleryModal = ({
                             </Box>
                         )}
                     </TransformWrapper>
-                </ModalBody>
+                </ModalBody>)}
             </ModalContent>
         </Modal>
     );
