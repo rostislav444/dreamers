@@ -136,7 +136,6 @@ class DeletableMediaField(FileNaming, DeleteMethods, models.FileField):
         kwargs['storage'] = self.storage
         super().__init__(*args, **kwargs)
 
-
     @property
     def url(self):
         print('url', self.name)
@@ -249,8 +248,8 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
                 continue
 
             sizes = (
-                ('s', 120),
-                ('m', 520),
+                ('s', 150),
+                ('m', 640),
             )
 
             thumbnails_field_name = field.name + '_thumbnails'
@@ -260,9 +259,12 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
             # Open the image using PIL
             original = Image.open(image_field)
 
-            # Convert to RGBA if possible for better edge handling
+            # Preserve original mode for PNG files
+            preserve_transparency = original.mode == 'RGBA' and ext.lower() == 'png'
+
+            # Convert to RGBA only if needed
             if original.mode in ('RGBA', 'RGB'):
-                image = original.convert('RGBA')
+                image = original.convert('RGBA' if preserve_transparency else 'RGB')
             else:
                 image = original.convert('RGB')
 
@@ -279,39 +281,38 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
                 # Use high-quality downsampling
                 thumbnail = image.resize(
                     (width, height),
-                    resample=Image.Resampling.LANCZOS,  # Использует алгоритм Ланцоша для лучшего качества
+                    resample=Image.Resampling.LANCZOS,
                 )
 
                 # Apply subtle sharpening to preserve edges
                 enhancer = ImageEnhance.Sharpness(thumbnail)
-                thumbnail = enhancer.enhance(1.1)  # Значение 1.1 даёт лёгкую резкость без артефактов
-
-                # If original was RGBA, handle transparency properly
-                if original.mode == 'RGBA':
-                    # Create white background
-                    background = Image.new('RGB', thumbnail.size, (255, 255, 255))
-                    # Paste using alpha channel as mask
-                    background.paste(thumbnail, mask=thumbnail.split()[3])
-                    thumbnail = background
+                thumbnail = enhancer.enhance(1.1)
 
                 # Create a File object from the in-memory image
                 thumb_file = BytesIO()
 
                 # Save with optimal quality settings
                 if ext.lower() in ('jpg', 'jpeg'):
+                    # For JPEG, we need to flatten transparency against white
+                    if thumbnail.mode == 'RGBA':
+                        background = Image.new('RGB', thumbnail.size, (255, 255, 255))
+                        background.paste(thumbnail, mask=thumbnail.split()[3])
+                        thumbnail = background
+
                     thumbnail.save(
                         thumb_file,
                         'JPEG',
-                        quality=95,  # Высокое качество для JPEG
-                        optimize=True,  # Оптимизация файла
-                        progressive=True  # Прогрессивная загрузка
+                        quality=95,
+                        optimize=True,
+                        progressive=True
                     )
                 elif ext.lower() == 'png':
+                    # For PNG, preserve transparency if it existed in original
                     thumbnail.save(
                         thumb_file,
                         'PNG',
-                        optimize=True,  # Оптимизация файла
-                        quality=95  # Высокое качество
+                        optimize=True,
+                        quality=95
                     )
                 else:
                     thumbnail.save(thumb_file, format=original.format, quality=95)
@@ -324,7 +325,6 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
                 thumbnails[key] = thumbnail_name
 
             instance.__class__.objects.filter(pk=instance.pk).update(**{thumbnails_field_name: thumbnails})
-
 
 # @receiver(post_save)
 # def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
@@ -370,4 +370,3 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
 #
 #
 #             instance.__class__.objects.filter(pk=instance.pk).update(**{thumbnails_field_name: thumbnails})
-
