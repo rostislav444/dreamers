@@ -20,7 +20,7 @@ export const ProductMaterials = ({parts, selectedMaterials, setSelectedMaterials
 
     // Filter parts with multiple material groups and materials at initialization
     const validParts = parts.filter(part =>
-        part.material_groups.length > 1 &&
+        part.material_groups.length >= 1 &&
         part.material_groups.some(group => group.materials.length > 1)
     );
 
