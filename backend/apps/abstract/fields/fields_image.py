@@ -3,7 +3,7 @@ import random
 import string
 from io import BytesIO
 
-from PIL import Image
+from PIL import Image, ImageEnhance
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -257,18 +257,64 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
             storage = image_field.storage
 
             # Open the image using PIL
-            image = Image.open(image_field)
+            original = Image.open(image_field)
+
+            # Convert to RGBA if possible for better edge handling
+            if original.mode in ('RGBA', 'RGB'):
+                image = original.convert('RGBA')
+            else:
+                image = original.convert('RGB')
+
             thumbnails = {}
 
             for key, value in sizes:
                 thumbnail_name = f'{name}_{key}.{ext}'
 
-                thumbnail = image.copy()
-                thumbnail.thumbnail((value, value))
+                # Calculate the proportional height to maintain aspect ratio
+                width = value
+                aspect_ratio = float(image.size[0]) / float(image.size[1])
+                height = int(width / aspect_ratio)
+
+                # Use high-quality downsampling
+                thumbnail = image.resize(
+                    (width, height),
+                    resample=Image.Resampling.LANCZOS,  # Использует алгоритм Ланцоша для лучшего качества
+                )
+
+                # Apply subtle sharpening to preserve edges
+                enhancer = ImageEnhance.Sharpness(thumbnail)
+                thumbnail = enhancer.enhance(1.1)  # Значение 1.1 даёт лёгкую резкость без артефактов
+
+                # If original was RGBA, handle transparency properly
+                if original.mode == 'RGBA':
+                    # Create white background
+                    background = Image.new('RGB', thumbnail.size, (255, 255, 255))
+                    # Paste using alpha channel as mask
+                    background.paste(thumbnail, mask=thumbnail.split()[3])
+                    thumbnail = background
 
                 # Create a File object from the in-memory image
                 thumb_file = BytesIO()
-                thumbnail.save(thumb_file, format=image.format, quality=100)
+
+                # Save with optimal quality settings
+                if ext.lower() in ('jpg', 'jpeg'):
+                    thumbnail.save(
+                        thumb_file,
+                        'JPEG',
+                        quality=95,  # Высокое качество для JPEG
+                        optimize=True,  # Оптимизация файла
+                        progressive=True  # Прогрессивная загрузка
+                    )
+                elif ext.lower() == 'png':
+                    thumbnail.save(
+                        thumb_file,
+                        'PNG',
+                        optimize=True,  # Оптимизация файла
+                        quality=95  # Высокое качество
+                    )
+                else:
+                    thumbnail.save(thumb_file, format=original.format, quality=95)
+
                 thumb_file.seek(0)
 
                 # Save the thumbnail using storage
@@ -276,6 +322,51 @@ def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
 
                 thumbnails[key] = thumbnail_name
 
-
             instance.__class__.objects.filter(pk=instance.pk).update(**{thumbnails_field_name: thumbnails})
+
+
+# @receiver(post_save)
+# def generate_thumbnails_post_save(sender, instance, *args, **kwargs):
+#     for field in instance._meta.fields:
+#         if isinstance(field, DeletableImageField) and hasattr(instance, field.name + '_thumbnails'):
+#             if hasattr(instance, 'local') and instance.local:
+#                 return
+#
+#             image_field = getattr(instance, field.name)
+#
+#             # Check if the image field is empty
+#             if not image_field:
+#                 continue
+#
+#             sizes = (
+#                 ('s', 120),
+#                 ('m', 520),
+#             )
+#
+#             thumbnails_field_name = field.name + '_thumbnails'
+#             name, ext = image_field.name.split('.')
+#             storage = image_field.storage
+#
+#             # Open the image using PIL
+#             image = Image.open(image_field)
+#             thumbnails = {}
+#
+#             for key, value in sizes:
+#                 thumbnail_name = f'{name}_{key}.{ext}'
+#
+#                 thumbnail = image.copy()
+#                 thumbnail.thumbnail((value, value))
+#
+#                 # Create a File object from the in-memory image
+#                 thumb_file = BytesIO()
+#                 thumbnail.save(thumb_file, format=image.format, quality=100)
+#                 thumb_file.seek(0)
+#
+#                 # Save the thumbnail using storage
+#                 storage.save(thumbnail_name, File(thumb_file))
+#
+#                 thumbnails[key] = thumbnail_name
+#
+#
+#             instance.__class__.objects.filter(pk=instance.pk).update(**{thumbnails_field_name: thumbnails})
 

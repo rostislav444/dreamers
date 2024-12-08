@@ -51,7 +51,8 @@ const LazyImage = ({lowResSrc, highResSrc, alt}: { lowResSrc: string, highResSrc
             style={{
                 transition: 'all 0.5s',
                 opacity: isLoaded ? 1 : 0.2,
-                filter: isLoaded ? 'blur(0)' : 'blur(10px)'
+                filter: isLoaded ? 'blur(0)' : 'blur(10px)',
+                imageRendering: 'pixelated',
             }}
         />
     );
@@ -151,7 +152,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                     cursor='pointer'
                 >
                     <CameraImagesWrapper onContextMenu={handleContextMenuOpen} key={key}>
-                        {camera.reverse().map((image, imageKey) => {
+                        {camera.map((image, imageKey) => {
                             return <CameraImage className={'camera-image'} key={imageKey}
                                                 src={MEDIA_URL + image.thumbnails?.m}/>
                         })}

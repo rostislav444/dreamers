@@ -18,21 +18,29 @@ interface filterMaterialsResponse {
     bestFitIndex: number
 }
 
+
+// Function signature
 const getSkusMaterials = (skus: SkuInterface[], selectedMaterials: Record<string, number>): SkuMaterialsResponse => {
+    // Extract keys from the selectedMaterials object
     const selectedMaterialKeys = Object.keys(selectedMaterials);
 
+    // Use the reduce function to iterate over the skus array and accumulate the result
     return skus.reduce((result, sku) => {
+        // Check if the SKU has all selected materials matching their respective values
         const hasSelectedMaterials = selectedMaterialKeys.every((key) => sku.materials[key] === selectedMaterials[key]);
 
+        // If all selected materials match, include the SKU materials in the result
         if (hasSelectedMaterials) {
             Object.entries(sku.materials).forEach(([key, materialId]) => {
                 result[key] = Array.from(new Set([...(result[key] || []), materialId]));
             });
         }
 
+        // Return the updated result for the next iteration
         return result;
     }, {} as SkuMaterialsResponse);
 };
+
 
 const getBestFitSku = (selectedMaterials: any, skus: any) => {
     let indexes: number[] = Array(skus.length).fill(0);
@@ -50,8 +58,10 @@ const getBestFitSku = (selectedMaterials: any, skus: any) => {
     return maxIndex;
 };
 
+
 const filterMaterials = ({parts, skus, selectedMaterials = {}}: FilterMaterialsProps): filterMaterialsResponse => {
     const skuMaterials = getSkusMaterials(skus, selectedMaterials);
+
 
     const newFilteredParts = parts.map((part) => {
         const filteredMaterials = part.materials.filter((material) => skuMaterials[part.id].includes(material.id));
@@ -64,10 +74,7 @@ const filterMaterials = ({parts, skus, selectedMaterials = {}}: FilterMaterialsP
 };
 
 export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMaterialProps) => {
-    // Filter out parts without materials at initialization
-    const validParts = product.parts.filter(part => part.materials.length >= 1 && part.materials.length > 1);
-    const productParts = useRef(validParts);
-
+    const productParts = useRef(product.parts);
     const [selectedMaterials, setSelectedMaterials] = useState<Record<string, number>>({});
     const [filteredParts, setFilteredParts] = useState<PartInterface[]>([]);
 
@@ -76,6 +83,7 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
             {parts: productParts.current, skus: product.sku, selectedMaterials});
         setFilteredParts(newFilteredParts);
         setSelectedSku(bestFitIndex)
+
     }, [selectedMaterials, product.sku, setSelectedSku]);
 
     const handleSelectMaterial = (partId: number, materialId: number) => {
@@ -90,37 +98,31 @@ export const ProductCardMaterial = ({product, setSelectedSku}: ProductCardMateri
         setSelectedMaterials(newSelectedMaterials);
     };
 
-    if (validParts.length === 0) {
-        return null;
-    }
-
     return (
         <Box mb={2}>
-            {validParts.map((part) => (
-                part.materials.length > 0 && (
-                    <Box key={part.id}>
-                        <Text as="span" mt={2}>
-                            {part.name}
-                        </Text>
-                        <Grid mt={2} gridTemplateColumns={"repeat(auto-fill, 40px)"}
-                              gridTemplateRows={"repeat(auto-fill, 40px)"} gap={1}>
-                            {part.materials.map((material) => (
-                                <Flex
-                                    key={material.id}
-                                    justifyContent="center"
-                                    alignItems="center"
-                                    onClick={() => handleSelectMaterial(part.id, material.id)}
-                                    borderWidth={2}
-                                    borderColor={selectedMaterials[part.id] === material.id ? "brown" : "transparent"}
-                                >
-                                    {material.color && <Box w={8} h={8} backgroundColor={material.color.hex}/>}
-                                    {material.material &&
-                                        <Box w={8} h={8} backgroundSize="cover" backgroundImage={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}/>}
-                                </Flex>
-                            ))}
-                        </Grid>
-                    </Box>
-                )
+            {product.parts.map((part) => (
+                <Box key={part.id}>
+                    <Text as="span" mt={2}>
+                        {part.name}
+                    </Text>
+                    <Grid mt={2} gridTemplateColumns={"repeat(auto-fill, 40px)"}
+                          gridTemplateRows={"repeat(auto-fill, 40px)"} gap={1}>
+                        {part.materials.map((material) => (
+                            <Flex
+                                key={material.id}
+                                justifyContent="center"
+                                alignItems="center"
+                                onClick={() => handleSelectMaterial(part.id, material.id)}
+                                borderWidth={2}
+                                borderColor={selectedMaterials[part.id] === material.id ? "brown" : "transparent"}
+                            >
+                                {material.color && <Box w={8} h={8} backgroundColor={material.color.hex}/>}
+                                {material.material &&
+                                    <Box w={8} h={8} backgroundSize="cover" backgroundImage={MEDIA_LOCAL ? BASE_URL + material.material.image : material.material.image}/>}
+                            </Flex>
+                        ))}
+                    </Grid>
+                </Box>
             ))}
         </Box>
     );
