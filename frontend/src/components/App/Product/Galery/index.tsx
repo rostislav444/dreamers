@@ -116,7 +116,7 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
 
     return <Box w='100%'>
         <MainImageWrapper>
-            {images.map((image: string, imageKey: number) =>
+            {images.reverse().map((image: string, imageKey: number) =>
                 <LazyImage
                     key={imageKey}
                     lowResSrc={imagesAlt[imageKey] as string}
@@ -151,9 +151,9 @@ export const ProductGallery = ({mobile, product, selectedMaterials}: ProductGall
                     cursor='pointer'
                 >
                     <CameraImagesWrapper onContextMenu={handleContextMenuOpen} key={key}>
-                        {camera.map((image, imageKey) => {
+                        {camera.reverse().map((image, imageKey) => {
                             return <CameraImage className={'camera-image'} key={imageKey}
-                                                src={MEDIA_URL + image.thumbnails?.s}/>
+                                                src={MEDIA_URL + image.thumbnails?.m}/>
                         })}
                     </CameraImagesWrapper>
                 </GridItem>
