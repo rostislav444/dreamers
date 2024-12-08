@@ -19,7 +19,7 @@ export const CameraImagesWrapper = styled.div`
 
 
 export const CameraImage = styled.img`
-    image-rendering: pixelated;
+    image-rendering: crisp-edges;
     position: absolute;
     display: block;
     width: 100%;
