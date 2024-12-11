@@ -37,12 +37,11 @@ export const GalleryArrowWrapper = styled.div<{ left: boolean }>`
     top: 50%;
     right: ${props => props.left ? 'auto' : '0'};
     cursor: pointer;
-    z-index: 2;
-    background-color: rgba(255, 255, 255, 0.5);
     padding: 4px;
     width: 48px;
     height: 48px;
     transition: background-color 0.3s;
+    z-index: 1000;
 
     &:hover {
         background-color: rgba(255, 255, 255, 0.7);

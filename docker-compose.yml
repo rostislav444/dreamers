@@ -14,7 +14,7 @@ services:
       - ./backend/.env
     depends_on:
       - db
-      - rabbitmq
+      - redis
 
   db:
     image: postgres:13-alpine
@@ -27,14 +27,12 @@ services:
     env_file:
       - ./backend/.env
 
-  rabbitmq:
-    image: rabbitmq:3-management
+  redis:
+    image: redis:6-alpine
     ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=password
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   celery:
     build:
@@ -47,10 +45,10 @@ services:
       - ./backend/.env
     depends_on:
       - db
-      - rabbitmq
-
+      - redis
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  redis_data:

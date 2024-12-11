@@ -176,8 +176,8 @@ AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
 FILE_STORAGE = S3Storage if PRODUCTION else default_storage
 # Celery Configuration Options
-CELERY_BROKER_URL = 'amqp://user:password@rabbitmq:5672//'
-# CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 СELERY_QUEUES = {
     'default': {
@@ -204,9 +204,12 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 # django setting.
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'my_cache_table',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
