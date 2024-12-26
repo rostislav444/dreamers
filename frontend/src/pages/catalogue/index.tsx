@@ -47,7 +47,7 @@ export const getStaticProps = (async (context) => {
     if (productsResp.ok) {
         return {
             props: {
-                products: productsResp.data,
+                products: productsResp.data.results,
                 categories: categoriesResp.ok ? categoriesResp.data.results : []
             },
             revalidate: 60 * 5,
