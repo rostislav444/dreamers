@@ -7,7 +7,8 @@ import Link from "next/link";
 import dynamic from 'next/dynamic'
 import {Logo} from "@/components/Shared/Header/Logo";
 
-const DynamicCartCounter = dynamic(() =>
+const DynamicCartCounter = dynamic(
+    () =>
         import('@/components/Shared/Header/Cart').then((module) => module.CartCounter),
     {
         ssr: false,
@@ -27,13 +28,14 @@ export const Header = () => {
                 alignItems='center'
                 gap='6'
                 templateColumns="auto 32px"
-                p={mobile ? "0 16px 0 8px" : "0 24px"}
+                px={{base: 4, sm: 6, md: 8, lg: 12}}
+
                 m='0 auto'
             >
                 <Flex alignItems="center" justifyContent="flex-start">
                     <Burger mobile={mobile} isOpen={burgerOpen} setOpen={setBurgerOpen}/>
                     <Link href={'/'}>
-                        <Logo mobile={mobile} />
+                        <Logo mobile={mobile}/>
                     </Link>
                 </Flex>
                 {/*<Search/>*/}

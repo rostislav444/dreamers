@@ -56,8 +56,6 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
         const randomIndex = getRandomInt(length)
         initialMaterials[part.id] = part.material_groups[0].materials[randomIndex]?.id;
     });
-    console.log('material_parts', material_parts)
-    console.log('initialMaterials', initialMaterials)
     return initialMaterials;
 }
 

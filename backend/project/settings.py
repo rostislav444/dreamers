@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Apps
     'apps.abstract.apps.AbstractConfig',
     'apps.product.apps.ProductConfig',
     'apps.order.apps.OrderConfig',
@@ -54,13 +55,15 @@ INSTALLED_APPS = [
     'apps.core.apps.CoreConfig',
     'apps.interior.apps.InteriorConfig',
     'apps.material.apps.MaterialConfig',
-    'rest_framework',
-
+    # Third party
     'mptt',
     'corsheaders',
     'colorfield',
     'django_admin_inline_paginator',
     'django_celery_results',
+    'rest_framework',
+    'django_filters',
+
 ]
 
 MIDDLEWARE = [
@@ -141,8 +144,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 24
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -200,7 +206,6 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 60 * 60 * 30
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
-
 
 # django setting.
 CACHES = {

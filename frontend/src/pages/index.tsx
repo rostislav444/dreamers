@@ -1,31 +1,21 @@
 import Layout from '@/components/Shared/Layout'
-import {Box, Grid, GridItem, useMediaQuery} from "@chakra-ui/react";
 import fetchApi from "@/utils/fetch";
 import type {GetStaticProps} from "next";
-import Link from "next/link";
+import ResponsiveHero from "@/components/App/Home/ResponsiveHeroSection";
+import {ProductInterface} from "@/interfaces/Product";
+import {CategoryState} from "@/interfaces/Categories";
 
 
 interface Props {
-    categories: any
+    categories: CategoryState[]
+    products: ProductInterface[]
 }
 
 
-export default function Home({categories}: Props) {
-    const [mobile] = useMediaQuery('(max-width: 960px)')
-
+export default function Home({categories, products}: Props) {
     return (
         <Layout breadcrumbs={[]} description='description' title='Меблі, що надихаюь'>
-            <Grid gridTemplateColumns='repeat(auto-fill, minmax(200px, 1fr))' gap={4} mt={mobile ? 4 : 0}>
-                {categories.map((category: any) => (
-                    <GridItem key={category.id} colSpan={mobile ? 1 : 2}>
-                        <Link href='/catalogue/[slug]' as={`/catalogue/${category.slug}`}>
-                            <Box bg='brown.100' p={4} _hover={{bg: 'brown.500', color: 'yellow.200'}}>
-                                <h3>{category.name}</h3>
-                            </Box>
-                        </Link>
-                    </GridItem>
-                ))}
-            </Grid>
+            <ResponsiveHero categories={categories} products={products} />
         </Layout>
     )
 }
@@ -33,12 +23,13 @@ export default function Home({categories}: Props) {
 
 export const getStaticProps = (async (context) => {
     const api = fetchApi()
-    const categoriesResp = await api.get('category');
-
+    const categoriesResp = await api.get('category', {}, true);
+    const productsResp = await api.get('catalogue/products/', {limit: 4}, true);
 
     return {
         props: {
-            categories: categoriesResp.ok ? categoriesResp.data : []
+            categories: categoriesResp.ok ? categoriesResp.data.results : [],
+            products: productsResp.ok ? productsResp.data.results : []
         },
         revalidate: 60 * 5,
     }

@@ -5,11 +5,12 @@ from apps.category.models import Category
 
 class NestedCategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
+    image = serializers.JSONField(source='get_image', read_only=True)
 
     class Meta:
         model = Category
         fields = [
-            'id', 'name', 'slug', 'children'
+            'id', 'name', 'slug', 'children', 'image',
         ]
 
     def get_children(self, instance):

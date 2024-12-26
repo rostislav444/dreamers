@@ -14,11 +14,9 @@ interface ImageInterface {
 }
 
 interface Props {
-    images: ImageInterface[]
+    images: ImageInterface[],
 }
 
-// https://eu-north-1.console.aws.amazon.com/s3/buckets/dreamers/komod-1_w1200_h1750_d400/product/productpartscenematerialimage/25553/image-jseprw_m.png
-// https://dreamers.s3.eu-north-1.amazonaws.com/komod-2_w1200_h1350_d400/product/productpartscenematerialimage/26783/image-aspzid.png
 
 
 export const CatalogueProductImages = ({images}: Props) => {

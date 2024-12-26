@@ -21,7 +21,7 @@ class ProductClass(NameSlug):
     collection = models.ForeignKey(Collection, null=True, blank=True, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(default='', blank=True, null=True)
     materials_set = models.ForeignKey(MaterialsSet, on_delete=models.PROTECT, null=True, blank=True)
-    interior = models.ForeignKey(Interior,  on_delete=models.PROTECT, null=True, blank=True)
+    interior = models.ForeignKey(Interior, on_delete=models.PROTECT, null=True, blank=True)
     images_by_sku = models.BooleanField(default=False)
     number_in_collection = models.PositiveIntegerField(default=0)
 
@@ -46,10 +46,13 @@ class ProductClass(NameSlug):
     generate_sku_from_options = models.BooleanField(default=False, verbose_name='Сгенерировать Sku и сочетания цветов')
     generate_variants_from_sizes = models.BooleanField(default=False, verbose_name='Сгенерировать варианты из размеров')
 
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = '1. Товары'
-        ordering = ['name']
+        ordering = ['-created_at', 'name']
 
     def __str__(self):
         return self.name

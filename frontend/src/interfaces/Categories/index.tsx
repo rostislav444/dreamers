@@ -1,8 +1,8 @@
 export interface CategoryState {
-  id: number;
-  name: string;
-  slug: string;
-  image?: string,
+    id: number;
+    name: string;
+    slug: string;
+    image: string[]
 }
 
 export interface RecursiveCategoryInterface {
@@ -10,8 +10,9 @@ export interface RecursiveCategoryInterface {
     name: string;
     slug: string;
     children: RecursiveCategoryInterface[] | null;
+    image: string[]
 }
 
 export interface CategoryListProps {
-  categories: CategoryState[];
+    categories: CategoryState[];
 }

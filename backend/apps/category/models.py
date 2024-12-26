@@ -12,7 +12,6 @@ class Category(MPTTModel, NameSlug):
 
     def __str__(self):
         names = [c.name for c in self.get_ancestors(include_self=True)]
-
         return ' > '.join(names)
 
     class Meta:
@@ -21,6 +20,15 @@ class Category(MPTTModel, NameSlug):
 
     class MPTTMeta:
         order_insertion_by = ['name']
+
+    @property
+    def get_image(self):
+        product_class = self.products.filter(products__isnull=False).first()
+        if product_class:
+            product = product_class.products.first()
+            if product:
+                return product.get_parts_images
+
 
 
 class Properties(NameSlug):
