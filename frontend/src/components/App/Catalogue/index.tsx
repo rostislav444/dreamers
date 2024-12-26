@@ -5,17 +5,15 @@ import {PaginatedData} from "@/utils/fetch";
 
 
 interface ProductsListInterface {
-    products: PaginatedData<ProductInterface>
+    products: ProductInterface[]
 }
 
 
 export const ProductsList = ({products}: ProductsListInterface) => {
-    const {results} = products
-
     return <Box mt={8}>
         <Grid templateColumns='repeat(auto-fill, minmax(340px, 1fr))' gap={4}>
             {
-                results.map((product, key) =>
+                products.map((product, key) =>
                     <ProductCard key={product.id} product={product}/>
                 )
             }

@@ -12,8 +12,6 @@ interface CatalogueProps {
 
 
 export default function CatalogueCategory({products, categories = []}: CatalogueProps) {
-    console.log('categories', categories)
-
     const breadcrumbs = [
         {title: 'Каталог', link: '/catalogue'},
         ...categories.map(category => ({title: category.name}))
