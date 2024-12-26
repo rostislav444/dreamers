@@ -12,6 +12,8 @@ interface CatalogueProps {
 
 
 export default function CatalogueCategory({products, categories = []}: CatalogueProps) {
+    console.log('categories', categories)
+
     const breadcrumbs = [
         {title: 'Каталог', link: '/catalogue'},
         ...categories.map(category => ({title: category.name}))
@@ -36,14 +38,14 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
     const api = fetchApi();
     const {categories} = params as { categories: string[] };
 
-    const categoryResp = await api.get('category/?categories=' + categories.join(','));
-    const productsResp = await api.get('catalogue/products/?categories=' + categories.join(','));
+    const categoryResp = await api.get('category/?categories=' + categories.join(','), {}, true);
+    const productsResp = await api.get('catalogue/products/?categories=' + categories.join(','), {}, true);
 
     if (productsResp.ok) {
         return {
             props: {
-                products: productsResp.data,
-                categories: categoryResp.ok ? categoryResp.data : []
+                products: productsResp.data.results,
+                categories: categoryResp.ok ? categoryResp.data.results : []
             },
             revalidate: 60 * 5,
         };
@@ -53,26 +55,27 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
 };
 
 
-const getFlatCategories = (categories: RecursiveCategoryInterface[], parentPath = '/catalogue'): string[] => {
-    return categories.reduce<string[]>((flatCategories, category) => {
-        const path = `${parentPath}/${category.slug}`;
-        flatCategories.push(path);
-
-        if (category.children && category.children.length > 0) {
-            flatCategories.push(...getFlatCategories(category.children, path));
-        }
-
-        return flatCategories
-    }, []);
-};
-
 export const getStaticPaths = async () => {
+    const getFlatCategories = (categories: RecursiveCategoryInterface[], parentPath = '/catalogue'): string[] => {
+        return categories.reduce<string[]>((flatCategories, category) => {
+            const path = `${parentPath}/${category.slug}`;
+            flatCategories.push(path);
+
+            if (category.children && category.children.length > 0) {
+                flatCategories.push(...getFlatCategories(category.children, path));
+            }
+
+            return flatCategories
+        }, []);
+    };
+
     try {
         const api = fetchApi();
-        const response = await api.get('category');
+        const response = await api.get('category', {}, true);
+
 
         if (response.ok) {
-            const paths = getFlatCategories(response.data);
+            const paths = getFlatCategories(response.data.results);
 
             return {
                 paths,

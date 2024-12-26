@@ -24,6 +24,7 @@ export default function Catalogue({products, categories}: CatalogueProps) {
         {title: 'Каталог'},
     ]
 
+
     if (!products) {
         return <Layout breadcrumbs={breadcrumbs} description={'description'} title={'Каталог'}>
             <h1>Нет товаров</h1>
@@ -40,14 +41,14 @@ export default function Catalogue({products, categories}: CatalogueProps) {
 
 export const getStaticProps = (async (context) => {
     const api = fetchApi()
-    const productsResp = await api.get('catalogue/products/')
-    const categoriesResp = await api.get('category');
+    const productsResp = await api.get('catalogue/products/', {}, true);
+    const categoriesResp = await api.get('category', {}, true);
 
     if (productsResp.ok) {
         return {
             props: {
                 products: productsResp.data,
-                categories: categoriesResp.ok ? categoriesResp.data : []
+                categories: categoriesResp.ok ? categoriesResp.data.results : []
             },
             revalidate: 60 * 5,
         }
