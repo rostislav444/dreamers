@@ -5,7 +5,7 @@ import {PaginatedData} from "@/utils/fetch";
 
 
 interface CategoriesListProps {
-    categories: PaginatedData<RecursiveCategoryInterface>
+    categories: RecursiveCategoryInterface[]
 }
 
 export const CategoriesList = ({categories}: CategoriesListProps) => {
