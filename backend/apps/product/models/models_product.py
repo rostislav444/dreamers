@@ -1,48 +1,55 @@
-import itertools
 import random
 import string
-
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 from apps.abstract.fields import DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.attribute.models import AttributeGroup
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 from .models_3d import Camera
-from .models_productclass import ProductClass, ProductClassProductAttributes, ProductClassOptionGroup
+from .models_productclass import (
+    ProductClass,
+    ProductClassOptionGroup,
+    ProductClassProductAttributes,
+)
 
 
 class Product(models.Model):
-    product_class = models.ForeignKey(ProductClass, on_delete=models.CASCADE, related_name='products')
-    code = models.CharField(_('Code'), blank=True, null=True, max_length=255)
-    price = models.PositiveIntegerField(_('Price'), blank=True, null=True)
-    stock = models.PositiveIntegerField(_('Stock'), blank=True, null=True)
+    product_class = models.ForeignKey(
+        ProductClass, on_delete=models.CASCADE, related_name="products"
+    )
+    code = models.CharField(_("Code"), blank=True, null=True, max_length=255)
+    price = models.PositiveIntegerField(_("Price"), blank=True, null=True)
+    stock = models.PositiveIntegerField(_("Stock"), blank=True, null=True)
     render_variants = models.BooleanField(default=False)
 
-    generate_sku_from_materials = models.BooleanField(default=False, verbose_name='Сгенерировать SKU из материалов')
+    generate_sku_from_materials = models.BooleanField(
+        default=False, verbose_name="Сгенерировать SKU из материалов"
+    )
 
-    width = models.PositiveIntegerField(_('Width'), default=0, blank=True)
-    height = models.PositiveIntegerField(_('Height'), default=0, blank=True)
-    depth = models.PositiveIntegerField(_('Depth'), default=0, blank=True)
+    width = models.PositiveIntegerField(_("Width"), default=0, blank=True)
+    height = models.PositiveIntegerField(_("Height"), default=0, blank=True)
+    depth = models.PositiveIntegerField(_("Depth"), default=0, blank=True)
 
     remove_images = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'Вариант'
-        verbose_name_plural = '2. Варианты'
-        ordering = ['product_class', 'width', 'height', 'depth']
+        verbose_name = "Вариант"
+        verbose_name_plural = "2. Варианты"
+        ordering = ["product_class", "width", "height", "depth"]
 
     def __str__(self):
         return self.product_class.name
 
     @property
     def get_image(self):
-        sku = self.sku.filter(images__isnull=False).first()
+        sku = self.skus.filter(images__isnull=False).first()
         return sku.images.filter(index=0).first().image.url if sku else None
 
     @property
     def get_sku_images(self):
-        sku = self.sku.filter(images__isnull=False).first()
+        sku = self.skus.filter(images__isnull=False).first()
         return [obj.image.url for obj in sku.images.all()] if sku else None
 
     @property
@@ -59,41 +66,33 @@ class Product(models.Model):
             if camera:
                 for part in camera.parts.all():
                     material = part.materials.first()
-                    if hasattr(material, 'image'):
+                    if hasattr(material, "image"):
                         links.append(material.image.image.name)
         return links
 
     @property
     def get_name(self):
-        return '-'.join([self.product_class.name, self.code])
+        return "-".join([self.product_class.name, self.code])
 
     @property
     def get_price_multiplier_attribute_groups(self):
         return self.product_class.option_groups.filter(
-            attribute_group__price_required=AttributeGroup.PRICE_RQ_MULTIPLIER)
+            attribute_group__price_required=AttributeGroup.PRICE_RQ_MULTIPLIER
+        )
 
     @property
     def get_price_sub_group_multiplier_attribute_groups(self):
         return self.product_class.option_groups.filter(
-            attribute_group__price_required=AttributeGroup.PRICE_RQ_SUB_GROUP_MULTIPLIER)
-
-
-
-class ProductCustomizedPart(models.Model):
-    custom_name = models.CharField(max_length=255, blank=True, null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='customized_parts')
-    part = models.ForeignKey('material.ProductPart', on_delete=models.PROTECT)
-    area = models.DecimalField(default=1, decimal_places=1, max_digits=10)
-    price = models.DecimalField(default=0, decimal_places=1, max_digits=10)
-
-    def __str__(self):
-        return str(self.part)
+            attribute_group__price_required=AttributeGroup.PRICE_RQ_SUB_GROUP_MULTIPLIER
+        )
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='product/')
-    image_thumb = models.ImageField(upload_to='product/', null=True, blank=True)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="images"
+    )
+    image = models.ImageField(upload_to="product/")
+    image_thumb = models.ImageField(upload_to="product/", null=True, blank=True)
 
 
 class ProductProperty(NameSlug):
@@ -101,23 +100,34 @@ class ProductProperty(NameSlug):
     value = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name + ' - ' + self.value
+        return self.name + " - " + self.value
 
 
 class ProductOptionPriceMultiplier(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='multipliers')
-    option_group = models.ForeignKey(ProductClassOptionGroup, on_delete=models.CASCADE, related_name='multiplier')
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="multipliers"
+    )
+    option_group = models.ForeignKey(
+        ProductClassOptionGroup, on_delete=models.CASCADE, related_name="multiplier"
+    )
     value = models.PositiveIntegerField(default=0)
 
 
 class ProductAttribute(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
-    attribute = models.ForeignKey(ProductClassProductAttributes, on_delete=models.CASCADE,
-                                  related_name='product_attributes', null=True, blank=True)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="attributes"
+    )
+    attribute = models.ForeignKey(
+        ProductClassProductAttributes,
+        on_delete=models.CASCADE,
+        related_name="product_attributes",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        unique_together = (('product', 'attribute'),)
-        ordering = ('attribute__attribute_group',)
+        unique_together = (("product", "attribute"),)
+        ordering = ("attribute__attribute_group",)
 
     @property
     def get_name(self):
@@ -127,29 +137,40 @@ class ProductAttribute(models.Model):
 
 
 class Sku(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sku')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="skus")
     code = models.CharField(max_length=1024, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
-    materials = models.ManyToManyField('material.ProductPartMaterials', related_name='sku_materials')
+    materials = models.ManyToManyField(
+        "material.ProductPartMaterials", related_name="sku_materials"
+    )
     generate_images = models.BooleanField(default=True)
 
 
 class SkuImages(models.Model):
-    sku = models.ForeignKey(Sku, max_length=1024, on_delete=models.CASCADE, related_name='images')
-    camera = models.ForeignKey(Camera, on_delete=models.CASCADE, related_name='sku_images', null=True, blank=True)
+    sku = models.ForeignKey(
+        Sku, max_length=1024, on_delete=models.CASCADE, related_name="images"
+    )
+    camera = models.ForeignKey(
+        Camera,
+        on_delete=models.CASCADE,
+        related_name="sku_images",
+        null=True,
+        blank=True,
+    )
     image = DeletableImageField(null=True, blank=True)
     image_thumbnails = models.JSONField(default=dict, blank=True)
     index = models.PositiveIntegerField(default=0)
     local = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ('index',)
+        ordering = ("index",)
 
     @property
     def name(self):
-        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        return self.get_name()
 
     def get_name(self):
         sku = self.sku.get_name
-        sha = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        return '-'.join([sku, sha])
+        sha = "".join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        return "-".join([sku, sha])
+    

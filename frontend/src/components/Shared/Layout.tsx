@@ -37,7 +37,7 @@ export default function Layout({children, title, description, breadcrumbs}: Layo
                 <Box
                     as='main'
                     w='calc(100% - 24px)'
-                    minH='calc(100vh - 196px)'
+                    minH='calc(100vh - 700px)'
                     px={{base: 4, sm: 6, md: 8, lg: 12}}
                     py={{base: 6, sm: 8, md: 10}}
                     m={'0 12px'}

@@ -1,3 +1,4 @@
+from .serializers_custom_part import *
 from .serializers_product import *
 from .serializers_product_class import *
 from .serializers_render import *

@@ -1,4 +1,4 @@
-import {Box, Table, TableContainer, Tbody, Td, Tr} from '@chakra-ui/react'
+import {Box, Table, TableContainer, Tbody, Td, Tr, Text} from '@chakra-ui/react'
 import {ProductInterface} from "@/interfaces/Product";
 import {InfoHeading} from "@/components/Shared/Typogrphy";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
@@ -9,16 +9,14 @@ interface ProductCharacteristicsProps {
 }
 
 
-const TdStyledLeft = ({children}: { children: any }) => <Td w={52} px={0} pb={3} borderBottom="none">{children}</Td>
+const TdStyledLeft = ({children}: { children: any }) => <Td w={24} px={0} pb={3} borderBottom="none">{children}</Td>
 const TdStyled = ({children}: { children: any }) => <Td px={0} pb={3} borderBottom="none">{children}</Td>
 
 export const ProductCharacteristics = ({product, selectedMaterials}: ProductCharacteristicsProps) => {
     const selectedParts = product.material_parts.map((part, i) => {
         return {
             name: part.name,
-            material: part.material_groups.flatMap(group => group.materials.find(
-                material => material.id == selectedMaterials[part.id]
-            ))[0]
+            material: selectedMaterials[part.blender_name].material_name
         }
     })
 
@@ -26,7 +24,7 @@ export const ProductCharacteristics = ({product, selectedMaterials}: ProductChar
         <InfoHeading>Характеристики</InfoHeading>
         <Box mt='4'>
             <TableContainer>
-                <Table size='sm'>
+                <Table size='sm' >
                     <Tbody>
                         <Tr>
                             <TdStyledLeft>Ширина</TdStyledLeft>
@@ -40,11 +38,14 @@ export const ProductCharacteristics = ({product, selectedMaterials}: ProductChar
                             <TdStyledLeft>Глибина</TdStyledLeft>
                             <TdStyled>{product.depth} см.</TdStyled>
                         </Tr>
-                        {...selectedParts.map((mat, key) => <Tr key={key}>
-                            <TdStyledLeft>{mat.name}</TdStyledLeft>
-                            {mat.material && <TdStyled>{mat.material?.color?.name}</TdStyled>}
-
-                        </Tr>)}
+                        {...selectedParts.map((mat, key) =>
+                            <Tr key={key}>
+                                <Td w={24} px={0} pb={3} borderBottom="none" verticalAlign="top">{mat.name}</Td>
+                                {mat.material && <Td px={0} pb={3} borderBottom="none" verticalAlign="top">
+                                    <Text whiteSpace='break-spaces' color='green'>{mat.material}</Text>
+                                </Td>}
+                            </Tr>
+                        )}
                     </Tbody>
                 </Table>
             </TableContainer>

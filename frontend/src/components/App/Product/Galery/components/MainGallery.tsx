@@ -39,10 +39,12 @@ const MainGallery = ({
                             alt='img'
                         />
                     ) : (
-                    <img
+                    <Image
                         key={`${currentImage}-${imageKey}`}
                         src={image}
                         alt='img'
+                        width={1000}
+                        height={1000}
                         style={{
                             position: 'absolute',
                             width: '100%',

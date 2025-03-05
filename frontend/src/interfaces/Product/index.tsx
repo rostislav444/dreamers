@@ -62,6 +62,14 @@ export interface ProductInterface {
     model_3d: Model3dInterface[]
     material_parts: ProductPart[]
     camera: CameraInterface,
-
+    customized_parts: {
+        [key: string]: {
+            material_groups: {
+                [key: string]: {
+                    price: number
+                }
+            }
+        }
+    }
 }
 

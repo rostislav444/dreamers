@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.core.cache import cache
 from rest_framework import viewsets, mixins, generics
-from django.conf import settings
 from rest_framework.response import Response
 
 from apps.product.models import Product
@@ -23,6 +22,8 @@ class ProductViewSet(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retr
         return f'product_detail_{code}'
 
     def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
         cache_key = self.get_list_cache_key()
         result = cache.get(cache_key)
 
@@ -34,6 +35,8 @@ class ProductViewSet(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retr
         return Response(result)
 
     def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
         code = kwargs.get(self.lookup_field)
         cache_key = self.get_detail_cache_key(code)
         result = cache.get(cache_key)

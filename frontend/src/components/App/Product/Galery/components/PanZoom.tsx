@@ -76,13 +76,13 @@ const ProductGalleryModal = ({
             window.addEventListener('resize', updateScale);
             return () => window.removeEventListener('resize', updateScale);
         }
-    }, [isOpen]);
+    }, [isOpen, updateScale]);
 
     useEffect(() => {
         if (isOpen) {
             updateScale();
         }
-    }, [currentImageIndex]);
+    }, [currentImageIndex, isOpen, updateScale]);
 
     const handleReset = () => {
         updateScale();

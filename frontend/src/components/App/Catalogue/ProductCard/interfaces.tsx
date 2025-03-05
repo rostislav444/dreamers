@@ -1,14 +1,14 @@
 export interface PartMaterial {
   id: number;
-  color?: {
-    id: number;
-    name: string;
-    hex: string;
-  };
   material?: {
     id: number,
     name: string;
     image: string;
+    color?: {
+      id: number;
+      name: string;
+      hex: string;
+    };
   }
 }
 

@@ -11,32 +11,32 @@ interface ButButtonProps {
     selectedMaterials: SelectedMaterialsInterface
 }
 
-export const ButButton = ({product, selectedMaterials}: ButButtonProps) => {
-    const router = useRouter();
+export const BuyButton = ({product, selectedMaterials}: ButButtonProps) => {
     const {addItem} = useCart()
-
+    const router = useRouter();
+    const partsSum = Object.entries(selectedMaterials).reduce((acc, [key, value]) => {
+        return acc + product.customized_parts[key].material_groups[value.group].price
+    }, product.price)
 
     const handleAddCartItem = () => {
         const currentPath = router.asPath
-
         const payload = {
             product: product.id,
             sku: 0,
             name: product.name,
             code: product.code,
-            price: product.price,
+            price: partsSum,
             qty: 1,
             images: getThumbnailM(product.model_3d[0].cameras[3].parts, selectedMaterials),
             materials: selectedMaterials,
             url: currentPath
         }
-
         addItem(payload)
         router.push('/order')
     }
 
     return <Box>
-        <Text color={'brown.500'} fontSize={24} mt={8}>{product.price} грн.</Text>
-        <Button w={'100%'} mt={8} p={6} onClick={handleAddCartItem}>Придбати</Button>
+        <Text color={'brown.500'} fontSize={24} mt={8}>{partsSum} грн.</Text>
+        <Button w={'100%'} mt={8} p={6} borderRadius='6px' onClick={handleAddCartItem}>Придбати</Button>
     </Box>
 }

@@ -1,4 +1,5 @@
 export interface CategoryState {
+    description?: string;
     id: number;
     name: string;
     slug: string;

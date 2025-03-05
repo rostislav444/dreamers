@@ -13,12 +13,15 @@ export const MaterialsSet = ({ material_parts, selectedMaterial, setSelectedMate
         setSelectedMaterial({ ...selectedMaterial, [partId]: materialId });
     };
 
+
+    console.log(material_parts)
+
     return (
         <Box>
             {material_parts.map((part, key) => {
                 // Проверяем, есть ли группы материалов с более чем одним материалом
-                const hasMultipleMaterials = part.material_groups.length >= 1 &&
-                    part.material_groups.some((group: any) => group.materials.length > 1);
+                const hasMultipleMaterials = part.material_groups.length >= 0 &&
+                    part.material_groups.some((group: any) => group.materials.length > 0);
 
                 // Рендерим часть только если есть выбор материалов
                 return hasMultipleMaterials ? (
@@ -38,17 +41,17 @@ export const MaterialsSet = ({ material_parts, selectedMaterial, setSelectedMate
                                         key={`${i}-${j}`}
                                         p='2px'
                                         borderWidth='2px'
-                                        borderColor={selectedMaterial[part.id] === material.id ? 'brown.500' : 'transparent'}
+                                        borderColor={selectedMaterial[part.blender_name] === material.id ? 'brown.500' : 'transparent'}
                                         onClick={() => handleSetMaterial(part.id, material.id)}
                                         cursor="pointer"
                                         _hover={{
                                             borderColor: 'orange.500'
                                         }}
                                     >
-                                        {material?.color && (
-                                            <Box w='26px' h='26px' bg={material.color.hex} />
+                                        {material.material.color && (
+                                            <Box w='26px' h='26px' bg={material.material.color.hex} />
                                         )}
-                                        {material?.material && (
+                                        {material.material.material && (
                                             <Img
                                                 w='26px'
                                                 h='26px'

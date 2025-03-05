@@ -7,6 +7,7 @@ export interface ColorMaterial {
 }
 
 export interface Material {
+  name: string;
   id: number;
   color: ColorMaterial;
   material: any;

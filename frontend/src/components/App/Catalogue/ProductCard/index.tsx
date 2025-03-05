@@ -6,6 +6,7 @@ import {ProductInterface} from "@/interfaces/Product";
 import {MaterialsSet} from "@/components/App/Catalogue/ProductCard/MaterialsSet";
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import {CameraImageFromMaterials, setInitialMaterials} from "@/utils/Product/Materials";
+import {UniversalMaterials} from "@/components/Shared/Materials/UniversalMaterials";
 
 
 interface Props {
@@ -25,7 +26,17 @@ export const ProductCard = ({product}: Props) => {
     const link = `/product/${product.code}/${objectToMaterialsString(selectedMaterials)}`
 
     return (
-        <Box borderWidth="3px" borderColor={"brown.500"} overflow="hidden">
+        <Box 
+            borderWidth="3px" 
+            borderColor={"brown.500"} 
+            overflow="hidden"
+            borderRadius="xl"
+            transition="all 0.3s ease"
+            _hover={{ 
+                boxShadow: "md",
+                transform: "translateY(-4px)"
+            }}
+        >
             <Link href={link}>
                 <CatalogueProductImages images={images}/>
             </Link>
@@ -35,10 +46,14 @@ export const ProductCard = ({product}: Props) => {
                         {product.name}
                     </Box>
                 </Link>
-                <MaterialsSet material_parts={product.material_parts} setSelectedMaterial={setSelectedMaterials}
-                              selectedMaterial={selectedMaterials}/>
-                <Box>
-                    <Box as="span" fontSize="l">
+                <UniversalMaterials
+                    parts={product.material_parts}
+                    selectedMaterials={selectedMaterials}
+                    setSelectedMaterials={setSelectedMaterials}
+                    isCatalog={true}
+                />
+                <Box mt={3}>
+                    <Box as="span" fontSize="lg" fontWeight="medium" color="brown.600">
                         {product.price} {"грн."}
                     </Box>
                 </Box>

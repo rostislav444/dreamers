@@ -55,9 +55,10 @@ class Material3DSerializer(serializers.ModelSerializer):
 
 
 class MaterialSerializer(serializers.ModelSerializer):
+    color = ColorLiteSerializer(read_only=True)
     class Meta:
         model = Material
-        fields = ('id', 'name', 'image',)
+        fields = ('id', 'name', 'image', 'color')
 
 
 __all__ = [

@@ -42,5 +42,10 @@ export interface ProductPartsInterface {
 
 
 export interface SelectedMaterialsInterface {
-    [key: number]: number
+    [key: string]: {
+        partId: number,
+        group: string,
+        material: number,
+        material_name?: string
+    }
 }

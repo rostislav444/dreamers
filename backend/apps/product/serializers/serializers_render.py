@@ -76,12 +76,23 @@ class ProductRenderSerializer(serializers.ModelSerializer):
 
 
 class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
-    color = ColorSerializer(read_only=True)
-    material = Material3DSerializer(read_only=True)
+    color = serializers.SerializerMethodField()
+    material = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductPartMaterials
         fields = ('id', 'color', 'material',)
+
+    @staticmethod
+    def get_color(obj):
+        if obj.material and obj.material.color:
+            return ColorSerializer(obj.material.color).data
+
+    @staticmethod
+    def get_material(obj):
+        if obj.material and not obj.material.color and obj.material.material:
+            return Material3DSerializer(obj.material).data
+
 
 
 class ProductPartRenderMaterialsGroupsSerializer(serializers.ModelSerializer):
@@ -98,10 +109,10 @@ class ProductPartRenderMaterialsGroupsSerializer(serializers.ModelSerializer):
             part__camera__model_3d__product=product,
             part__part=obj.product_part,
             # image__image__isnull=True
-        )
+        ).distinct()
         qs = ProductPartMaterials.objects.filter(
             material_scene__in=product_part_scene_material
-        )
+        ).distinct()
         serializer = ProductPartRenderMaterialSerializer(qs, many=True, read_only=True,
                                                          context={'request': self.context['request']})
         return serializer.data

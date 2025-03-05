@@ -2,9 +2,10 @@ from django.contrib import admin
 
 from apps.abstract.admin import ParentLinkMixin
 from apps.product.forms import ProductOptionPriceMultiplierFromSet, ProductOptionPriceMultiplierFrom
-from apps.product.models import Product, ProductOptionPriceMultiplier, ProductClass, ProductCustomizedPart
+from apps.product.models import Product, ProductOptionPriceMultiplier, ProductClass
 from .admin_3d import Product3DBlenderModelInline
 from .admin_product_attribute import ProductAttributeInline
+from .admin_product_custom_parts import ProductCustomizedPartInline
 from .admin_sku import SkuInline
 
 
@@ -27,40 +28,12 @@ class ProductOptionPriceMultiplierInline(admin.StackedInline):
         return self.calc_num(obj)
 
 
-class ProductCustomizedPart(admin.TabularInline):
-    model = ProductCustomizedPart
-    readonly_fields = ['part']
-
-    def __init__(self, *args, **kwrgs):
-        self.materials_set = None
-        super().__init__(*args, **kwrgs)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'part' and self.materials_set:
-            kwargs['queryset'] = self.materials_set.parts.all()
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-    def calc_num(self, obj):
-        if not obj:
-            return 0
-        self.materials_set = obj.product_class.materials_set
-        if self.materials_set:
-            return self.materials_set.parts.count()
-        return 0
-
-    def get_min_num(self, request, obj=None, **kwargs):
-        return self.calc_num(obj)
-
-    def get_max_num(self, request, obj=None, **kwargs):
-        return self.calc_num(obj)
-
-
 
 @admin.register(Product)
 class ProductAdmin(ParentLinkMixin, admin.ModelAdmin):
     parent_model = ProductClass
     inlines = [
-        ProductCustomizedPart,
+        ProductCustomizedPartInline,
         Product3DBlenderModelInline,
         ProductOptionPriceMultiplierInline,
         ProductAttributeInline,

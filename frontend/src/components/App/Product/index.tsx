@@ -9,8 +9,7 @@ import {parseMaterialsWithDefaults} from "@/utils/Product/Materials";
 
 export const ProductComponent = ({product, materials}: ProductProps) => {
     const [mobile] = useMediaQuery('(max-width: 960px)');
-
-    const parsedMaterials = parseMaterialsWithDefaults(materials, product.material_parts);
+    const parsedMaterials = parseMaterialsWithDefaults(product.material_parts, materials);
     const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterialsInterface>(parsedMaterials)
 
     return <Box>
@@ -26,3 +25,4 @@ export const ProductComponent = ({product, materials}: ProductProps) => {
     </Box>
 
 }
+

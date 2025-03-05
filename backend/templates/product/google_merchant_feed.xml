@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <title>Ваш магазин - Каталог товаров</title>
+    <link>https://yourdomain.com</link>
+    <description>Описание вашего магазина</description>
+    {% for product in products %}
+    <item>
+      <g:id>{{ product.id }}</g:id>
+      <g:title>{{ product.title }}</g:title>
+      <g:description>{{ product.description }}</g:description>
+      <g:link>{{ product.link }}</g:link>
+      <g:image_link>{{ product.image_link }}</g:image_link>
+      {% for additional_image in product.additional_image_link %}
+      <g:additional_image_link>{{ additional_image }}</g:additional_image_link>
+      {% endfor %}
+      <g:availability>{{ product.availability }}</g:availability>
+      <g:price>{{ product.price }}</g:price>
+      <g:brand>{{ product.brand }}</g:brand>
+      {% if product.gtin %}
+      <g:gtin>{{ product.gtin }}</g:gtin>
+      {% endif %}
+      <g:mpn>{{ product.mpn }}</g:mpn>
+      <g:condition>{{ product.condition }}</g:condition>
+      <g:google_product_category>{{ product.google_product_category }}</g:google_product_category>
+      <g:product_type>{{ product.product_type }}</g:product_type>
+      {% if product.material %}
+      <g:material>{{ product.material }}</g:material>
+      {% endif %}
+      {% if product.color %}
+      <g:color>{{ product.color }}</g:color>
+      {% endif %}
+      {% if product.size %}
+      <g:size>{{ product.size }}</g:size>
+      {% endif %}
+    </item>
+    {% endfor %}
+  </channel>
+</rss> 

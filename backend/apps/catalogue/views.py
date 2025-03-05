@@ -1,30 +1,33 @@
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins, generics
+from rest_framework import viewsets, mixins, generics, pagination
+from rest_framework.response import Response
 from django.conf import settings
 
 from apps.catalogue.serializers import CatalogueProductSerializer
 from apps.category.models import Category
 from apps.product.models import Product
+from apps.core.pagination import StandardResultsSetPagination
 
 
-class CatalogueProductViewSet(generics.GenericAPIView,
-                              mixins.ListModelMixin,
-                              mixins.RetrieveModelMixin,
-                              viewsets.ViewSet):
+class CatalogueProductViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CatalogueProductSerializer
+    pagination_class = StandardResultsSetPagination
     CACHE_TTL = 60 * 15  # 15 минут
-
+    
     def get_queryset(self):
-        categories = self.request.GET.get('categories', '')
-        cache_key = f'catalogue_products_{categories}'
+        categories = self.request.query_params.get('categories', '')
+        
+        # Include pagination info in cache key
+        page = self.request.query_params.get('page', '1')
+        page_size = self.request.query_params.get('page_size', '24')
+        cache_key = f'catalogue_products_{categories}_{page}_{page_size}'
 
-        # Пробуем получить данные из кеша
+        # Try to get from cache
         queryset = cache.get(cache_key)
-        print('queryset', queryset)
 
         if queryset is None:
-            # Если в кеше нет, выполняем запрос
+            # If not in cache, execute query
             queryset = Product.objects.all()
             final_category = self.get_final_category(categories)
 
@@ -33,10 +36,21 @@ class CatalogueProductViewSet(generics.GenericAPIView,
 
             queryset = self.apply_prefetch_related(queryset)
 
-            # Сохраняем в кеш
+            # Save to cache
             cache.set(cache_key, queryset, self.CACHE_TTL)
 
         return queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @staticmethod
     def get_final_category(categories):

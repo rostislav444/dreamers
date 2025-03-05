@@ -1,180 +1,491 @@
-import {Box, Button, Flex, Grid, Image, Text} from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  Text,
+  Container,
+  VStack,
+  HStack,
+  AspectRatio,
+  Heading,
+  SimpleGrid,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import InspirationBlock from "@/components/App/Home/InspirationBlock";
-import {CategoryState} from "@/interfaces/Categories";
-import {ProductInterface} from "@/interfaces/Product";
-import {ProductCard} from "@/components/App/Catalogue/ProductCard";
-import {CatalogueProductImages} from "@/components/App/Catalogue/ProductCard/Images";
-import {MEDIA_URL} from "@/local";
+import { CategoryState } from "@/interfaces/Categories";
+import { ProductInterface } from "@/interfaces/Product";
+import { ProductCard } from "@/components/App/Catalogue/ProductCard";
+import { MEDIA_URL } from "@/local";
+import { motion } from "framer-motion";
+import InfoBlock from "@/components/App/Home/InfoBlock";
+import FeaturedProductCard from "@/components/App/Home/FeaturedProductCard";
 
+// Custom motion components
+const MotionBox = motion(Box);
+const MotionFlex = motion(Flex);
+const MotionText = motion(Text);
 
 interface Props {
-    categories: CategoryState[]
-    products: ProductInterface[]
+  categories: CategoryState[];
+  products: ProductInterface[];
 }
 
-const ResponsiveHero = ({categories, products}: Props) => {
-    const categoriesResponsive = categories.map((category, index) => {
-        return {
-            ...category,
-            colSpan: {base: 12, sm: 12, md: index === 0 ? 8 : 4},
-            rowSpan: {base: 1, sm: 1, md: 2},
-            height: {base: "300px", sm: "400px", md: "400px"}
-        }
-    })
+const ResponsiveHero = ({ categories, products }: Props) => {
+  // Make sure we have products before trying to split them
+  const featuredProducts = products?.length ? products.slice(0, 4) : [];
+  const restProducts = products?.length > 4 ? products.slice(4) : [];
 
+  // Информационные блоки для отображения
+  const infoBlocks = [
+    {
+      tagline: "Простір для мрій",
+      title: "Меблі, що надихають на творчість",
+      description: "Створіть простір, який відображає вашу індивідуальність та надихає на нові ідеї щодня",
+      buttonText: "Відкрити колекцію",
+      buttonLink: "/catalogue",
+      bgColor: "brown.100",
+      delay: 0.2
+    }
+  ];
 
-    return (
-        <Box width="100%" bg="brown.50">
-            {/* Hero Content Container */}
-            <Box width="100%">
-                {/* Hero Text */}
-                <Box
-                    maxW={{base: "100%", lg: "80%", xl: "60%"}}
-                    mb={{base: 6, md: 10}}
-                >
-                    <Text
-                        as="h1"
-                        fontSize={{base: "3xl", sm: "4xl", md: "5xl", lg: "6xl"}}
-                        fontWeight="bold"
-                        color='brown.500'
-                        lineHeight="1.2"
-                        mb={4}
-                    >
-                        Знайдіть свої<br/>ідеальні меблі
-                    </Text>
-                    <Text
-                        fontSize={{base: "md", sm: "lg", md: "xl"}}
-                        color='brown.500'
-                        maxW={{base: "100%", md: "80%", lg: "70%"}}
-                        mb={6}
-                    >
-                        Ми допоможемо вам створити простір вашої мрії.
-                        Оберіть свій стиль разом з нами.
-                    </Text>
-                    <Flex
-                        gap={4}
-                        flexWrap="wrap"
-                    >
-                        <Link href='/catalogue'>
-                            <Button
-                                bg='brown.500'
-                                color="white"
-                                _hover={{bg: "brown.800"}}
-                                size={{base: "md", md: "lg"}}
-                                px={{base: 6, md: 8}}
-                                py={{base: 4, md: 6}}
-                            >
-                                Каталог
-                            </Button>
-                        </Link>
-                        <Button
-                            variant="outline"
-                            borderColor='brown.500'
-                            borderWidth={2}
-                            color='brown.500'
-                            _hover={{bg: "brown.100"}}
-                            size={{base: "md", md: "lg"}}
-                            px={{base: 6, md: 8}}
-                            py={{base: 3, md: 5}}
-                        >
-                            Консультація
-                        </Button>
-                    </Flex>
-                </Box>
+  return (
+    <Box width="100%" maxWidth="100vw">
+      {/* Main Container with spacing */}
+      <Container maxW="container.full" py={6} px={0}>
+        {/* Hero Grid Layout */}
+        <Grid
+          templateColumns={{ base: "1fr", lg: "1fr 1fr" }}
+          templateRows={{
+            base: "repeat(auto-fit, minmax(250px, 1fr))",
+            lg: "1fr",
+          }}
+          gap={6}
+          mb={10}
+        >
+          {/* Left Side - Main featured product */}
+          <MotionBox
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            gridColumn={{ base: "1", lg: "1" }}
+            gridRow={{ base: "1", lg: "1" }}
+            borderRadius="xl"
+            overflow="hidden"
+            boxShadow="lg"
+            height="100%"
+          >
+            {featuredProducts[0] && (
+              <FeaturedProductCard
+                product={featuredProducts[0]}
+                isLarge={true}
+              />
+            )}
+          </MotionBox>
 
-                {/* Category Grid */}
-                <Grid
-                    templateColumns="repeat(12, 1fr)"
-                    gap={{base: 4, md: 6, lg: 8}}
-                    templateRows="auto"
-                    width="100%"
-                >
-                    {categoriesResponsive.map((category) => (
-                        <Box
-                            key={category.name}
-                            gridColumn={`span ${category.colSpan.base}`}
-                            // gridRow={`span ${category.rowSpan.base as number}`}
-                            sx={{
-                                '@media screen and (min-width: 30em)': {
-                                    gridColumn: `span ${category.colSpan.sm}`
-                                },
-                                '@media screen and (min-width: 48em)': {
-                                    gridColumn: `span ${category.colSpan.md}`
-                                }
-                            }}
-                            as={Link}
-                            href={`/catalogue/${category.slug}`}
-                            position="relative"
-                            height={category.height}
-                            overflow="hidden"
-                            transition="all 0.3s"
-                            _hover={{
-                                transform: "translateY(-4px)",
-                                shadow: "xl"
-                            }}
-                        >
-                            {category.image.map((image, key) =>
-                                <Image
-                                    src={MEDIA_URL + image}
-                                    pos='absolute'
-                                    top='0'
-                                    left='0'
-                                    width='100%'
-                                    height='100%'
-                                    objectFit='contain'
-                                    key={key} alt='image'/>
-                            )}
-                            <Box
-                                position="absolute"
-                                bottom={0}
-                                left={0}
-                                right={0}
-                                p={{base: 4, md: 6}}
-                                background="linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0))"
-                            >
-                                <Text
-                                    fontSize={{base: "xl", sm: "2xl", md: "3xl"}}
-                                    fontWeight="bold"
-                                    color="brown.500"
-                                >
-                                    {category.name}
-                                </Text>
-                            </Box>
-                        </Box>
+          {/* Right Side - Grid of smaller items */}
+          <Grid
+            templateRows={{ base: "auto auto", lg: "1fr 1fr" }}
+            templateColumns={{ base: "1fr 1fr", lg: "1fr 1fr" }}
+            gap={6}
+            gridColumn={{ base: "1", lg: "2" }}
+            gridRow={{ base: "2", lg: "1" }}
+          >
+            {/* Top left */}
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              gridRow="1"
+              gridColumn="1"
+              borderRadius="xl"
+              overflow="hidden"
+              boxShadow="md"
+              position="relative"
+              height="100%"
+            >
+              {categories[0] && (
+                <Link href={`/catalogue/${categories[0].slug}`}>
+                  <Box
+                    position="relative"
+                    height="100%"
+                    minHeight="250px"
+                    transition="transform 0.3s ease"
+                    _hover={{ transform: "scale(1.03)" }}
+                  >
+                    {categories[0].image.map((image, idx) => (
+                      <Box
+                        key={idx}
+                        position="absolute"
+                        top="0"
+                        left="0"
+                        width="100%"
+                        height="100%"
+                        backgroundImage={`url(${MEDIA_URL + image})`}
+                        backgroundSize="cover"
+                        backgroundPosition="center"
+                      />
                     ))}
-                </Grid>
-                {/* New Arrivals */}
-                <Box mt='16' mb={16}>
-                    <Flex justify="space-between" align="center" mb={6}>
-                        <Text
-                            fontSize={{base: "2xl", md: "3xl"}}
-                            fontWeight="bold"
-                            color="brown.900"
-                        >
-                            Нові надходження
-                        </Text>
-                        <Link href='/catalogue'>
-                            <Button
-                                variant="link"
-                                color="brown.800"
-                                _hover={{color: "brown.600"}}
-                            >
-                                Дивитись все
-                            </Button>
-                        </Link>
-                    </Flex>
+                    <Box
+                      position="absolute"
+                      bottom="0"
+                      left="0"
+                      width="100%"
+                      bg="linear-gradient(to top, rgba(143, 33, 23, 0.7), transparent)"
+                      p={4}
+                      color="white"
+                    >
+                      <Heading as="h3" fontSize="xl">
+                        {categories[0].name}
+                      </Heading>
+                    </Box>
+                  </Box>
+                </Link>
+              )}
+            </MotionBox>
 
-                    <Grid templateColumns='repeat(auto-fill, minmax(280px, 1fr))' gap={4}>
-                        {products.map((item) => <ProductCard key={item.id} product={item}/>)}
-                    </Grid>
-
-                    {/* Цитата */}
-                    <InspirationBlock/>
-                </Box>
+            {/* Top right - InfoBlock */}
+            <Box
+              gridRow="1"
+              gridColumn="2"
+            >
+              <InfoBlock {...infoBlocks[0]} />
             </Box>
+
+            {/* Bottom left */}
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              gridRow="2"
+              gridColumn="1"
+              borderRadius="xl"
+              overflow="hidden"
+              boxShadow="md"
+              position="relative"
+              height="100%"
+            >
+              {featuredProducts[1] && (
+                <FeaturedProductCard product={featuredProducts[1]} />
+              )}
+            </MotionBox>
+
+            {/* Bottom right */}
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              gridRow="2"
+              gridColumn="2"
+              borderRadius="xl"
+              overflow="hidden"
+              boxShadow="md"
+              position="relative"
+              height="100%"
+            >
+              {featuredProducts[2] && (
+                <FeaturedProductCard product={featuredProducts[2]} />
+              )}
+            </MotionBox>
+          </Grid>
+        </Grid>
+
+        {/* Design Collections Section */}
+        <Box mb={16} mt={16}>
+          <MotionBox
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            mb={10}
+          >
+            <Flex
+              justify="space-between"
+              align="center"
+              mb={6}
+              direction={{ base: "column", sm: "row" }}
+              gap={{ base: 3, sm: 0 }}
+            >
+              <Box>
+                <Text
+                  color="brown.500"
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  textTransform="uppercase"
+                  mb={1}
+                >
+                  Наші колекції
+                </Text>
+                <Heading
+                  fontSize={{ base: "2xl", md: "3xl" }}
+                  fontWeight="medium"
+                  color="brown.800"
+                >
+                  Каталог меблів
+                </Heading>
+              </Box>
+              <Link href="/catalogue">
+                <Button
+                  variant="outline"
+                  borderColor="brown.500"
+                  color="brown.500"
+                  borderRadius="full"
+                  size="sm"
+                >
+                  Переглянути всі колекції
+                </Button>
+              </Link>
+            </Flex>
+          </MotionBox>
+
+          {/* Collections Grid */}
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
+            {categories.slice(0, 3).map((category, idx) => (
+              <MotionBox
+                key={category.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <Box
+                  borderRadius="xl"
+                  overflow="hidden"
+                  bg="brown.50"
+                  boxShadow="md"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    transform: "translateY(-8px)",
+                    boxShadow: "lg",
+                  }}
+                  height="100%"
+                >
+                  <AspectRatio ratio={4 / 3}>
+                    <Box position="relative" width="100%" height="100%">
+                      {category.image.map((image, idx) => (
+                        <Box
+                          key={idx}
+                          position="absolute"
+                          top="0"
+                          left="0"
+                          width="100%"
+                          height="100%"
+                          backgroundImage={`url(${MEDIA_URL + image})`}
+                          backgroundSize="cover"
+                          backgroundPosition="center"
+                        />
+                      ))}
+                    </Box>
+                  </AspectRatio>
+                  <Box p={5}>
+                    <Heading
+                      fontSize="xl"
+                      fontWeight="medium"
+                      mb={2}
+                      color="brown.700"
+                    >
+                      {category.name}
+                    </Heading>
+                    <Text color="brown.600" mb={3} fontSize="md">
+                      {category.description ||
+                        "Відкрийте для себе нашу прекрасну колекцію меблів"}
+                    </Text>
+                    <Link href={`/catalogue/${category.slug}`}>
+                      <Button
+                        variant="link"
+                        color="brown.500"
+                        fontWeight="medium"
+                        size="sm"
+                        rightIcon={
+                          <Box as="span" ml={1}>
+                            →
+                          </Box>
+                        }
+                      >
+                        Дізнатися більше
+                      </Button>
+                    </Link>
+                  </Box>
+                </Box>
+              </MotionBox>
+            ))}
+          </SimpleGrid>
         </Box>
-    );
+
+        {/* New Arrivals Section */}
+        <Box mb={16}>
+          <MotionBox
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            mb={10}
+          >
+            <Flex
+              justify="space-between"
+              align="center"
+              direction={{ base: "column", sm: "row" }}
+              gap={{ base: 3, sm: 0 }}
+            >
+              <Box>
+                <Text
+                  color="brown.500"
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  textTransform="uppercase"
+                  mb={1}
+                >
+                  Останні надходження
+                </Text>
+                <Heading
+                  fontSize={{ base: "2xl", md: "3xl" }}
+                  fontWeight="medium"
+                  color="brown.800"
+                >
+                  Нові надходження
+                </Heading>
+              </Box>
+              <Link href="/catalogue?sort=newest">
+                <Button
+                  variant="outline"
+                  borderColor="brown.500"
+                  color="brown.500"
+                  borderRadius="full"
+                  size="sm"
+                >
+                  Переглянути всі новинки
+                </Button>
+              </Link>
+            </Flex>
+          </MotionBox>
+
+          {/* Products Grid */}
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
+            {restProducts.map((product, idx) => (
+              <MotionBox
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <ProductCard product={product} />
+              </MotionBox>
+            ))}
+          </SimpleGrid>
+        </Box>
+      </Container>
+
+      {/* Inspiration Block - Full width */}
+      <Box width="100%" overflow="hidden" mb={16}>
+        <InspirationBlock />
+      </Box>
+
+      {/* Craftsmanship Section */}
+      <Container maxW="container.full" mb={16} px={0}>
+        <SimpleGrid
+          columns={{ base: 1, lg: 2 }}
+          spacing={10}
+          bg="brown.50"
+          p={8}
+          borderRadius="xl"
+          boxShadow="md"
+        >
+          {/* Left side - Image */}
+          <MotionBox
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <AspectRatio ratio={16 / 9} borderRadius="lg" overflow="hidden">
+              <Box
+                width="100%"
+                height="100%"
+                backgroundImage={`url("/craftsmanship.jpg")`}
+                backgroundSize="cover"
+                backgroundPosition="center"
+              />
+            </AspectRatio>
+          </MotionBox>
+
+          {/* Right side - Text */}
+          <MotionBox
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <Text
+              color="brown.500"
+              fontWeight="semibold"
+              fontSize="sm"
+              textTransform="uppercase"
+              mb={2}
+            >
+              Наш процес
+            </Text>
+            <Heading
+              fontSize={{ base: "2xl", md: "3xl" }}
+              fontWeight="medium"
+              color="brown.800"
+              mb={4}
+            >
+              Майстерність і якість
+            </Heading>
+            <Text
+              fontSize={{ base: "md", md: "lg" }}
+              color="brown.600"
+              mb={6}
+              lineHeight="tall"
+            >
+              Кожен виріб, який ми створюємо, поєднує в собі традиційну
+              європейську майстерність із сучасним дизайном. Наші майстри
+              забезпечують якість, яка залишається на покоління.
+            </Text>
+
+            {/* Process Steps */}
+            <VStack spacing={4} align="flex-start">
+              {[
+                {
+                  number: "01",
+                  title: "Дизайн",
+                  desc: "Продуманий дизайн, що поєднує естетику та функціональність",
+                },
+                {
+                  number: "02",
+                  title: "Підбір матеріалів",
+                  desc: "Преміальні матеріали від надійних постачальників",
+                },
+                {
+                  number: "03",
+                  title: "Виробництво",
+                  desc: "Досвідчені майстри створюють кожен виріб з точністю",
+                },
+              ].map((step) => (
+                <HStack key={step.number} spacing={4} align="flex-start">
+                  <Text fontWeight="bold" fontSize="xl" color="brown.400">
+                    {step.number}
+                  </Text>
+                  <Box>
+                    <Text
+                      fontWeight="medium"
+                      fontSize="lg"
+                      color="brown.700"
+                      mb={1}
+                    >
+                      {step.title}
+                    </Text>
+                    <Text color="brown.600">{step.desc}</Text>
+                  </Box>
+                </HStack>
+              ))}
+            </VStack>
+          </MotionBox>
+        </SimpleGrid>
+      </Container>
+    </Box>
+  );
 };
 
 export default ResponsiveHero;

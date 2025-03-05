@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.abstract.fields import FileNaming
-from apps.material.models import BlenderMaterial, Material, RecommendedCombinations, RecommendedCombinationsParts, \
+from apps.material.models import BlenderMaterial, RecommendedCombinations, RecommendedCombinationsParts, \
     ProductPartMaterials, MaterialsSet, ProductStaticPart, ProductPart, ProductPartMaterialsGroups, \
     ProductPartMaterialsSubGroups
 
@@ -157,3 +157,5 @@ def copy_materials_set(sender, instance, created, **kwargs):
 
         # Clear copy_from after successful copy
         MaterialsSet.objects.filter(pk=instance.pk).update(copy_from=None)
+
+

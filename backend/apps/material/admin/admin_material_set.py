@@ -16,12 +16,8 @@ class ProductStaticPartInline(admin.StackedInline):
     form = ProductStaticPartForm
     extra = 0
 
-    fields = (('name', 'blender_name', 'group'), 'material', 'color')
+    fields = (('name', 'blender_name', 'group'), 'material')
 
-
-class ProductPartMaterialsFilter(AutocompleteFilter):
-    title = 'Color'
-    field_name = 'color'
 
 
 @admin.register(ProductPartMaterials)
@@ -33,37 +29,31 @@ class ProductPartMaterialsInline(admin.TabularInline):
     _obj = None
 
     model = ProductPartMaterials
-    readonly_fields = ('code', 'preview')
-    list_filter = [ProductPartMaterialsFilter]
-    search_fields = ['color__name']
-    autocomplete_fields = ['color']
+    readonly_fields = ('code','preview')
+    # list_filter = [ProductPartMaterialsFilter]
+    # search_fields = ['color__name']
+    # autocomplete_fields = ['color']
     extra = 0
 
     def preview(self, obj):
         if obj:
-            if obj.color:
-                return format_html('<div style="width: 48px; height: 48px; background-color: {};"></div>',
-                                   obj.color.hex)
+            print(obj.material)
+            if obj.material and obj.material.color:
+                return format_html('<div style="width: 64px; height: 64px; background-color: {};"></div>',
+                                   obj.material.color.hex)
             if obj.material and obj.material.blender_material and obj.material.blender_material.color:
-                return format_html('<div style="width: 48px; height: 48px; background-color: {};"></div>',
+                return format_html('<div style="width: 64px; height: 64px; background-color: {};"></div>',
                                    obj.material.blender_material.color.hex)
             if obj.material and obj.material.image:
-                return format_html('<img src="{}" style="width: 48px; height: 48px; object-fit: cover;" />',
+                return format_html('<img src="{}" style="width: 64px; height: 64px; object-fit: cover;" />',
                                    obj.material.image.url)
         return '-'
 
     def get_fields(self, request, obj=None):
         self._obj = obj
-        fields = ['material', 'color', 'preferred', 'preview', 'code', ]
-        if obj:
-            if obj.group.type == 'material':
-                fields.remove('color')
-            elif obj.group.type == 'color':
-                fields.remove('material')
-        return fields
+        return ['material', 'preferred', 'preview', 'code',]
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        print(self._obj, self._obj.group)
         if db_field.name == 'material':
             kwargs['queryset'] = Material.objects.filter(group=self._obj.group)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -115,9 +105,9 @@ class RecommendedCombinationsPartsForm(forms.ModelForm):
 def get_preview(obj):
     if obj and obj.material:
         if obj.material.color:
-            return '<div style="width: 48px; height: 48px; background-color: %s;"></div>' % obj.material.color.hex
+            return '<div style="width: 64px; height: 64px; background-color: %s;"></div>' % obj.material.color.hex
         if obj.material.material and obj.material.material.image:
-            return '<img src="%s" style="width: 48px; height: 48px; object-fit: cover;" />' % obj.material.material.image.url
+            return '<img src="%s" style="width: 64px; height: 64px; object-fit: cover;" />' % obj.material.material.image.url
     return '-'
 
 class RecommendedCombinationsPartsInline(admin.TabularInline):

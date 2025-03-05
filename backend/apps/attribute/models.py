@@ -6,7 +6,6 @@ from apps.abstract.models import NameSlug
 from apps.attribute.abstract.fields import AttributeGroupTypeField
 from apps.attribute.abstract.models import AttributeGroupAbstract, AttributeAbstract
 from apps.attribute.untils import get_closet_color
-from apps.category.models import Category
 from apps.material.models import Color
 
 

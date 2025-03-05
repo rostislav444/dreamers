@@ -8,20 +8,13 @@ from apps.material.models import ProductPart, ProductPartMaterialsGroups, Produc
 
 
 class ProductPartMaterialSerializer(serializers.ModelSerializer):
-    color = ColorSerializer(read_only=True)
     material = MaterialSerializer(read_only=True)
     sub_group = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
+    name = serializers.CharField(source='material.name')
 
     class Meta:
         model = ProductPartMaterials
-        fields = ('id', 'color', 'material', 'sub_group','name',)
-
-    @staticmethod
-    def get_name(obj):
-        if obj.color:
-            return obj.color.name
-        return obj.material.name
+        fields = ('id', 'material', 'sub_group','name',)
 
     @staticmethod
     def get_sub_group(obj):

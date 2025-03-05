@@ -27,6 +27,7 @@ interface PaginatedResponse<T = any> extends BaseResponse {
         results: T[];
         count: number;
         next: string | null;
+        previous: string | null;
     };
 }
 
