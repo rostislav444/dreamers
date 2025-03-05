@@ -10,7 +10,7 @@ from apps.material.models import ProductPart, ProductPartMaterialsGroups, Produc
 class ProductPartMaterialSerializer(serializers.ModelSerializer):
     material = MaterialSerializer(read_only=True)
     sub_group = serializers.SerializerMethodField()
-    name = serializers.CharField(source='material.name')
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductPartMaterials
@@ -21,6 +21,12 @@ class ProductPartMaterialSerializer(serializers.ModelSerializer):
         if obj.material and obj.material.sub_group:
             return obj.material.sub_group.id
         return None
+
+    @staticmethod
+    def get_name(obj):
+        if obj.material:
+            return obj.material.name
+        return ""
 
 
 class ProductPartMaterialsSubGroupsSerializer(serializers.ModelSerializer):
