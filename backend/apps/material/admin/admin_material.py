@@ -193,7 +193,7 @@ class MaterialInline(TabularInlinePaginated):
     readonly_fields = ("preview",)
     autocomplete_fields = ["color"]
     search_fields = ["color__name"]
-    per_page = 10
+    per_page = 40
 
     def get_fieldsets(self, request, obj=None):
         custom_fieldsets = []
