@@ -13,6 +13,7 @@ from apps.material.models import (
 from apps.material.utils.blender_matrial_admin_preview import blender_material_preview
 from django.contrib import admin
 from django.utils.html import format_html
+from django_admin_inline_paginator.admin import TabularInlinePaginated
 
 
 class BlenderMaterialFilter(AutocompleteFilter):
@@ -132,7 +133,7 @@ class PaletteAdmin(admin.ModelAdmin):
     def colors(self, obj):
         data = []
         for hex_color in (
-                obj.colors.all().order_by("color__ral").values_list("color__hex", flat=True)
+            obj.colors.all().order_by("color__ral").values_list("color__hex", flat=True)
         ):
             data.append(
                 f'<div style="background-color: {hex_color}; width: 48px; height: 48px; margin: 2px;"></div>'
@@ -185,36 +186,42 @@ class MaterialAdmin(admin.ModelAdmin):
     pass
 
 
-class MaterialInline(admin.StackedInline):
+class MaterialInline(TabularInlinePaginated):
     _obj = None
     model = Material
     show_change_link = True
     readonly_fields = ("preview",)
     autocomplete_fields = ["color"]
     search_fields = ["color__name"]
+    per_page = 10
 
     def get_fieldsets(self, request, obj=None):
         custom_fieldsets = []
 
+        if obj and obj.type == "color" and obj.color_only:
+            return ((None, {"fields": ("preview", "color", "name", "sub_group")}),)
         if obj and obj.type == "color":
-            custom_fieldsets.append('color')
+            custom_fieldsets.append("color")
         if obj and obj.type == "material":
-            custom_fieldsets.extend(['image', 'blender_material'])
+            custom_fieldsets.extend(["image", "blender_material"])
 
         return (
-            (None, {
-                "fields": ("name", "sub_group")
-            }),
-            ('View', {
-                "fields": ("preview", *custom_fieldsets)
-            }),
-
-            ('Manufacturer', {
-                "fields": ("manufacturer", "manufacturer_name", "code", "price", "sheet_price", "store_link")
-            }),
-            ('Dimensions', {
-                "fields": (("width", "height", "depth"),)
-            }),
+            (None, {"fields": ("name", "sub_group")}),
+            ("View", {"fields": ("preview", *custom_fieldsets)}),
+            (
+                "Manufacturer",
+                {
+                    "fields": (
+                        "manufacturer",
+                        "manufacturer_name",
+                        "code",
+                        "price",
+                        "sheet_price",
+                        "store_link",
+                    )
+                },
+            ),
+            ("Dimensions", {"fields": (("width", "height", "depth"),)}),
         )
 
     @staticmethod
@@ -222,7 +229,7 @@ class MaterialInline(admin.StackedInline):
         if obj.group.type == "color" and obj.color:
             return format_html(
                 '<div style="width: 48px; height: 48px; background-color: {};"></div>',
-                obj.color.hex
+                obj.color.hex,
             )
         blender_material = obj.blender_material
         if blender_material:

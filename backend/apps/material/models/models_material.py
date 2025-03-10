@@ -31,6 +31,7 @@ class MaterialGroups(NameSlug):
     )
 
     type = models.CharField(max_length=25, choices=TYPES, default=TYPES[0][0])
+    color_only = models.BooleanField(default=False)
     price = models.IntegerField(default=0, verbose_name="Цена, м2", blank=True)
     price_level = models.CharField(
         choices=PRICE_LEVEL_CHOICES, max_length=9, null=True, blank=True

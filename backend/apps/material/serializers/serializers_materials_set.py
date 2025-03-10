@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from apps.material.serializers.serializers_materials import ColorSerializer, MaterialSerializer, ColorLiteSerializer
+from apps.material.serializers.serializers_materials import MaterialSerializer, ColorLiteSerializer
 from apps.material.models import ProductPart, ProductPartMaterialsGroups, ProductPartMaterials, \
     ProductPartMaterialsSubGroups, MaterialsSet
 
