@@ -90,7 +90,7 @@ class ProductPartRenderMaterialSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_material(obj):
-        if obj.material and not obj.material.color and obj.material.material:
+        if obj.material and not obj.material.color and obj.material.blender_material:
             return Material3DSerializer(obj.material).data
 
 
