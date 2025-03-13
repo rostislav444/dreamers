@@ -84,6 +84,7 @@ class ProductPartMaterialsGroups(models.Model):
     group = models.ForeignKey(
         MaterialGroups, on_delete=models.CASCADE, related_name="product_class_groups"
     )
+    load_all_materials = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} / {} ({}: {})".format(
@@ -92,6 +93,14 @@ class ProductPartMaterialsGroups(models.Model):
             self.group.type + "s",
             self.materials.count(),
         )
+
+    def save(self, *args, **kwargs):
+        if self.load_all_materials:
+            self.materials.all().delete()
+            for material in Material.objects.filter(group=self.group):
+                ProductPartMaterials.objects.create(group=self, material=material)
+            self.load_all_materials = False
+        super(ProductPartMaterialsGroups, self).save(*args, **kwargs)
 
 
 class ProductPartMaterialsSubGroups(models.Model):
