@@ -67,11 +67,14 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
     material_parts.forEach(part => {
         const materialGroup = part.material_groups[getRandomInt(part.material_groups.length)]
         const randomIndex = getRandomInt(materialGroup.materials.length)
-        initialMaterials[part.blender_name] = {
-            partId: part.id,
-            group: materialGroup.name,
-            material: materialGroup.materials[randomIndex].id,
-            material_name: materialGroup.materials[randomIndex].name
+
+        if (materialGroup.materials[randomIndex]) {
+            initialMaterials[part.blender_name] = {
+                partId: part.id,
+                group: materialGroup.name,
+                material: materialGroup.materials[randomIndex].id,
+                material_name: materialGroup.materials[randomIndex].name
+            }
         }
     });
     return initialMaterials;
@@ -80,7 +83,7 @@ export const setInitialMaterials = (material_parts: ProductPart[]) => {
 
 export const CameraImageFromMaterials = (parts: CameraProductPartInterface[], selectedMaterials: SelectedMaterialsInterface) => {
     return parts.map(part => {
-        return part.materials.find(material => material.material == selectedMaterials[part.part.blender_name].material) || part.materials[0]
+        return part.materials.find(material => material.material == selectedMaterials[part.part.blender_name]?.material) || part.materials[0]
     })
 }
 

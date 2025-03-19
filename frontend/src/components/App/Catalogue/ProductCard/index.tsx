@@ -7,6 +7,7 @@ import {MaterialsSet} from "@/components/App/Catalogue/ProductCard/MaterialsSet"
 import {SelectedMaterialsInterface} from "@/interfaces/Materials";
 import {CameraImageFromMaterials, setInitialMaterials} from "@/utils/Product/Materials";
 import {UniversalMaterials} from "@/components/Shared/Materials/UniversalMaterials";
+import { log } from "console";
 
 
 interface Props {
@@ -24,6 +25,7 @@ export const ProductCard = ({product}: Props) => {
 
     const images = product.camera ? CameraImageFromMaterials(product.camera.parts, selectedMaterials) : []
     const link = `/product/${product.code}/${objectToMaterialsString(selectedMaterials)}`
+
 
     return (
         <Box 

@@ -15,7 +15,11 @@ export const BuyButton = ({product, selectedMaterials}: ButButtonProps) => {
     const {addItem} = useCart()
     const router = useRouter();
     const partsSum = Object.entries(selectedMaterials).reduce((acc, [key, value]) => {
-        return acc + product.customized_parts[key].material_groups[value.group].price
+        const materialGroup = product?.customized_parts[key]?.material_groups[value.group]
+        if (materialGroup?.price) {
+            return acc + materialGroup.price
+        }
+        return acc
     }, product.price)
 
     const handleAddCartItem = () => {
