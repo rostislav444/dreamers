@@ -15,7 +15,7 @@ interface Props {
 }
 
 const objectToMaterialsString = (obj: any) => {
-    return 'materials_' + Object.entries(obj).map(([key, value]) => `${key}-${value}`).join('_');
+    return 'materials_' + Object.values(obj).map((material: any) => `${material.partId}-${material.material}`).join('_');
 };
 
 export const ProductCard = ({product}: Props) => {
@@ -29,14 +29,13 @@ export const ProductCard = ({product}: Props) => {
 
     return (
         <Box 
-            borderWidth="3px" 
-            borderColor={"brown.500"} 
+            bg="rgba(255, 255, 255, 0.5)"
+            border="none"
             overflow="hidden"
             borderRadius="xl"
             transition="all 0.3s ease"
             _hover={{ 
-                boxShadow: "md",
-                transform: "translateY(-4px)"
+                bg: "rgba(255, 255, 255, 0.8)"
             }}
         >
             <Link href={link}>

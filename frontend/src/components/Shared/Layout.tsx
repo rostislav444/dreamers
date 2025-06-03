@@ -16,9 +16,10 @@ interface LayoutProps {
     title: string;
     description: string;
     breadcrumbs: Breadcrumb[];
+    isHomePage?: boolean;
 }
 
-export default function Layout({children, title, description, breadcrumbs}: LayoutProps) {
+export default function Layout({children, title, description, breadcrumbs, isHomePage = false}: LayoutProps) {
     const [mobile] = useMediaQuery('(max-width: 960px)')
     const fullBreadcrumbs = [
         {title: 'Головна', link: '/'},
@@ -36,11 +37,11 @@ export default function Layout({children, title, description, breadcrumbs}: Layo
                 <Header/>
                 <Box
                     as='main'
-                    w='calc(100% - 24px)'
+                    w={isHomePage ? '100%' : 'calc(100% - 24px)'}
                     minH='calc(100vh - 700px)'
-                    px={{base: 4, sm: 6, md: 8, lg: 12}}
-                    py={{base: 6, sm: 8, md: 10}}
-                    m={'0 12px'}
+                    px={isHomePage ? 0 : {base: 1, sm: 2, md: 6, lg: 8}}
+                    py={isHomePage ? 0 : {base: 2, sm: 4, md: 6, lg: 8}}
+                    m={isHomePage ? 0 : '0 12px'}
                 >
                     {breadcrumbs.length > 0 && <Breadcrumb
                         mt={4}

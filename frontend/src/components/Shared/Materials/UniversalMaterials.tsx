@@ -82,10 +82,10 @@ export const UniversalMaterials = ({
   const validParts = parts.filter(
     (part) =>
       part.material_groups.length >= 1 &&
-      part.material_groups.some((group) => group.materials.length > 0),
+      part.material_groups.some((group) => group.materials.length >= 2)
   );
 
-  const [showAll, setShowAll] = useState<boolean[]>(validParts.map(() => true));
+  const [showAll, setShowAll] = useState<boolean[]>(validParts.map((_, index) => index === 0));
 
   const getFlatMaterials = (part: ProductPart) => {
     return part.material_groups.flatMap((group) =>

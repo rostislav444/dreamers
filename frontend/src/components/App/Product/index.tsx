@@ -14,7 +14,7 @@ export const ProductComponent = ({product, materials}: ProductProps) => {
 
     return <Box>
         <Grid mb='2' gridTemplateColumns={mobile ? '1fr' : '3fr 1fr'}>
-            <GridItem>
+            <GridItem position={mobile ? 'static' : 'sticky'} top={mobile ? 'auto' : '20px'} alignSelf="start">
                 <ProductGallery mobile={mobile} product={product} selectedMaterials={selectedMaterials}/>
             </GridItem>
             <GridItem>

@@ -36,7 +36,7 @@ export const ProductsList = ({
     
     return (
         <Box mt={8}>
-            <Grid templateColumns='repeat(auto-fill, minmax(340px, 1fr))' gap={4}>
+            <Grid templateColumns='repeat(auto-fill, minmax(340px, 1fr))' gap={2}>
                 {
                     products.map((product) =>
                         <ProductCard key={product.id} product={product}/>

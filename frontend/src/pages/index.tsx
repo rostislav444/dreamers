@@ -16,6 +16,7 @@ export default function Home({ categories, products }: Props) {
       breadcrumbs={[]}
       description="Dreamers | Меблі, що надихають"
       title="Dreamers | Меблі, що надихають"
+      isHomePage={true}
     >
       <ResponsiveHero categories={categories} products={products} />
     </Layout>

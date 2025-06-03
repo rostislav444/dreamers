@@ -28,7 +28,7 @@ export const Header = () => {
                 alignItems='center'
                 gap='6'
                 templateColumns="auto 32px"
-                px={{base: 4, sm: 6, md: 8, lg: 12}}
+                px={{base: 1, sm: 2, md: 6, lg: 8}}
 
                 m='0 auto'
             >

@@ -65,7 +65,7 @@ export const Footer = () => {
       mt={12}
       width="100%"
     >
-      <Container as={Stack} maxW="container.full" py={10} px={12}>
+      <Container as={Stack} maxW="container.full" py={10} px={{base: 4, sm: 6, md: 8, lg: 10}}>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
           {/* Company info */}
           <Stack spacing={6}>

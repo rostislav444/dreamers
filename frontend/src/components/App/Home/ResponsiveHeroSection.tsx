@@ -52,16 +52,16 @@ const ResponsiveHero = ({ categories, products }: Props) => {
   return (
     <Box width="100%" maxWidth="100vw">
       {/* Main Container with spacing */}
-      <Container maxW="container.full" py={6} px={0}>
+      <Container maxW="container.xl" py={6} px={{ base: 1, sm: 1, md: 1 }}>
         {/* Hero Grid Layout */}
         <Grid
           templateColumns={{ base: "1fr", lg: "1fr 1fr" }}
           templateRows={{
-            base: "repeat(auto-fit, minmax(250px, 1fr))",
+            base: "auto",
             lg: "1fr",
           }}
-          gap={6}
-          mb={10}
+          gap={{ base: 4, md: 6 }}
+          mb={{ base: 8, md: 10 }}
         >
           {/* Left Side - Main featured product */}
           <MotionBox
@@ -73,7 +73,8 @@ const ResponsiveHero = ({ categories, products }: Props) => {
             borderRadius="xl"
             overflow="hidden"
             boxShadow="lg"
-            height="100%"
+            height={{ base: "300px", md: "400px", lg: "100%" }}
+            minHeight={{ lg: "500px" }}
           >
             {featuredProducts[0] && (
               <FeaturedProductCard
@@ -85,9 +86,9 @@ const ResponsiveHero = ({ categories, products }: Props) => {
 
           {/* Right Side - Grid of smaller items */}
           <Grid
-            templateRows={{ base: "auto auto", lg: "1fr 1fr" }}
-            templateColumns={{ base: "1fr 1fr", lg: "1fr 1fr" }}
-            gap={6}
+            templateRows={{ base: "auto auto", md: "auto auto", lg: "1fr 1fr" }}
+            templateColumns={{ base: "1fr", md: "1fr 1fr", lg: "1fr 1fr" }}
+            gap={{ base: 4, md: 6 }}
             gridColumn={{ base: "1", lg: "2" }}
             gridRow={{ base: "2", lg: "1" }}
           >
@@ -97,19 +98,19 @@ const ResponsiveHero = ({ categories, products }: Props) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               gridRow="1"
-              gridColumn="1"
+              gridColumn={{ base: "1", md: "1" }}
               borderRadius="xl"
               overflow="hidden"
               boxShadow="md"
               position="relative"
-              height="100%"
+              height={{ base: "200px", md: "250px", lg: "100%" }}
+              minHeight={{ lg: "240px" }}
             >
               {categories[0] && (
                 <Link href={`/catalogue/${categories[0].slug}`}>
                   <Box
                     position="relative"
                     height="100%"
-                    minHeight="250px"
                     transition="transform 0.3s ease"
                     _hover={{ transform: "scale(1.03)" }}
                   >
@@ -135,7 +136,7 @@ const ResponsiveHero = ({ categories, products }: Props) => {
                       p={4}
                       color="white"
                     >
-                      <Heading as="h3" fontSize="xl">
+                      <Heading as="h3" fontSize={{ base: "lg", md: "xl" }}>
                         {categories[0].name}
                       </Heading>
                     </Box>
@@ -146,8 +147,8 @@ const ResponsiveHero = ({ categories, products }: Props) => {
 
             {/* Top right - InfoBlock */}
             <Box
-              gridRow="1"
-              gridColumn="2"
+              gridRow={{ base: "2", md: "1" }}
+              gridColumn={{ base: "1", md: "2" }}
             >
               <InfoBlock {...infoBlocks[0]} />
             </Box>
@@ -157,13 +158,14 @@ const ResponsiveHero = ({ categories, products }: Props) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              gridRow="2"
-              gridColumn="1"
+              gridRow={{ base: "3", md: "2" }}
+              gridColumn={{ base: "1", md: "1" }}
               borderRadius="xl"
               overflow="hidden"
               boxShadow="md"
               position="relative"
-              height="100%"
+              height={{ base: "200px", md: "250px", lg: "100%" }}
+              minHeight={{ lg: "240px" }}
             >
               {featuredProducts[1] && (
                 <FeaturedProductCard product={featuredProducts[1]} />
@@ -175,13 +177,14 @@ const ResponsiveHero = ({ categories, products }: Props) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.4 }}
-              gridRow="2"
-              gridColumn="2"
+              gridRow={{ base: "4", md: "2" }}
+              gridColumn={{ base: "1", md: "2" }}
               borderRadius="xl"
               overflow="hidden"
               boxShadow="md"
               position="relative"
-              height="100%"
+              height={{ base: "200px", md: "250px", lg: "100%" }}
+              minHeight={{ lg: "240px" }}
             >
               {featuredProducts[2] && (
                 <FeaturedProductCard product={featuredProducts[2]} />
@@ -191,7 +194,7 @@ const ResponsiveHero = ({ categories, products }: Props) => {
         </Grid>
 
         {/* Design Collections Section */}
-        <Box mb={16} mt={16}>
+        <Box mb={{ base: 12, md: 16 }} mt={{ base: 12, md: 16 }}>
           <MotionBox
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -239,7 +242,7 @@ const ResponsiveHero = ({ categories, products }: Props) => {
           </MotionBox>
 
           {/* Collections Grid */}
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 6, md: 8 }}>
             {categories.slice(0, 3).map((category, idx) => (
               <MotionBox
                 key={category.name}
@@ -313,7 +316,7 @@ const ResponsiveHero = ({ categories, products }: Props) => {
         </Box>
 
         {/* New Arrivals Section */}
-        <Box mb={16}>
+        <Box mb={{ base: 12, md: 16 }}>
           <MotionBox
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -360,7 +363,7 @@ const ResponsiveHero = ({ categories, products }: Props) => {
           </MotionBox>
 
           {/* Products Grid */}
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={{ base: 6, md: 8 }}>
             {restProducts.map((product, idx) => (
               <MotionBox
                 key={product.id}
@@ -377,17 +380,17 @@ const ResponsiveHero = ({ categories, products }: Props) => {
       </Container>
 
       {/* Inspiration Block - Full width */}
-      <Box width="100%" overflow="hidden" mb={16}>
+      <Box width="100%" overflow="hidden" mb={{ base: 12, md: 16 }}>
         <InspirationBlock />
       </Box>
 
       {/* Craftsmanship Section */}
-      <Container maxW="container.full" mb={16} px={0}>
+      <Container maxW="container.xl" mb={{ base: 12, md: 16 }} px={{ base: 2, sm: 4, md: 6 }}>
         <SimpleGrid
           columns={{ base: 1, lg: 2 }}
-          spacing={10}
+          spacing={{ base: 6, md: 10 }}
           bg="brown.50"
-          p={8}
+          p={{ base: 6, md: 8 }}
           borderRadius="xl"
           boxShadow="md"
         >

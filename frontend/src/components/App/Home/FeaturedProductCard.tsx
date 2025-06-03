@@ -41,8 +41,8 @@ const FeaturedProductCard = ({
         <Box
           position="relative"
           width="100%"
-          height={isLarge ? "550px" : "100%"}
-          minHeight={isLarge ? "350px" : "250px"}
+          height={isLarge ? { base: "100%", lg: "550px" } : "100%"}
+          minHeight={isLarge ? { base: "300px", md: "350px" } : { base: "200px", md: "250px" }}
         >
           <CatalogueProductImages images={images} />
         </Box>
@@ -52,7 +52,7 @@ const FeaturedProductCard = ({
           left="0"
           width="100%"
           bg="linear-gradient(to top, rgba(143, 33, 23, 0.7), transparent)"
-          p={isLarge ? 6 : 4}
+          p={isLarge ? { base: 4, md: 6 } : 4}
           color="white"
         >
           {isLarge && (
